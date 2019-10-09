@@ -9,6 +9,10 @@ import org.sunbird.request.Request;
 
 import java.text.MessageFormat;
 
+/**
+ * this is a validator class for downloading certificate
+ * @author anmolgupta
+ */
 public class CertDownloadRequestValidator implements IRequestValidator {
 
     private Request request;

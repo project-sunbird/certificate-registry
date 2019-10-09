@@ -14,6 +14,11 @@ import org.sunbird.dto.SearchDTO;
 import java.util.Map;
 import java.util.concurrent.Future;
 
+
+/**
+ * this class will be used to add , retrive certificates from ES
+ * @author anmolgupta
+ */
 public class CertificateUtil {
     private static ElasticSearchService elasticSearchService= EsClientFactory.getInstance();
     static Logger logger=Logger.getLogger(CertificateUtil.class);

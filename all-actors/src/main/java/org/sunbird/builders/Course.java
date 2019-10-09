@@ -3,6 +3,11 @@ package org.sunbird.builders;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+
+/**
+ * this is a course class will be used to for a course object needs to be saved in ES.
+ * @author anmolgupta
+ */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Course {
 

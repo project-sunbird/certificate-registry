@@ -17,6 +17,7 @@ import java.util.Map;
 
 /**
  * This class contains method to validate certificate api request
+ * @author anmolgupta
  */
 public class CertGenerateValidator implements IRequestValidator{
 

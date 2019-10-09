@@ -25,6 +25,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Future;
 
+
+/**
+ * this is an implementaion class for the cert service , it will handel all the certificate related transactions
+ * @author anmolgupta
+ */
 public class CertsServiceImpl implements ICertService {
     static Logger logger = Logger.getLogger(CertsServiceImpl.class);
     private static ObjectMapper requestMapper = new ObjectMapper();

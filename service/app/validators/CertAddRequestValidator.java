@@ -14,6 +14,10 @@ import java.text.MessageFormat;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * this is a validator class for adding certificates
+ * @author anmolgupta
+ */
 public class CertAddRequestValidator implements IRequestValidator {
     static Logger logger=Logger.getLogger(CertAddRequestValidator.class);
     private Request request;
