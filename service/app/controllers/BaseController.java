@@ -32,9 +32,6 @@ import validators.IRequestValidator;
 public class BaseController extends Controller {
 
     protected static ObjectMapper mapper = new ObjectMapper();
-    protected static final String dummyResponse =
-            "{\"id\":\"api.200ok\",\"ver\":\"v1\",\"ts\":\"2019-01-17 16:53:26:286+0530\",\"params\":{\"resmsgid\":null,\"msgid\":\"8e27cbf5-e299-43b0-bca7-8347f7ejk5abcf\",\"err\":null,\"status\":\"success\",\"errmsg\":null},\"responseCode\":\"OK\",\"result\":{\"response\":{\"response\":\"SUCCESS\",\"errors\":[]}}}";
-
     /**
      * We injected HttpExecutionContext to decrease the response time of APIs.
      */
@@ -124,50 +121,7 @@ public class BaseController extends Controller {
 
     public CompletionStage<Result> handleRequest() {
         CompletableFuture<String> cf = new CompletableFuture<>();
-        cf.complete(dummyResponse);
-        return cf.thenApplyAsync(Results::ok);
-    }
-
-    /**
-     * This method is used specifically to handel Log Apis request this will set log levels and then
-     * return the CompletionStage of Result
-     *
-     * @return
-     */
-    public CompletionStage<Result> handleLogRequest() {
-//        startTrace("handleLogRequest");
-//        Response response = new Response();
-//        Request request = null;
-//        try {
-//            request = (Request) RequestMapper.mapRequest(request(), Request.class);
-//        } catch (Exception ex) {
-//            ProjectLogger.log(String.format("%s:%s:exception occurred in mapping request", this.getClass().getSimpleName(), "handleLogRequest"), LoggerEnum.ERROR.name());
-//            return RequestHandler.handleFailureResponse(ex, httpExecutionContext);
-//        }
-//
-//        if (LogValidator.isLogParamsPresent(request)) {
-//            if (LogValidator.isValidLogLevelPresent((String) request.get(JsonKey.LOG_LEVEL))) {
-//                ProjectLogger.setUserOrgServiceProjectLogger(
-//                        (String) request.get(JsonKey.LOG_LEVEL));
-//                response.put(JsonKey.ERROR, false);
-//                response.put(
-//                        JsonKey.MESSAGE,
-//                        "Log Level successfully set to " + request.get(JsonKey.LOG_LEVEL));
-//            } else {
-//                List<Enum> supportedLogLevelsValues = new ArrayList<>(EnumSet.allOf(LoggerEnum.class));
-//                response.put(JsonKey.ERROR, true);
-//                response.put(
-//                        JsonKey.MESSAGE,
-//                        "Valid Log Levels are " + Arrays.asList(supportedLogLevelsValues.toArray()));
-//            }
-//        } else {
-//            response.put(JsonKey.ERROR, true);
-//            response.put(
-//                    JsonKey.MESSAGE, "Missing Mandatory Request Param " + JsonKey.LOG_LEVEL);
-//        }
-
-        CompletableFuture<String> cf = new CompletableFuture<>();
-        cf.complete(dummyResponse);
+        cf.complete("helloOk");
         return cf.thenApplyAsync(Results::ok);
     }
 

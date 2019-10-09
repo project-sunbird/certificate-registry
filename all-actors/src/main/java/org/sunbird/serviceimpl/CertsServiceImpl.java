@@ -5,6 +5,7 @@ import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.http.HttpStatus;
 import org.apache.log4j.Logger;
 import org.sunbird.BaseException;
 import org.sunbird.CertVars;
@@ -27,11 +28,14 @@ import java.util.concurrent.Future;
 public class CertsServiceImpl implements ICertService {
     static Logger logger = Logger.getLogger(CertsServiceImpl.class);
     private static ObjectMapper requestMapper = new ObjectMapper();
+    static Map<String, String> headerMap = new HashMap<>();
+    static {
+        headerMap.put("Content-Type", "application/json");
+    }
 
     @Override
     public String add(Request request) throws BaseException {
-        Map<String, Object> certAddReqMap = new HashMap<>();
-        certAddReqMap = request.getRequest();
+        Map<String, Object> certAddReqMap = request.getRequest();
         assureUniqueCertId((String) certAddReqMap.get(JsonKeys.ID));
         processRecord(certAddReqMap);
         logger.info("CertsServiceImpl:add:record successfully processed with request:"+certAddReqMap);
@@ -128,15 +132,13 @@ public class CertsServiceImpl implements ICertService {
             logger.info("CertsServiceImpl:download:request body found:" + requestBody);
             String apiToCall = CertVars.getSERVICE_BASE_URL().concat(CertVars.getDOWNLOAD_URI());
             logger.info("CertsServiceImpl:download:complete url found:" + apiToCall);
-            Map<String, String> headerMap = new HashMap<>();
-            headerMap.put("Content-Type", "application/json");
             Future<HttpResponse<JsonNode>>responseFuture=CertificateUtil.makeAsyncPostCall(apiToCall,requestBody,headerMap);
             HttpResponse<JsonNode> jsonResponse = responseFuture.get();
-            if (jsonResponse != null && jsonResponse.getStatus() == 200) {
+            if (jsonResponse != null && jsonResponse.getStatus() == HttpStatus.SC_OK) {
                 String signedUrl=jsonResponse.getBody().getObject().getJSONObject(JsonKeys.RESULT).getString(JsonKeys.SIGNED_URL);
                 response.put(JsonKeys.SIGNED_URL,signedUrl);
             } else {
-                throw new BaseException(IResponseMessage.INVALID_REQUESTED_DATA, MessageFormat.format(IResponseMessage.INVALID_PROVIDED_URL,"2222"), ResponseCode.CLIENT_ERROR.getCode());
+                throw new BaseException(IResponseMessage.INVALID_REQUESTED_DATA, MessageFormat.format(IResponseMessage.INVALID_PROVIDED_URL,(String)request.getRequest().get(JsonKeys.PDF_URL)), ResponseCode.CLIENT_ERROR.getCode());
             }
 
         } catch (Exception e) {
@@ -156,8 +158,6 @@ public class CertsServiceImpl implements ICertService {
             logger.info("CertsServiceImpl:generate:request body found:" + requestBody);
             String apiToCall = CertVars.getSERVICE_BASE_URL().concat(CertVars.getGenerateUri());
             logger.info("CertsServiceImpl:generate:complete url found:" + apiToCall);
-            Map<String, String> headerMap = new HashMap<>();
-            headerMap.put("Content-Type", "application/json");
             Future<HttpResponse<JsonNode>>responseFuture=CertificateUtil.makeAsyncPostCall(apiToCall,requestBody,headerMap);
             HttpResponse<JsonNode> jsonResponse = responseFuture.get();
             if (jsonResponse != null && jsonResponse.getStatus() == 200) {

@@ -1,6 +1,5 @@
 # Sets up all environment vars.
 
 ################### CERTIFICATION-SERVICE configuration ###################################
-#export keyA=valA
-
+export cert_service_base_url={cert_service_base_url}
 ################### END - CERTIFICATION-SERVICE configuration #############################

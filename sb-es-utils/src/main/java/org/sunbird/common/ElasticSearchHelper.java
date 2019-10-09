@@ -51,8 +51,6 @@ public class ElasticSearchHelper {
   public static final String RAW_APPEND = ".raw";
   protected static Map<String, Boolean> indexMap = new HashMap<>();
   protected static Map<String, Boolean> typeMap = new HashMap<>();
-  protected static final String ES_CONFIG_FILE = "elasticsearch.conf";
-  private static Config config = ConfigUtil.getConfig(ES_CONFIG_FILE);
   public static final int WAIT_TIME = 5;
   public static Timeout timeout = new Timeout(WAIT_TIME, TimeUnit.SECONDS);
   public static final List<String> upsertResults =

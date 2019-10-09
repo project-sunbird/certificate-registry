@@ -9,10 +9,11 @@ import org.apache.log4j.Logger;
  */
 public class CertVars {
 
+    public static final String CERT_SERVICE_BASE_URL= "cert_service_base_url";
     private static Logger logger=Logger.getLogger(CertVars.class);
-    private  static String SERVICE_BASE_URL="http://localhost:9100";
-    private static String DOWNLOAD_URI= "/v1/user/certs/download";
-    private static String GENERATE_URI="/v1/certs/generate";
+    private  static final String SERVICE_BASE_URL=getPropsFromEnvs(CERT_SERVICE_BASE_URL);
+    private static final String DOWNLOAD_URI= "/v1/user/certs/download";
+    private static final String GENERATE_URI="/v1/certs/generate";
 
 
     public static String getGenerateUri() {
@@ -21,6 +22,10 @@ public class CertVars {
 
 
     public static String getSERVICE_BASE_URL() {
+        if(StringUtils.isBlank(SERVICE_BASE_URL)){
+            logger.error("CertVars:getPropsFromEnvs:no suitable host found for downloadUri");
+            System.exit(-1);
+        }
         return SERVICE_BASE_URL;
 
     }
@@ -32,10 +37,6 @@ public class CertVars {
 
     private static String getPropsFromEnvs(String props){
         String propValue=System.getenv(props);
-        if(StringUtils.isBlank(propValue)){
-            logger.error("CertVars:getPropsFromEnvs:no suitable env found for downloadUri");
-            System.exit(-1);
-        }
         return propValue;
     }
 
