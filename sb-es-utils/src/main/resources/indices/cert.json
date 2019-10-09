@@ -83,10 +83,7 @@
                 "course": {
                     "type": "object"
                 },
-                "certData": {
-                    "type": "object"
-                },
-                "rawData": {
+                "data": {
                     "type": "object"
                 },
                 "recipientName": {

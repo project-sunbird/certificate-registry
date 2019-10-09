@@ -15,7 +15,7 @@ public class Certificate {
     private String pdfUrl;
     private String jsonUrl;
     private String recipientName;
-    private Map<String, Object> certData;
+    private Map<String, Object> data;
     private Course course;
     private String createdBy;
     private String updatedBy;
@@ -29,7 +29,7 @@ public class Certificate {
         this.pdfUrl = certificateBuilder.pdfUrl;
         this.jsonUrl = certificateBuilder.jsonUrl;
         this.recipientName = certificateBuilder.recipientName;
-        this.certData = certificateBuilder.certData;
+        this.data = certificateBuilder.data;
         this.course = certificateBuilder.course;
         this.createdBy = certificateBuilder.createdBy;
         this.updatedBy = certificateBuilder.updatedBy;
@@ -58,8 +58,8 @@ public class Certificate {
     }
 
 
-    public Map<String, Object> getCertData() {
-        return certData;
+    public Map<String, Object> getData() {
+        return data;
     }
 
     public Course getCourse() {
@@ -85,7 +85,7 @@ public class Certificate {
                 ", pdfUrl='" + pdfUrl + '\'' +
                 ", jsonUrl='" + jsonUrl + '\'' +
                 ", recipientId='" + recipientName + '\'' +
-                ", certData=" + certData +
+                ", certData=" + data +
                 ", course=" + course +
                 ", createdBy='" + createdBy + '\'' +
                 ", updatedBy='" + updatedBy + '\'' +
@@ -101,7 +101,7 @@ public class Certificate {
         private String pdfUrl;
         private String jsonUrl;
         private String recipientName;
-        private Map<String, Object> certData;
+        private Map<String, Object> data;
         private Course course;
         private String createdBy;
         private String updatedBy;
@@ -109,6 +109,11 @@ public class Certificate {
         private String accessCode;
 
 
+
+        public CertificateBuilder setData(Map<String, Object> data) {
+            this.data = data;
+            return this;
+        }
         public CertificateBuilder setRecipientName(String recipientName) {
             this.recipientName = recipientName;
             return this;
@@ -135,13 +140,6 @@ public class Certificate {
             return this;
 
         }
-
-        public CertificateBuilder setCertData(Map<String, Object> certData) {
-            this.certData = certData;
-            return this;
-
-        }
-
         public CertificateBuilder setCourse(Course course) {
             this.course = course;
             return this;

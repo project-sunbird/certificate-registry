@@ -62,7 +62,7 @@ public class CertsServiceImpl implements ICertService {
     private Certificate getCertificate(Map<String, Object> certReqAddMap) {
         Certificate certificate = new Certificate.CertificateBuilder()
                 .setId((String) certReqAddMap.get(JsonKeys.ID))
-                .setCertData(getCertData(certReqAddMap))
+                .setData(getData(certReqAddMap))
                 .setPdfUrl((String)certReqAddMap.get(JsonKeys.PDF_URL))
                 .setRevoked(false)
                 .setAccessCode((String)certReqAddMap.get(JsonKeys.ACCESS_CODE))
@@ -87,7 +87,7 @@ public class CertsServiceImpl implements ICertService {
         return course;
     }
 
-    private Map<String, Object> getCertData(Map<String, Object> certAddRequestMap) {
+    private Map<String, Object> getData(Map<String, Object> certAddRequestMap) {
         return (Map) certAddRequestMap.get(JsonKeys.JSON_DATA);
     }
 
@@ -100,7 +100,7 @@ public class CertsServiceImpl implements ICertService {
         if (MapUtils.isNotEmpty(esCertData) && StringUtils.equalsIgnoreCase((String)esCertData.get(JsonKeys.ACCESS_CODE),accessCode)) {
             Certificate certificate=getCertObject(esCertData);
             Map<String,Object>responseMap=new HashMap<>();
-            responseMap.put(JsonKeys.JSON,certificate.getCertData());
+            responseMap.put(JsonKeys.JSON,certificate.getData());
             responseMap.put(JsonKeys.PDF,certificate.getPdfUrl());
             responseMap.put(JsonKeys.COURSE_ID,certificate.getCourse().getId());
             responseMap.put(JsonKeys.BATCH_ID,certificate.getCourse().getBatchId());
