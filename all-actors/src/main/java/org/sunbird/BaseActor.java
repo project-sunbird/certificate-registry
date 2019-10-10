@@ -25,9 +25,9 @@ public abstract class BaseActor extends UntypedAbstractActor {
             String operation = request.getOperation();
             logger.info("BaseActor:onReceive called for operation:" + operation);
             try {
-                logger.info(String.format("%s:%s:method started at %s",this.getClass().getSimpleName(),operation,System.currentTimeMillis()));
+                logger.info("BaseActor:onReceive:method started at"+System.currentTimeMillis());
                 onReceive(request);
-                logger.info(String.format("%s:%s:method ended at %s",this.getClass().getSimpleName(),operation,System.currentTimeMillis()));
+                logger.info("BaseActor:onReceive:method ended at"+System.currentTimeMillis());
             } catch (Exception e) {
                 onReceiveException(operation, e);
             }
