@@ -1,0 +1,43 @@
+package org.sunbird;
+
+import org.apache.commons.lang3.StringUtils;
+import org.apache.log4j.Logger;
+
+/**
+ * this class will help in getting the env values for calling the cert service
+ * @author anmolgupta
+ */
+public class CertVars {
+
+    public static final String CERT_SERVICE_BASE_URL= "cert_service_base_url";
+    private static Logger logger=Logger.getLogger(CertVars.class);
+    private  static final String SERVICE_BASE_URL=getPropsFromEnvs(CERT_SERVICE_BASE_URL);
+    private static final String DOWNLOAD_URI= "/v1/user/certs/download";
+    private static final String GENERATE_URI="/v1/certs/generate";
+
+
+    public static String getGenerateUri() {
+        return GENERATE_URI;
+    }
+
+
+    public static String getSERVICE_BASE_URL() {
+        if(StringUtils.isBlank(SERVICE_BASE_URL)){
+            logger.error("CertVars:getPropsFromEnvs:no suitable host found for downloadUri");
+            System.exit(-1);
+        }
+        return SERVICE_BASE_URL;
+
+    }
+
+    public static String getDOWNLOAD_URI() {
+        return DOWNLOAD_URI;
+    }
+
+
+    private static String getPropsFromEnvs(String props){
+        String propValue=System.getenv(props);
+        return propValue;
+    }
+
+}

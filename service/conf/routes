@@ -1,0 +1,17 @@
+# Routes
+# This file defines all application routes (Higher priority routes first)
+# ~~~~
+
+#Health check
+GET  /health                                  @controllers.health.HealthController.getHealth()
+
+
+# Logs Management APIs
+POST  /certs/v1/add                          @controllers.CertificateController.add()
+POST  /certs/v1/validate                     @controllers.CertificateController.validate()
+POST  /certs/v1/download                     @controllers.CertificateController.download()
+POST  /certs/v1/generate                     @controllers.CertificateController.generate()
+
+
+
+
