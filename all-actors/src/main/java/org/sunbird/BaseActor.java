@@ -86,21 +86,4 @@ public abstract class BaseActor extends UntypedAbstractActor {
         return System.currentTimeMillis();
     }
 
-    /**
-     * This method we used to print the logs of starting time of methods
-     *
-     * @param tag
-     */
-    public void startTrace(String tag) {
-        logger.info(String.format("%s:%s:started at %s", this.getClass().getSimpleName(), tag, getTimeStamp()));
-    }
-
-    /**
-     * This method we used to print the logs of ending time of methods
-     *
-     * @param tag
-     */
-    public void endTrace(String tag) {
-        logger.info(String.format("%s:%s:ended at %s", this.getClass().getSimpleName(), tag, getTimeStamp()));
-    }
 }

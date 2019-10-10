@@ -2,7 +2,6 @@ package controllers;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
-import java.util.function.Function;
 import javax.inject.Inject;
 
 import akka.actor.ActorRef;
@@ -17,7 +16,6 @@ import play.mvc.Result;
 import play.mvc.Results;
 import utils.JsonKey;
 import utils.RequestMapper;
-import utils.RequestValidatorFunction;
 import validators.IRequestValidator;
 
 /**
