@@ -8,6 +8,6 @@ ADD ./service-1.0.0-SNAPSHOT-dist.zip /home/sunbird/
 RUN unzip /home/sunbird/service-1.0.0-SNAPSHOT-dist.zip -d /home/sunbird/
 RUN chown -R sunbird:sunbird /home/sunbird
 USER sunbird
-EXPOSE 9014
+EXPOSE 9000
 WORKDIR /home/sunbird/
 CMD java  -cp '/home/sunbird/service-1.0.0-SNAPSHOT/lib/*' play.core.server.ProdServerStart  /home/sunbird/service-1.0.0-SNAPSHOT
