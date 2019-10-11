@@ -6,7 +6,7 @@
 	<version>1.0-SNAPSHOT</version>
 	<name>sb-es-utils</name>
 	<parent>
-		<artifactId>ext-cert-service</artifactId>
+		<artifactId>certification-service</artifactId>
 		<groupId>org.sunbird</groupId>
 		<version>1.0.0-SNAPSHOT</version>
 	</parent>
