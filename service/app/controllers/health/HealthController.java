@@ -24,4 +24,13 @@ public class HealthController extends BaseController {
     CompletionStage<Result> response = handleRequest();
     return response;
   }
+  /**
+   * This action method is responsible for checking Health.
+   *
+   * @return a CompletableFuture of success response
+   */
+  public CompletionStage<Result> getServiceHealth(String service) {
+    CompletionStage<Result> response = handleRequest();
+    return response;
+  }
 }

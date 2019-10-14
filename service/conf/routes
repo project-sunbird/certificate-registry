@@ -4,7 +4,7 @@
 
 #Health check
 GET  /health                                  @controllers.health.HealthController.getHealth()
-GET  /service/health                           @controllers.health.HealthController.getHealth()
+GET  /:service/health                           @controllers.health.HealthController.getServiceHealth(service:String)
 
 
 # Logs Management APIs
