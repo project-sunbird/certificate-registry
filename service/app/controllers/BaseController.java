@@ -5,11 +5,13 @@ import java.util.concurrent.CompletionStage;
 import javax.inject.Inject;
 
 import akka.actor.ActorRef;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.sunbird.Application;
 import org.sunbird.BaseException;
 import org.sunbird.message.Localizer;
 import org.sunbird.request.Request;
+import play.libs.Json;
 import play.libs.concurrent.HttpExecutionContext;
 import play.mvc.Controller;
 import play.mvc.Result;
@@ -118,10 +120,10 @@ public class BaseController extends Controller {
 
 
     public CompletionStage<Result> handleRequest() {
-        CompletableFuture<String> cf = new CompletableFuture<>();
+        CompletableFuture<JsonNode> cf = new CompletableFuture<>();
          String dummyResponse =
                 "{\"id\":\"api.service.health\",\"ver\":\"v1\",\"ts\":\"2019-01-17 16:53:26:286+0530\",\"params\":{\"resmsgid\":null,\"msgid\":\"8e27cbf5-e299-43b0-bca7-8347f7ejk5abcf\",\"err\":null,\"status\":\"success\",\"errmsg\":null},\"responseCode\":\"OK\",\"result\":{\"response\":{\"response\":\"SUCCESS\",\"errors\":[]}}}";
-        cf.complete(dummyResponse);
+        cf.complete(Json.toJson(dummyResponse));
         return cf.thenApplyAsync(Results::ok);
     }
 
