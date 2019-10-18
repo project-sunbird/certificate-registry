@@ -15,7 +15,7 @@ public class JsonKeys {
     public static final String ACCESS_CODE = "accessCode";
     public static final String ID = "id";
     public static final String USER_ID = "userId";
-    public static final String CERT = "cert";
+    public static final String CERT = "certreg";
     public static final String REQUEST = "request";
     public static final String COURSE = "course";
     public static final String CREATED_AT = "createdAt";
@@ -51,7 +51,15 @@ public class JsonKeys {
     public static final String TYPE = "type";
     public static final String ACCOUNT = "account";
     public static final String key = "key";
-
+    public static final String USER_NAME="userName";
+    public static final String RECIPIENT_TYPE="recipientType";
+    public static final String REASON="reason";
+    public static final String COURSE_COMPLETION="course-completion";
+    public static final String COURSE_PERFORMANCE="course-performance";
+    public static final String ASSESSMENT="assessment";
+    public static final String RELATED="related";
+    public static final String INDIVIDUAL="individual";
+    public static final String ENTITY="entity";
 
 
 

@@ -21,8 +21,9 @@ import java.util.Map;
 public class CertAddRequestValidator implements IRequestValidator {
     static Logger logger=Logger.getLogger(CertAddRequestValidator.class);
     private Request request;
-    static List<String> mandatoryParamsList = Lists.newArrayList(JsonKeys.ID, JsonKeys.ACCESS_CODE, JsonKeys.PDF_URL, JsonKeys.USER_ID);
-
+    static List<String> mandatoryParamsList = Lists.newArrayList(JsonKeys.ID, JsonKeys.ACCESS_CODE, JsonKeys.PDF_URL, JsonKeys.USER_ID,JsonKeys.RECIPIENT_TYPE);
+    static List<String>allowedRelatedTypes=Lists.newArrayList(JsonKeys.COURSE_COMPLETION, JsonKeys.ASSESSMENT,JsonKeys.COURSE_PERFORMANCE);
+    static List<String> allowedRecipientsType=Lists.newArrayList(JsonKeys.INDIVIDUAL,JsonKeys.ENTITY);
     public CertAddRequestValidator() {
     }
 
@@ -32,6 +33,10 @@ public class CertAddRequestValidator implements IRequestValidator {
         logger.info("CertAddRequestValidator:validate:started validating the request with request id "+request.getRequest());
         validateMandatoryParams();
         validateMandatoryJsonData();
+        validateRecipientType();
+        if(request.getRequest().containsKey(JsonKeys.RELATED)){
+            validateRelatedObject();
+        }
         logger.info("CertAddRequestValidator:validateMandatoryParams:correct request provided");
     }
 
@@ -73,6 +78,29 @@ public class CertAddRequestValidator implements IRequestValidator {
         if (StringUtils.isBlank(value)) {
             logger.error("CertAddRequestValidator:validatePresence:incorrect request provided");
             throw new BaseException(IResponseMessage.INVALID_REQUESTED_DATA, MessageFormat.format(IResponseMessage.EMPTY_MANDATORY_PARAM,key), ResponseCode.CLIENT_ERROR.getCode());
+        }
+    }
+
+
+    private void validateRelatedObject() throws BaseException {
+        if(!(request.getRequest().get(JsonKeys.RELATED) instanceof Map)){
+            throw new BaseException(IResponseMessage.INVALID_REQUESTED_DATA, MessageFormat.format(IResponseMessage.DATA_TYPE_ERROR,JsonKeys.RELATED,"map"), ResponseCode.CLIENT_ERROR.getCode());
+        }
+        Map<String,Object>relatedMap=(Map)request.getRequest().get(JsonKeys.RELATED);
+        if(!relatedMap.containsKey(JsonKeys.TYPE)){
+            throw new BaseException(IResponseMessage.INVALID_REQUESTED_DATA, MessageFormat.format(IResponseMessage.MISSING_MANADATORY_PARAMS, JsonKeys.TYPE.concat(" inside related map")), ResponseCode.CLIENT_ERROR.getCode());
+        }
+        String relatedType=(String)relatedMap.get(JsonKeys.TYPE);
+        if(!allowedRelatedTypes.contains(relatedType)){
+            throw new BaseException(IResponseMessage.INVALID_REQUESTED_DATA, MessageFormat.format(IResponseMessage.INVALID_RELATED_TYPE,relatedType,allowedRelatedTypes), ResponseCode.CLIENT_ERROR.getCode());
+        }
+    }
+
+    private void validateRecipientType() throws BaseException {
+
+        String recType=(String)request.getRequest().get(JsonKeys.RECIPIENT_TYPE);
+        if(!allowedRecipientsType.contains(recType)){
+            throw new BaseException(IResponseMessage.INVALID_REQUESTED_DATA, MessageFormat.format(IResponseMessage.INVALID_RECIPIENT_TYPE,recType,allowedRecipientsType), ResponseCode.CLIENT_ERROR.getCode());
         }
     }
 }

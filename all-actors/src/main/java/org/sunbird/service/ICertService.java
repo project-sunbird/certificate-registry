@@ -19,6 +19,4 @@ public interface ICertService{
     Response download(Request request) throws BaseException;
 
     Response generate(Request request) throws BaseException;
-
-
 }
