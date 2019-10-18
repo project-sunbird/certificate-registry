@@ -15,7 +15,7 @@ public class JsonKeys {
     public static final String ACCESS_CODE = "accessCode";
     public static final String ID = "id";
     public static final String USER_ID = "userId";
-    public static final String CERT = "cert";
+    public static final String CERT = "certreg";
     public static final String REQUEST = "request";
     public static final String COURSE = "course";
     public static final String CREATED_AT = "createdAt";
