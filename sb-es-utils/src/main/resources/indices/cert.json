@@ -80,27 +80,14 @@
                     "search_analyzer": "cs_search_analyzer",
                     "fielddata": true
                 },
-                "course": {
+                "related": {
                     "type": "object"
                 },
                 "data": {
                     "type": "object"
                 },
-                "recipientName": {
-                    "type": "text",
-                    "fields": {
-                        "raw": {
-                            "type": "text",
-                            "analyzer": "keylower",
-                            "fielddata": true
-                        }
-                    },
-                    "copy_to": [
-                        "all_fields"
-                    ],
-                    "analyzer": "cs_index_analyzer",
-                    "search_analyzer": "cs_search_analyzer",
-                    "fielddata": true
+                "recipient": {
+                    "type": "object"
                 },
                 "createdAt": {
                     "type": "date",
@@ -189,7 +176,24 @@
                             "type": "boolean"
                         }
                     }
+                },
+                "reason": {
+                    "type": "text",
+                    "fields": {
+                        "raw": {
+                            "type": "text",
+                            "analyzer": "keylower",
+                            "fielddata": true
+                        }
+                    },
+                    "copy_to": [
+                        "all_fields"
+                    ],
+                    "analyzer": "cs_index_analyzer",
+                    "search_analyzer": "cs_search_analyzer",
+                    "fielddata": true
                 }
-            }        }
+            }
+        }
     }
 }

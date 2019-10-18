@@ -14,37 +14,38 @@ public class Certificate {
     private String id;
     private String pdfUrl;
     private String jsonUrl;
-    private String recipientName;
+    private Recipient recipient;
     private Map<String, Object> data;
-    private Course course;
+    private Map<String, Object> related;
     private String createdBy;
     private String updatedBy;
     private boolean isRevoked;
+    private String reason;
     private String accessCode;
-
     public Certificate(){}
 
-    private Certificate(CertificateBuilder certificateBuilder) {
-        this.id = certificateBuilder.id;
-        this.pdfUrl = certificateBuilder.pdfUrl;
-        this.jsonUrl = certificateBuilder.jsonUrl;
-        this.recipientName = certificateBuilder.recipientName;
-        this.data = certificateBuilder.data;
-        this.course = certificateBuilder.course;
-        this.createdBy = certificateBuilder.createdBy;
-        this.updatedBy = certificateBuilder.updatedBy;
-        this.isRevoked = certificateBuilder.isRevoked;
-        this.accessCode=certificateBuilder.accessCode;
+    private Certificate(Builder builder) {
+        this.id = builder.id;
+        this.pdfUrl = builder.pdfUrl;
+        this.jsonUrl = builder.jsonUrl;
+        this.recipient = builder.recipient;
+        this.data = builder.data;
+        this.related = builder.related;
+        this.createdBy = builder.createdBy;
+        this.updatedBy = builder.updatedBy;
+        this.isRevoked = builder.isRevoked;
+        this.accessCode= builder.accessCode;
+        this.reason=builder.reason;
     }
 
     public String getAccessCode() {
         return accessCode;
     }
 
-    public String getRecipientName() {
-        return recipientName;
+    public Recipient getRecipient() {
+        return recipient;
     }
-
+    public String getReason() { return reason;}
     public String getId() {
         return id;
     }
@@ -62,8 +63,8 @@ public class Certificate {
         return data;
     }
 
-    public Course getCourse() {
-        return course;
+    public Map<String, Object> getRelated() {
+        return related;
     }
 
     public String getCreatedBy() {
@@ -84,82 +85,90 @@ public class Certificate {
                 "id='" + id + '\'' +
                 ", pdfUrl='" + pdfUrl + '\'' +
                 ", jsonUrl='" + jsonUrl + '\'' +
-                ", recipientId='" + recipientName + '\'' +
-                ", certData=" + data +
-                ", course=" + course +
+                ", recipient=" + recipient +
+                ", data=" + data +
+                ", related=" + related +
                 ", createdBy='" + createdBy + '\'' +
                 ", updatedBy='" + updatedBy + '\'' +
                 ", isRevoked=" + isRevoked +
+                ", reason='" + reason + '\'' +
                 ", accessCode='" + accessCode + '\'' +
                 '}';
     }
 
-    public static class CertificateBuilder{
+    public static class Builder {
 
 
         private String id;
         private String pdfUrl;
         private String jsonUrl;
-        private String recipientName;
+        private Recipient recipient;
         private Map<String, Object> data;
-        private Course course;
+        private Map<String, Object> related;
         private String createdBy;
         private String updatedBy;
         private boolean isRevoked;
         private String accessCode;
+        private String reason;
 
 
+        public Builder setReason(String reason) {
+            this.reason = reason;
+            return this;
+        }
 
-        public CertificateBuilder setData(Map<String, Object> data) {
+        public Builder setData(Map<String, Object> data) {
             this.data = data;
             return this;
         }
-        public CertificateBuilder setRecipientName(String recipientName) {
-            this.recipientName = recipientName;
+
+        public Builder setRecipient(Recipient recipient) {
+            this.recipient = recipient;
             return this;
         }
 
-        public CertificateBuilder setAccessCode(String accessCode) {
+
+        public Builder setAccessCode(String accessCode) {
             this.accessCode = accessCode;
             return this;
         }
 
-        public CertificateBuilder setId(String id) {
+        public Builder setId(String id) {
             this.id = id;
             return this;
         }
 
-        public CertificateBuilder setPdfUrl(String pdfUrl) {
+        public Builder setPdfUrl(String pdfUrl) {
             this.pdfUrl = pdfUrl;
             return this;
 
         }
 
-        public CertificateBuilder setJsonUrl(String jsonUrl) {
+        public Builder setJsonUrl(String jsonUrl) {
             this.jsonUrl = jsonUrl;
             return this;
 
         }
-        public CertificateBuilder setCourse(Course course) {
-            this.course = course;
+        public Builder setRelated(Map<String, Object> related) {
+            this.related = related;
             return this;
 
         }
 
-        public CertificateBuilder setCreatedBy(String createdBy) {
+        public Builder setCreatedBy(String createdBy) {
             this.createdBy = createdBy;
             return this;
 
         }
 
-        public CertificateBuilder setUpdatedBy(String updatedBy) {
+        public Builder setUpdatedBy(String updatedBy) {
             this.updatedBy = updatedBy;
             return this;
 
         }
 
 
-        public CertificateBuilder setRevoked(boolean revoked) {
+        public Builder setRevoked(boolean revoked) {
             isRevoked = revoked;
             return this;
 

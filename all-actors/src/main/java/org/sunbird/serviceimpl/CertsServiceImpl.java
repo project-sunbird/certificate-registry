@@ -11,7 +11,7 @@ import org.sunbird.BaseException;
 import org.sunbird.CertVars;
 import org.sunbird.JsonKeys;
 import org.sunbird.builders.Certificate;
-import org.sunbird.builders.Course;
+import org.sunbird.builders.Recipient;
 import org.sunbird.message.IResponseMessage;
 import org.sunbird.message.ResponseCode;
 import org.sunbird.request.Request;
@@ -65,31 +65,27 @@ public class CertsServiceImpl implements ICertService {
         CertificateUtil.insertRecord(recordMap);
     }
     private Certificate getCertificate(Map<String, Object> certReqAddMap) {
-        Certificate certificate = new Certificate.CertificateBuilder()
+        Certificate certificate = new Certificate.Builder()
                 .setId((String) certReqAddMap.get(JsonKeys.ID))
                 .setData(getData(certReqAddMap))
                 .setPdfUrl((String)certReqAddMap.get(JsonKeys.PDF_URL))
                 .setRevoked(false)
                 .setAccessCode((String)certReqAddMap.get(JsonKeys.ACCESS_CODE))
                 .setJsonUrl((String)certReqAddMap.get(JsonKeys.JSON_URL))
-                .setRecipientName((String)certReqAddMap.get(JsonKeys.USER_ID))
-                .setCourse(getCompositeCourseObject(certReqAddMap))
+                .setRecipient(getCompositeReciepientObject(certReqAddMap))
+                .setRelated((Map)certReqAddMap.get(JsonKeys.RELATED))
+                .setReason((String)certReqAddMap.get(JsonKeys.REASON))
                 .build();
         logger.info("CertsServiceImpl:getCertificate:certificate object formed: "+certificate);
         return certificate;
-
     }
-
-    private Course getCompositeCourseObject(Map<String, Object> certAddRequestMap){
-        Course course= new Course.CourseBuilder()
-                .setBatchId((String)certAddRequestMap.get(JsonKeys.BATCH_ID))
-                .setId((String)certAddRequestMap.get(JsonKeys.COURSE_ID))
-                .setUserId((String)certAddRequestMap.get(JsonKeys.USER_ID))
-                .setCompletionUrl((String)certAddRequestMap.get(JsonKeys.COMPLETION_URL))
-                .setIntroUrl((String)certAddRequestMap.get(JsonKeys.INTRO_URL))
+    private Recipient getCompositeReciepientObject(Map<String, Object> certAddRequestMap) {
+        Recipient recipient = new Recipient.Builder()
+                .setName((String) certAddRequestMap.get(JsonKeys.RECIPIENT_NAME))
+                .setId((String) certAddRequestMap.get(JsonKeys.USER_ID))
+                .setType((String) certAddRequestMap.get(JsonKeys.RECIPIENT_TYPE))
                 .build();
-        logger.info("CertsServiceImpl:getCompositeCourseObject:certificate object formed: "+course);
-        return course;
+    return recipient;
     }
 
     private Map<String, Object> getData(Map<String, Object> certAddRequestMap) {
@@ -107,8 +103,7 @@ public class CertsServiceImpl implements ICertService {
             Map<String,Object>responseMap=new HashMap<>();
             responseMap.put(JsonKeys.JSON,certificate.getData());
             responseMap.put(JsonKeys.PDF,certificate.getPdfUrl());
-            responseMap.put(JsonKeys.COURSE_ID,certificate.getCourse().getId());
-            responseMap.put(JsonKeys.BATCH_ID,certificate.getCourse().getBatchId());
+            responseMap.put(JsonKeys.RELATED,certificate.getRelated());
             Response response=new Response();
             response.put(JsonKeys.RESPONSE,responseMap);
             return response;
