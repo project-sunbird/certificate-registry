@@ -41,6 +41,7 @@ public class ConnectionManager {
       String cluster = System.getenv(EsJsonKey.SUNBIRD_ES_CLUSTER);
       String hostName = System.getenv(EsJsonKey.SUNBIRD_ES_IP);
       String port = System.getenv(EsJsonKey.SUNBIRD_ES_PORT);
+      logger.info("ConnectionManager:initialiseRestClientConnection: GOT HOSTNAME FROM ENVS:"+hostName+":port from envs:"+port+"clustername from env:"+cluster);
       if (StringUtils.isBlank(hostName) || StringUtils.isBlank(port)) {
         return false;
       }
