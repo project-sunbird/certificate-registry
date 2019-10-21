@@ -40,4 +40,13 @@ public class CertificateController extends BaseController {
         IRequestValidator requestValidator=new CertDownloadRequestValidator();
         return handleRequest(request(),requestValidator, JsonKeys.CERT_DOWNLOAD);
     }
+    /**
+     * this action method will be called for verify certificate
+     * @return CompletionStage of Result
+     */
+    public CompletionStage<Result> verify()
+    {
+        IRequestValidator requestValidator=new CertVerifyRequestValidator();
+        return handleRequest(request(),requestValidator, JsonKeys.CERT_VERIFY);
+    }
 }

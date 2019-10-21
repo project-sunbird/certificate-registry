@@ -14,7 +14,7 @@ public class CertVars {
     private  static final String SERVICE_BASE_URL=getPropsFromEnvs(CERT_SERVICE_BASE_URL);
     private static final String DOWNLOAD_URI= "/v1/user/certs/download";
     private static final String GENERATE_URI="/v1/certs/generate";
-    public static final String VERIFY_URI="/v1/certs/verify";
+    private static final String VERIFY_URI="/v1/certs/verify";
 
 
     public static String getVerifyUri() { return VERIFY_URI; }
@@ -32,6 +32,7 @@ public class CertVars {
     public static String getDOWNLOAD_URI() {
         return DOWNLOAD_URI;
     }
+
     private static String getPropsFromEnvs(String props){
         String propValue=System.getenv(props);
         return propValue;
