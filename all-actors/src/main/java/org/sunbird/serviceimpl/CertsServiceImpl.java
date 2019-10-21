@@ -82,7 +82,7 @@ public class CertsServiceImpl implements ICertService {
     private Recipient getCompositeReciepientObject(Map<String, Object> certAddRequestMap) {
         Recipient recipient = new Recipient.Builder()
                 .setName((String) certAddRequestMap.get(JsonKeys.RECIPIENT_NAME))
-                .setId((String) certAddRequestMap.get(JsonKeys.USER_ID))
+                .setId((String) certAddRequestMap.get(JsonKeys.RECIPIENT_ID))
                 .setType((String) certAddRequestMap.get(JsonKeys.RECIPIENT_TYPE))
                 .build();
     return recipient;
