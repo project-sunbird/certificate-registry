@@ -61,7 +61,7 @@ public class CertsServiceImpl implements ICertService {
     private void processRecord(Map<String, Object> certReqAddMap){
         Certificate certificate=getCertificate(certReqAddMap);
         Map<String,Object>recordMap= requestMapper.convertValue(certificate,Map.class);
-        recordMap.put(JsonKeys.CREATED_AT,CertificateUtil.getDateFormatter().format(new Date()));
+        recordMap.put(JsonKeys.CREATED_AT,System.currentTimeMillis());
         recordMap.put(JsonKeys.UPDATED_AT,null);
         CertificateUtil.insertRecord(recordMap);
     }
