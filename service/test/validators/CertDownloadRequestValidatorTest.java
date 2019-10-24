@@ -39,9 +39,9 @@ public class CertDownloadRequestValidatorTest {
         requestValidator.validate(request);
     }
 
-    @Test
+    @Test(expected = Test.None.class)
     public void testValidateWhenMandatoryParamIsPresent() throws BaseException {
-        reqMap.put(JsonKeys.PDF_URL,"/PDFuRL");
+        reqMap.put(JsonKeys.PDF_URL,"/pdf_uRL");
         request.setRequest(reqMap);
         requestValidator.validate(request);
 
