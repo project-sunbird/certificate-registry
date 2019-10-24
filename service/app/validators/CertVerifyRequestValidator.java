@@ -28,7 +28,7 @@ public class CertVerifyRequestValidator implements IRequestValidator {
     }
 
 
-    private void validateData() throws BaseException {
+    private void validateData(){
         Map<String, Object> dataMap = (Map) request.getRequest().get(JsonKeys.DATA);
         if (!(request.getRequest().get(JsonKeys.DATA) instanceof Map)) {
             error=true;
