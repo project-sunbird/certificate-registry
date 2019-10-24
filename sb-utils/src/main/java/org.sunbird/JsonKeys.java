@@ -56,6 +56,7 @@ public class JsonKeys {
     public static final String REASON="reason";
     public static final String COURSE_COMPLETION="course-completion";
     public static final String COURSE_PERFORMANCE="course-performance";
+    public static final String OFFLINE_COURSE="offline-course";
     public static final String ASSESSMENT="assessment";
     public static final String RELATED="related";
     public static final String INDIVIDUAL="individual";
