@@ -61,6 +61,8 @@ public class JsonKeys {
     public static final String RELATED="related";
     public static final String INDIVIDUAL="individual";
     public static final String ENTITY="entity";
+    public static final String CERT_VERIFY="verify";
+    public static final String MESSAGE="message";
     public static final String RECIPIENT_ID="recipientId";
 
 

@@ -9,7 +9,8 @@ public enum ActorOperations {
     ADD("add"),
     VALIDATE("validate"),
     DOWNLOAD("download"),
-    GENERATE("generate");
+    GENERATE("generate"),
+    VERIFY("verify");
 
     private String operation;
 

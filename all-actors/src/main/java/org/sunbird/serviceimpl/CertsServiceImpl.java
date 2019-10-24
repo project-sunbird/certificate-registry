@@ -20,6 +20,7 @@ import org.sunbird.service.ICertService;
 import org.sunbird.utilities.CertificateUtil;
 
 import java.text.MessageFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -160,7 +161,7 @@ public class CertsServiceImpl implements ICertService {
             logger.info("CertsServiceImpl:generate:complete url found:" + apiToCall);
             Future<HttpResponse<JsonNode>>responseFuture=CertificateUtil.makeAsyncPostCall(apiToCall,requestBody,headerMap);
             HttpResponse<JsonNode> jsonResponse = responseFuture.get();
-            if (jsonResponse != null && jsonResponse.getStatus() == 200) {
+            if (jsonResponse != null && jsonResponse.getStatus() == HttpStatus.SC_OK) {
                 String stringifyResponse=jsonResponse.getBody().getObject().getJSONObject(JsonKeys.RESULT).get(JsonKeys.RESPONSE).toString();
                 List<Map<String,Object>> apiRespList=requestMapper.readValue(stringifyResponse,List.class);
                 response.put(JsonKeys.RESPONSE,apiRespList);
@@ -173,5 +174,50 @@ public class CertsServiceImpl implements ICertService {
             throw new BaseException(IResponseMessage.INTERNAL_ERROR, IResponseMessage.INTERNAL_ERROR, ResponseCode.SERVER_ERROR.getCode());
         }
         return response;
+    }
+
+    @Override
+    public Response verify(Request request) throws BaseException {
+        Response response = new Response();
+        try {
+            Map<String, Object> certVerifyReqMap = new HashMap<>();
+            certVerifyReqMap.put(JsonKeys.REQUEST,composeCertVerifyRequest(request));
+            String requestBody = requestMapper.writeValueAsString(certVerifyReqMap);
+            logger.info("CertsServiceImpl:verify:request body prepared:" + requestBody);
+            String apiToCall = CertVars.getSERVICE_BASE_URL().concat(CertVars.getVerifyUri());
+            logger.info("CertsServiceImpl:verify:complete url prepared:" + apiToCall);
+            Future<HttpResponse<JsonNode>>responseFuture=CertificateUtil.makeAsyncPostCall(apiToCall,requestBody,headerMap);
+            HttpResponse<JsonNode> jsonResponse = responseFuture.get();
+            if (jsonResponse != null && jsonResponse.getStatus() == HttpStatus.SC_OK) {
+                String stringifyResponse=jsonResponse.getBody().getObject().getJSONObject(JsonKeys.RESULT).get(JsonKeys.RESPONSE).toString();
+                Map<String,Object> apiResp=requestMapper.readValue(stringifyResponse,Map.class);
+                response.put(JsonKeys.RESPONSE,apiResp);
+            }
+            else if(jsonResponse!=null && jsonResponse.getStatus() == HttpStatus.SC_BAD_REQUEST){
+                String stringifyResponse=jsonResponse.getBody().getObject().getJSONObject(JsonKeys.RESULT).get(JsonKeys.MESSAGE).toString();
+                throw new BaseException(IResponseMessage.INVALID_REQUESTED_DATA,stringifyResponse, ResponseCode.CLIENT_ERROR.getCode());
+            }
+            else {
+                throw new BaseException(IResponseMessage.INVALID_REQUESTED_DATA,IResponseMessage.INVALID_REQUESTED_DATA, ResponseCode.CLIENT_ERROR.getCode());
+            }
+
+        } catch (Exception e) {
+            logger.error("CertsServiceImpl:verify:exception occurred:" + e);
+            throw new BaseException(IResponseMessage.INTERNAL_ERROR, e.getMessage(), ResponseCode.SERVER_ERROR.getCode());
+        }
+        return response;
+    }
+
+    private Map<String,Object> composeCertVerifyRequest(Request request){
+        Map<String,Object>certificate=new HashMap<>();
+        Map<String,Object>certVerifyMap=new HashMap<>();
+        if(MapUtils.isNotEmpty((Map)request.getRequest().get(JsonKeys.DATA))) {
+            certificate.put(JsonKeys.DATA, request.getRequest().get(JsonKeys.DATA));
+        }
+        if(StringUtils.isNotBlank((String)request.getRequest().get(JsonKeys.ID))) {
+            certificate.put(JsonKeys.ID, request.getRequest().get(JsonKeys.ID));
+        }
+        certVerifyMap.put(JsonKeys.CERTIFICATE,certificate);
+        return certVerifyMap;
     }
 }

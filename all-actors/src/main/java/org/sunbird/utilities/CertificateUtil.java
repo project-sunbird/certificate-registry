@@ -11,6 +11,7 @@ import org.sunbird.common.factory.EsClientFactory;
 import org.sunbird.common.inf.ElasticSearchService;
 import org.sunbird.dto.SearchDTO;
 
+import java.text.SimpleDateFormat;
 import java.util.Map;
 import java.util.concurrent.Future;
 
@@ -62,4 +63,10 @@ public class CertificateUtil {
                     .asJsonAsync();
             return jsonResponse;
         }
+
+    public static SimpleDateFormat getDateFormatter() {
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss:SSSZ");
+        simpleDateFormat.setLenient(false);
+        return simpleDateFormat;
+    }
 }

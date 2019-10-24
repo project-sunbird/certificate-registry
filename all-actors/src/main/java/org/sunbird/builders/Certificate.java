@@ -111,7 +111,6 @@ public class Certificate {
         private String accessCode;
         private String reason;
 
-
         public Builder setReason(String reason) {
             this.reason = reason;
             return this;
@@ -158,13 +157,11 @@ public class Certificate {
         public Builder setCreatedBy(String createdBy) {
             this.createdBy = createdBy;
             return this;
-
         }
 
         public Builder setUpdatedBy(String updatedBy) {
             this.updatedBy = updatedBy;
             return this;
-
         }
 
 
