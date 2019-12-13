@@ -21,7 +21,7 @@ import java.util.Map;
 public class CertAddRequestValidator implements IRequestValidator {
     static Logger logger=Logger.getLogger(CertAddRequestValidator.class);
     private Request request;
-    static List<String> mandatoryParamsList = Lists.newArrayList(JsonKeys.ID, JsonKeys.ACCESS_CODE, JsonKeys.PDF_URL,JsonKeys.RECIPIENT_TYPE);
+    static List<String> mandatoryParamsList = Lists.newArrayList(JsonKeys.ID, JsonKeys.ACCESS_CODE, JsonKeys.PDF_URL);
     static List<String> allowedRecipientsType=Lists.newArrayList(JsonKeys.INDIVIDUAL,JsonKeys.ENTITY);
     public CertAddRequestValidator() {
     }
