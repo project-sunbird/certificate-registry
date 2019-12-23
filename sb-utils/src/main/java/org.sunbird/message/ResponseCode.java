@@ -15,6 +15,14 @@ public enum ResponseCode {
   INVALID_REQUESTED_DATA(400);
 
 
+ interface Key {
+  String DB_UPDATE_FAIL = "DB_UPDATE_FAIL";
+ }
+
+ interface Message {
+  String DB_UPDATE_FAIL = "Db update operation failed.";
+ }
+
   private int code;
 
   ResponseCode(int code) {
@@ -24,5 +32,20 @@ public enum ResponseCode {
   public int getCode() {
     return this.code;
   }
+
+ /** error code contains String value */
+ private String errorCode;
+ /** errorMessage contains proper error message. */
+ private String errorMessage;
+
+ /** @return */
+ public String getErrorCode() {
+  return errorCode;
+ }
+
+ /** @return */
+ public String getErrorMessage() {
+  return errorMessage;
+ }
 
 }
