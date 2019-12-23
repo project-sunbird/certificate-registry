@@ -19,4 +19,10 @@ public interface IResponseMessage extends IUserResponseMessage, IOrgResponseMess
   String INVALID_PROVIDED_URL="PROVIDED URL {0} DOESN'T EXISITS";
   String INVALID_RELATED_TYPE="invalid related type {0} provided valid related types are {1}";
   String INVALID_RECIPIENT_TYPE="invalid provided recipientType {0} valid recipientTypes are {1}";
+  String DB_UPDATE_FAIL_KEY = "DB_UPDATE_FAIL";
+  String DB_UPDATE_FAIL_MSG = "Db update operation failed.";
+  String DB_INSERTION_FAIL_KEY = "DB_INSERTION_FAIL";
+  String DB_INSERTION_FAIL_MSG = "DB insert operation failed.";
+  String INVALID_PROPERTY_ERROR = "INVALID_PROPERTY_ERROR";
+  String INVALID_PROPERTY_ERROR_MSG = "Invalid property {0}.";
 }

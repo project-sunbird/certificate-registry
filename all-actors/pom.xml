@@ -8,6 +8,9 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>all-actors</artifactId>
+    <properties>
+        <cassandra.driver.version>3.7.0</cassandra.driver.version>
+    </properties>
 
     <dependencies>
         <dependency>
@@ -29,6 +32,11 @@
             <groupId>com.mashape.unirest</groupId>
             <artifactId>unirest-java</artifactId>
             <version>1.4.9</version>
+        </dependency>
+        <dependency>
+            <groupId>com.datastax.cassandra</groupId>
+            <artifactId>cassandra-driver-mapping</artifactId>
+            <version>${cassandra.driver.version}</version>
         </dependency>
     </dependencies>
 </project>
