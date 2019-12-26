@@ -5,6 +5,7 @@ import controllers.TestHelper;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.sunbird.BaseException;
 import play.Application;
 import play.mvc.Result;
 import play.test.Helpers;
@@ -19,6 +20,9 @@ public class HealthControllerTest extends BaseControllerTest {
     TestHelper testHelper;
     public static Application app;
     public static Map<String, String[]> headerMap;
+
+    public HealthControllerTest() throws BaseException {
+    }
 
     @Before
     public void setUp() throws Exception {

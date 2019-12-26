@@ -39,7 +39,7 @@ public class CertValidateRequestValidator implements IRequestValidator {
         for (String param :mandatoryParamsList) {
             if(!certValMap.containsKey(param)){
                 logger.error("CertValidateRequestValidator:validateMandatoryParams:incorrect request provided");
-                throw new BaseException(IResponseMessage.INVALID_REQUESTED_DATA, MessageFormat.format(IResponseMessage.MISSING_MANADATORY_PARAMS,param), ResponseCode.CLIENT_ERROR.getCode());
+                throw new BaseException(IResponseMessage.INVALID_REQUESTED_DATA, MessageFormat.format(IResponseMessage.MISSING_MANDATORY_PARAMS,param), ResponseCode.CLIENT_ERROR.getCode());
             }
             if(!(certValMap.get(param) instanceof String)){
                 logger.error("CertValidateRequestValidator:validateMandatoryParams:incorrect request provided");

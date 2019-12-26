@@ -2,6 +2,8 @@ package org.sunbird;
 
 import akka.actor.UntypedAbstractActor;
 import org.apache.log4j.Logger;
+import org.sunbird.common.factory.EsClientFactory;
+import org.sunbird.common.inf.ElasticSearchService;
 import org.sunbird.message.IResponseMessage;
 import org.sunbird.message.Localizer;
 import org.sunbird.message.ResponseCode;
@@ -13,7 +15,7 @@ import java.util.Locale;
  * @author Amit Kumar
  */
 public abstract class BaseActor extends UntypedAbstractActor {
-
+    protected static final ElasticSearchService elasticSearchService= EsClientFactory.getInstance();
     private Logger logger = Logger.getLogger(BaseActor.class);
     public abstract void onReceive(Request request) throws Throwable;
     protected Localizer localizer = Localizer.getInstance();

@@ -67,7 +67,14 @@ public class JsonKeys {
     public static final String BEST_SCHOOL="best-school";
     public static final String BEST_TEACHER="best-teacher";
     public static final String BEST_STUDENT="best-student";
-
-
-
+    public static final String SUNBIRD_CASSANDRA_IP = "sunbird_cassandra_host";
+    public static final String SUNBIRD_CASSANDRA_KEYSPACE = "sunbird_cassandra_keyspace";
+    public static final String SUNBIRD_CASSANDRA_MODE = "sunbird_cassandra_mode";
+    public static final String SUNBIRD_CASSANDRA_PASSWORD = "sunbird_cassandra_password";
+    public static final String SUNBIRD_CASSANDRA_PORT = "sunbird_cassandra_port";
+    public static final String SUNBIRD_CASSANDRA_USER_NAME = "sunbird_cassandra_username";
+    public static final String STANDALONE_MODE = "standalone";
+    public static final String SUNBIRD = "sunbird";
+    public static final String CERT_REGISTRY = "cert_registry";
+    public static final String RECIPIENT="recipient";
 }

@@ -12,6 +12,7 @@ import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
+import org.sunbird.BaseException;
 import org.sunbird.message.IResponseMessage;
 import org.sunbird.message.Localizer;
 import org.sunbird.response.Response;
@@ -41,11 +42,11 @@ public class BaseControllerTest {
   private static BaseController baseController;
   //private OpenSaberApplication openSaberApplication;
 
-  public BaseControllerTest() {
+  public BaseControllerTest() throws BaseException {
     baseControllerTestsetUp();
   }
 
-  public void baseControllerTestsetUp() {
+  public void baseControllerTestsetUp() throws BaseException {
 
     application = PowerMockito.mock(org.sunbird.Application.class);
     PowerMockito.mockStatic(org.sunbird.Application.class);

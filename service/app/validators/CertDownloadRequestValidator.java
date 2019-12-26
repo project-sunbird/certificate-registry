@@ -26,7 +26,7 @@ public class CertDownloadRequestValidator implements IRequestValidator {
 
     private void validateDownlaodFileData() throws BaseException {
         if (StringUtils.isBlank((String)this.request.getRequest().get("pdfUrl"))) {
-            throw new BaseException(IResponseMessage.INVALID_REQUESTED_DATA, MessageFormat.format(IResponseMessage.MISSING_MANADATORY_PARAMS, JsonKeys.PDF_URL), ResponseCode.CLIENT_ERROR.getCode());
+            throw new BaseException(IResponseMessage.INVALID_REQUESTED_DATA, MessageFormat.format(IResponseMessage.MISSING_MANDATORY_PARAMS, JsonKeys.PDF_URL), ResponseCode.CLIENT_ERROR.getCode());
         }
     }
 

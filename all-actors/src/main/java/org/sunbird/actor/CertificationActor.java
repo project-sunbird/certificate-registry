@@ -1,6 +1,9 @@
-package org.sunbird;
+package org.sunbird.actor;
 
 import org.apache.log4j.Logger;
+import org.sunbird.BaseActor;
+import org.sunbird.BaseException;
+import org.sunbird.JsonKeys;
 import org.sunbird.actor.core.ActorConfig;
 import org.sunbird.request.Request;
 import org.sunbird.response.Response;
@@ -12,33 +15,38 @@ import org.sunbird.serviceimpl.CertsServiceImpl;
         dispatcher = "",
         asyncTasks = {}
 )
-public class Certification extends BaseActor {
-    static Logger logger = Logger.getLogger(Certification.class);
+public class CertificationActor extends BaseActor {
+    static Logger logger = Logger.getLogger(CertificationActor.class);
     private static ICertService certService = new CertsServiceImpl();
 
     @Override
     public void onReceive(Request request) throws BaseException {
-        logger.info("Certification:onReceive:request arrived with operation" + request.getOperation());
-        if (ActorOperations.ADD.getOperation().equalsIgnoreCase(request.getOperation())) {
-            add(request);
-        } else if (ActorOperations.VALIDATE.getOperation().equalsIgnoreCase(request.getOperation()))
-        {
-            validate(request);
-        }
-        else if(ActorOperations.DOWNLOAD.getOperation().equalsIgnoreCase(request.getOperation()))
-        {
-            download(request);
-        }
-        else if(ActorOperations.GENERATE.getOperation().equalsIgnoreCase(request.getOperation()))
-        {
-            generate(request);
-        }
-        else if(ActorOperations.VERIFY.getOperation().equalsIgnoreCase(request.getOperation()))
-        {
-            verify(request);
-        }
+        logger.info("CertificationActor:onReceive:request arrived with operation" + request.getOperation());
+        String operation = request.getOperation();
+        switch (operation) {
+            case "add" :
+                add(request);
+                break;
 
+            case  "validate" :
+                validate(request);
+                break;
 
+            case "download" :
+                download(request);
+                break;
+
+            case "generate" :
+                generate(request);
+                break;
+
+            case "verify" :
+                verify(request);
+                break;
+
+            default:
+                onReceiveUnsupportedMessage("CertificationActor");
+        }
     }
 
     private void add(Request request) throws BaseException {
