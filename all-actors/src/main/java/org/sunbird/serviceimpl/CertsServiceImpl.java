@@ -20,7 +20,6 @@ import org.sunbird.service.ICertService;
 import org.sunbird.utilities.CertificateUtil;
 
 import java.text.MessageFormat;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;

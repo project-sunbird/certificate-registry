@@ -21,8 +21,7 @@ import java.util.Map;
 public class CertAddRequestValidator implements IRequestValidator {
     static Logger logger=Logger.getLogger(CertAddRequestValidator.class);
     private Request request;
-    static List<String> mandatoryParamsList = Lists.newArrayList(JsonKeys.ID, JsonKeys.ACCESS_CODE, JsonKeys.PDF_URL,JsonKeys.RECIPIENT_TYPE);
-    static List<String>allowedRelatedTypes=Lists.newArrayList(JsonKeys.COURSE_COMPLETION, JsonKeys.ASSESSMENT,JsonKeys.COURSE_PERFORMANCE,JsonKeys.OFFLINE_COURSE);
+    static List<String> mandatoryParamsList = Lists.newArrayList(JsonKeys.ID, JsonKeys.ACCESS_CODE, JsonKeys.PDF_URL);
     static List<String> allowedRecipientsType=Lists.newArrayList(JsonKeys.INDIVIDUAL,JsonKeys.ENTITY);
     public CertAddRequestValidator() {
     }
@@ -33,7 +32,9 @@ public class CertAddRequestValidator implements IRequestValidator {
         logger.info("CertAddRequestValidator:validate:started validating the request with request id "+request.getRequest());
         validateMandatoryParams();
         validateMandatoryJsonData();
-        validateRecipientType();
+        if(request.getRequest().containsKey(JsonKeys.RECIPIENT_TYPE)) {
+            validateRecipientType();
+        }
         if(request.getRequest().containsKey(JsonKeys.RELATED)){
             validateRelatedObject();
         }
@@ -91,8 +92,8 @@ public class CertAddRequestValidator implements IRequestValidator {
             throw new BaseException(IResponseMessage.INVALID_REQUESTED_DATA, MessageFormat.format(IResponseMessage.MISSING_MANADATORY_PARAMS, JsonKeys.TYPE.concat(" inside related map")), ResponseCode.CLIENT_ERROR.getCode());
         }
         String relatedType=(String)relatedMap.get(JsonKeys.TYPE);
-        if(!allowedRelatedTypes.contains(relatedType)){
-            throw new BaseException(IResponseMessage.INVALID_REQUESTED_DATA, MessageFormat.format(IResponseMessage.INVALID_RELATED_TYPE,relatedType,allowedRelatedTypes), ResponseCode.CLIENT_ERROR.getCode());
+        if(StringUtils.isBlank(relatedType)){
+            throw new BaseException(IResponseMessage.INVALID_REQUESTED_DATA,IResponseMessage.INVALID_RELATED_TYPE, ResponseCode.CLIENT_ERROR.getCode());
         }
     }
 

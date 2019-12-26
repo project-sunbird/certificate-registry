@@ -17,6 +17,6 @@ public interface IResponseMessage extends IUserResponseMessage, IOrgResponseMess
   String EMPTY_MANDATORY_PARAM="value can not be empty for mandatory param {0}";
   String INVALID_ID_PROVIDED="PROVIDED ID {0} AND ACCESSCODE {1} COMBINATION DOES NOT EXISTS";
   String INVALID_PROVIDED_URL="PROVIDED URL {0} DOESN'T EXISITS";
-  String INVALID_RELATED_TYPE="invalid related type {0} provided valid related types are {1}";
+  String INVALID_RELATED_TYPE="invalid related.type";
   String INVALID_RECIPIENT_TYPE="invalid provided recipientType {0} valid recipientTypes are {1}";
 }
