@@ -69,9 +69,11 @@ public class BaseController extends Controller {
             }
             return new RequestHandler().handleRequest(request, httpExecutionContext, operation);
         } catch (BaseException ex) {
-            return RequestHandler.handleFailureResponse(ex, httpExecutionContext);
-        } catch (Exception ex) {
-            return RequestHandler.handleFailureResponse(ex, httpExecutionContext);
+            return (CompletionStage<Result>)
+                    RequestHandler.handleFailureResponse(ex, httpExecutionContext);   }
+        catch (Exception ex) {
+            return (CompletionStage<Result>)
+                    RequestHandler.handleFailureResponse(ex, httpExecutionContext);
         }
     }
 
@@ -94,9 +96,11 @@ public class BaseController extends Controller {
             }
             return new RequestHandler().handleRequest(request, httpExecutionContext, operation);
         } catch (BaseException ex) {
-            return RequestHandler.handleFailureResponse(ex, httpExecutionContext);
-        } catch (Exception ex) {
-            return RequestHandler.handleFailureResponse(ex, httpExecutionContext);
+            return (CompletionStage<Result>)
+                    RequestHandler.handleFailureResponse(ex, httpExecutionContext); }
+        catch (Exception ex) {
+            return (CompletionStage<Result>)
+                    RequestHandler.handleFailureResponse(ex, httpExecutionContext);
         }
     }
 
@@ -111,9 +115,11 @@ public class BaseController extends Controller {
         try {
             return new RequestHandler().handleRequest(req, httpExecutionContext, operation);
         } catch (BaseException ex) {
-            return RequestHandler.handleFailureResponse(ex, httpExecutionContext);
+            return (CompletionStage<Result>)
+                    RequestHandler.handleFailureResponse(ex, httpExecutionContext);
         } catch (Exception ex) {
-            return RequestHandler.handleFailureResponse(ex, httpExecutionContext);
+            return (CompletionStage<Result>)
+                    RequestHandler.handleFailureResponse(ex, httpExecutionContext);
         }
     }
 

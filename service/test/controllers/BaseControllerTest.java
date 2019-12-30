@@ -2,6 +2,9 @@ package controllers;
 
 import akka.actor.ActorRef;
 
+import akka.dispatch.Futures;
+import akka.pattern.Patterns;
+import akka.util.Timeout;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Test;
 
@@ -14,20 +17,21 @@ import org.powermock.modules.junit4.PowerMockRunner;
 
 import org.sunbird.message.IResponseMessage;
 import org.sunbird.message.Localizer;
+import org.sunbird.request.Request;
 import org.sunbird.response.Response;
 import play.Application;
-import scala.concurrent.Await;
+import scala.compat.java8.FutureConverters;
 import scala.concurrent.Future;
-import scala.concurrent.duration.FiniteDuration;
 import utils.JsonKey;
 
 import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
+import static org.powermock.api.mockito.PowerMockito.when;
 
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({org.sunbird.Application.class, BaseController.class, ActorRef.class, Await.class})
+@PrepareForTest({org.sunbird.Application.class, BaseController.class, ActorRef.class,Patterns.class, FutureConverters.class})
 @PowerMockIgnore({"javax.management.*", "javax.net.ssl.*", "javax.security.*"})
 
 public class BaseControllerTest {
@@ -49,7 +53,7 @@ public class BaseControllerTest {
 
     application = PowerMockito.mock(org.sunbird.Application.class);
     PowerMockito.mockStatic(org.sunbird.Application.class);
-    PowerMockito.when(org.sunbird.Application.getInstance()).thenReturn(application);
+    when(org.sunbird.Application.getInstance()).thenReturn(application);
     application.init();
     mockRequestHandler();
   }
@@ -59,13 +63,15 @@ public class BaseControllerTest {
     try {
       baseController = Mockito.mock(BaseController.class);
       actorRef = Mockito.mock(ActorRef.class);
-      Mockito.when(baseController.getActorRef(Mockito.anyString())).thenReturn(actorRef);
-      PowerMockito.mockStatic(Await.class);
-      PowerMockito.when(Await.result(Mockito.any(Future.class), Mockito.any(FiniteDuration.class)))
-              .thenReturn(getResponseObject());
+      when(baseController.getActorRef(Mockito.anyString())).thenReturn(actorRef);
+      PowerMockito.mockStatic(Patterns.class);
+      Future<Object>f1= Futures.successful(getResponseObject());
+      when(Patterns.ask(Mockito.any(ActorRef.class),Mockito.any(Request.class),Mockito.any(Timeout.class))).thenReturn(f1);
     }catch (Exception ex) {
+      ex.printStackTrace();
     }
   }
+
 
   private Response getResponseObject() {
 

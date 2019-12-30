@@ -12,6 +12,7 @@ import play.libs.Json;
 import play.libs.concurrent.HttpExecutionContext;
 import play.mvc.Result;
 import play.mvc.Results;
+import scala.compat.java8.FutureConverters;
 import scala.concurrent.Await;
 import scala.concurrent.Future;
 import utils.JsonKey;
@@ -19,6 +20,7 @@ import utils.JsonKey;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 
 
 /**
@@ -39,10 +41,18 @@ public class RequestHandler extends BaseController {
     public CompletionStage<Result> handleRequest(Request request, HttpExecutionContext httpExecutionContext, String operation) throws Exception {
         Object obj;
         request.setOperation(operation);
+        Function<Object, Result> fn =
+                new Function<Object, Result>() {
+
+                    @Override
+                    public Result apply(Object object) {
+                        return handleResponse(object, httpExecutionContext);
+                    }
+                };
+
         Timeout t = new Timeout(Long.valueOf(request.getTimeout()), TimeUnit.SECONDS);
         Future<Object> future = Patterns.ask(getActorRef(operation), request, t);
-        obj = Await.result(future, t.duration());
-        return handleResponse(obj,httpExecutionContext);
+        return FutureConverters.toJava(future).thenApplyAsync(fn);
     }
 
     /**
@@ -51,7 +61,7 @@ public class RequestHandler extends BaseController {
      * @param exception
      * @return
      */
-    public static CompletionStage<Result> handleFailureResponse(Object exception, HttpExecutionContext httpExecutionContext) {
+    public static Result handleFailureResponse(Object exception, HttpExecutionContext httpExecutionContext) {
 
         Response response = new Response();
         CompletableFuture<JsonNode> future = new CompletableFuture<>();
@@ -61,15 +71,15 @@ public class RequestHandler extends BaseController {
             response.put(JsonKey.MESSAGE, ex.getMessage());
             future.complete(Json.toJson(response));
             if (ex.getResponseCode() == Results.badRequest().status()) {
-                return future.thenApplyAsync(Results::badRequest, httpExecutionContext.current());
+                return Results.badRequest(Json.toJson(response));
             } else {
-                return future.thenApplyAsync(Results::internalServerError, httpExecutionContext.current());
+                return Results.internalServerError();
             }
         } else {
             response.setResponseCode(ResponseCode.SERVER_ERROR);
             response.put(JsonKey.MESSAGE,localizerObject.getMessage(IResponseMessage.INTERNAL_ERROR,null));
             future.complete(Json.toJson(response));
-            return future.thenApplyAsync(Results::internalServerError, httpExecutionContext.current());
+            return Results.internalServerError(Json.toJson(response));
         }
     }
 
@@ -79,7 +89,7 @@ public class RequestHandler extends BaseController {
      * @param httpExecutionContext
      * @return
      */
-    public  static CompletionStage<Result> handleResponse(Object object, HttpExecutionContext httpExecutionContext) {
+    public  static Result handleResponse(Object object, HttpExecutionContext httpExecutionContext) {
 
         if (object instanceof Response) {
             Response response = (Response) object;
@@ -96,9 +106,9 @@ public class RequestHandler extends BaseController {
      * @return
      */
 
-    public static CompletionStage<Result> handleSuccessResponse(Response response, HttpExecutionContext httpExecutionContext) {
+    public static Result handleSuccessResponse(Response response, HttpExecutionContext httpExecutionContext) {
         CompletableFuture<JsonNode> future = new CompletableFuture<>();
         future.complete(Json.toJson(response));
-        return future.thenApplyAsync(Results::ok, httpExecutionContext.current());
+        return Results.ok(Json.toJson(response));
     }
 }
