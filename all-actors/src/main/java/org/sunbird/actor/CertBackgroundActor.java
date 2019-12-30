@@ -30,9 +30,11 @@ public class CertBackgroundActor extends BaseActor {
             case "add_cert_es":
                 add(request);
                 break;
+
             case "delete_cert_es":
                 delete(request);
                 break;
+
             default:
                 onReceiveUnsupportedMessage("CertificationActor");
         }
@@ -43,6 +45,7 @@ public class CertBackgroundActor extends BaseActor {
         Boolean bool = (Boolean)ElasticSearchHelper.getResponseFromFuture(elasticSearchService.delete(JsonKeys.CERT,id));
         logger.info("Data deleted from ES for id "+id);
     }
+
 
     private void add(Request request) {
         Map<String,Object> certAddReqMap = (Map<String, Object>) request.getRequest().get(JsonKeys.REQUEST);

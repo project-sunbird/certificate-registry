@@ -11,7 +11,6 @@ import org.sunbird.request.Request;
 import org.sunbird.response.Response;
 import org.sunbird.service.ICertService;
 import org.sunbird.serviceimpl.CertsServiceImpl;
-import org.sunbird.utilities.CertificateUtil;
 
 @ActorConfig(
         tasks = {"add","validate","download","generate","verify"},
@@ -61,10 +60,6 @@ public class CertificationActor extends BaseActor {
         Response response = new Response();
         response.put(JsonKeys.ID, id);
         sender().tell(response, self());
-
-        //For re-issue certificate, the existing(old) certificate entry has to be removed
-        //Delete the old entries from DB And ES
-        certService.delete(request);
     }
 
     private void validate(Request request) throws BaseException {
