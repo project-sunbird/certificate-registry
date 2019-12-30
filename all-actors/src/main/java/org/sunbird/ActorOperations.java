@@ -11,7 +11,8 @@ public enum ActorOperations {
     DOWNLOAD("download"),
     GENERATE("generate"),
     VERIFY("verify"),
-    ADD_CERT_ES("add_cert_es");
+    ADD_CERT_ES("add_cert_es"),
+    DELETE_CERT_ES("delete_cert_es");
 
     private String operation;
 

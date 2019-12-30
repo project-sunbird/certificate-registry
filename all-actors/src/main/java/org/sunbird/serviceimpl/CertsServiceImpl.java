@@ -13,6 +13,7 @@ import org.sunbird.CertVars;
 import org.sunbird.JsonKeys;
 import org.sunbird.builders.Certificate;
 import org.sunbird.builders.Recipient;
+import org.sunbird.common.CassandraUtil;
 import org.sunbird.message.IResponseMessage;
 import org.sunbird.message.Localizer;
 import org.sunbird.message.ResponseCode;
@@ -40,6 +41,19 @@ public class CertsServiceImpl implements ICertService {
     static Map<String, String> headerMap = new HashMap<>();
     static {
         headerMap.put("Content-Type", "application/json");
+    }
+
+    @Override
+    public Response delete(Request request) throws BaseException {
+        Map<String, Object> certAddReqMap = request.getRequest();
+        Response response = null;
+        if(StringUtils.isNotBlank((String)certAddReqMap.get(JsonKeys.OLD_ID))){
+            response =  CertificateUtil.deleteRecord((String)certAddReqMap.get(JsonKeys.OLD_ID));
+            logger.info("ertsServiceImpl:delete Deleted the record from cert_registry table for id "+certAddReqMap.get(JsonKeys.OLD_ID));
+        }
+        //Delete from ES
+
+        return response;
     }
 
     @Override

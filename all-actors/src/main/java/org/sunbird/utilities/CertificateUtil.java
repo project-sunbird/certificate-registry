@@ -7,6 +7,7 @@ import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import org.apache.commons.collections.MapUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.sunbird.ActorOperations;
 import org.sunbird.Application;
@@ -51,6 +52,15 @@ public class CertificateUtil {
                 return true;
         }
         return false;
+    }
+    public static Response deleteRecord(String id) throws BaseException {
+        Response response = cassandraOperation.deleteRecord(JsonKeys.SUNBIRD,JsonKeys.CERT_REGISTRY,id);
+        //Delete the data from ES
+        Request req = new Request();
+        req.setOperation(ActorOperations.DELETE_CERT_ES.getOperation());
+        req.getRequest().put(JsonKeys.ID,id);
+        Application.getInstance().getActorRef(ActorOperations.DELETE_CERT_ES.getOperation()).tell(req, ActorRef.noSender());
+        return response;
     }
 
 
