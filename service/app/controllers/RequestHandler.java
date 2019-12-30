@@ -14,7 +14,6 @@ import org.sunbird.message.ResponseCode;
 import org.sunbird.request.Request;
 import org.sunbird.response.Response;
 import play.libs.Json;
-import play.libs.concurrent.HttpExecutionContext;
 import play.mvc.Result;
 import play.mvc.Results;
 import scala.compat.java8.FutureConverters;
@@ -32,14 +31,12 @@ public class RequestHandler extends BaseController {
      * this methis responsible to handle the request and ask from actor
      *
      * @param request
-     * @param httpExecutionContext
      * @param operation
      * @return CompletionStage<Result>
      * @throws Exception
      */
     public CompletionStage<Result> handleRequest(
             Request request,
-            HttpExecutionContext httpExecutionContext,
             String operation,
             play.mvc.Http.Request req)
             throws Exception {
@@ -47,13 +44,7 @@ public class RequestHandler extends BaseController {
         CompletableFuture<String> cf = new CompletableFuture<>();
         request.setOperation(operation);
         Function<Object, Result> fn =
-                new Function<Object, Result>() {
-
-                    @Override
-                    public Result apply(Object object) {
-                        return handleResponse(object, httpExecutionContext, req);
-                    }
-                };
+                object -> handleResponse(object, req);
 
         Timeout t = new Timeout(Long.valueOf(request.getTimeout()), TimeUnit.SECONDS);
         Future<Object> future = Patterns.ask(getActorRef(operation), request, t);
@@ -67,7 +58,7 @@ public class RequestHandler extends BaseController {
      * @return
      */
     public static Result handleFailureResponse(
-            Object exception, HttpExecutionContext httpExecutionContext, play.mvc.Http.Request req) {
+            Object exception, play.mvc.Http.Request req) {
 
         Response response = new Response();
         CompletableFuture<JsonNode> future = new CompletableFuture<>();
@@ -98,17 +89,16 @@ public class RequestHandler extends BaseController {
      * this method will divert the response on the basis of success and failure
      *
      * @param object
-     * @param httpExecutionContext
      * @return
      */
     public static Result handleResponse(
-            Object object, HttpExecutionContext httpExecutionContext, play.mvc.Http.Request req) {
+            Object object, play.mvc.Http.Request req) {
 
         if (object instanceof Response) {
             Response response = (Response) object;
-            return handleSuccessResponse(response, httpExecutionContext, req);
+            return handleSuccessResponse(response, req);
         } else {
-            return handleFailureResponse(object, httpExecutionContext, req);
+            return handleFailureResponse(object, req);
         }
     }
 
@@ -118,8 +108,7 @@ public class RequestHandler extends BaseController {
      * @param response
      * @return
      */
-    public static Result handleSuccessResponse(
-            Response response, HttpExecutionContext httpExecutionContext, play.mvc.Http.Request req) {
+    public static Result handleSuccessResponse(Response response, play.mvc.Http.Request req) {
         CompletableFuture<JsonNode> future = new CompletableFuture<>();
         String apiId = getApiId(req.path());
         response.setId(apiId);

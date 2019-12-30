@@ -5,6 +5,8 @@ import org.sunbird.BaseActor;
 import org.sunbird.JsonKeys;
 import org.sunbird.actor.core.ActorConfig;
 import org.sunbird.common.ElasticSearchHelper;
+import org.sunbird.common.factory.EsClientFactory;
+import org.sunbird.common.inf.ElasticSearchService;
 import org.sunbird.request.Request;
 
 import java.util.Map;
@@ -16,7 +18,10 @@ import java.util.Map;
 )
 public class CertBackgroundActor extends BaseActor {
     static Logger logger = Logger.getLogger(CertBackgroundActor.class);
-
+    private ElasticSearchService elasticSearchService = getESService();
+    private static ElasticSearchService getESService(){
+        return EsClientFactory.getInstance();
+    }
     @Override
     public void onReceive(Request request) throws Throwable {
         logger.info("CertificationActor:onReceive:request arrived with operation" + request.getOperation());

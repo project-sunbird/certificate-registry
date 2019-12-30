@@ -8,6 +8,8 @@ import org.sunbird.message.IResponseMessage;
 import org.sunbird.message.Localizer;
 import org.sunbird.message.ResponseCode;
 import org.sunbird.request.Request;
+import org.sunbird.service.ICertService;
+import org.sunbird.serviceimpl.CertsServiceImpl;
 
 import java.util.Locale;
 
@@ -15,7 +17,6 @@ import java.util.Locale;
  * @author Amit Kumar
  */
 public abstract class BaseActor extends UntypedAbstractActor {
-    protected static final ElasticSearchService elasticSearchService= EsClientFactory.getInstance();
     private Logger logger = Logger.getLogger(BaseActor.class);
     public abstract void onReceive(Request request) throws Throwable;
     protected Localizer localizer = Localizer.getInstance();

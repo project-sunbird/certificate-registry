@@ -108,11 +108,11 @@ public class BaseController extends Controller {
             if (validatorFunction != null) {
                 validatorFunction.apply(request);
             }
-            return new RequestHandler().handleRequest(request, httpExecutionContext, operation,req);
+            return new RequestHandler().handleRequest(request, operation,req);
         } catch (BaseException ex) {
-            return (CompletionStage<Result>) RequestHandler.handleFailureResponse(ex, httpExecutionContext,req);
+            return (CompletionStage<Result>) RequestHandler.handleFailureResponse(ex,req);
         } catch (Exception ex) {
-            return (CompletionStage<Result>)RequestHandler.handleFailureResponse(ex, httpExecutionContext,req);
+            return (CompletionStage<Result>)RequestHandler.handleFailureResponse(ex,req);
         }
 
     }
@@ -124,13 +124,13 @@ public class BaseController extends Controller {
      * @param operation
      * @return
      */
-    public CompletionStage<Result> handleRequest(Request req, String operation,play.mvc.Http.Request request) {
+    public CompletionStage<Result> handleRequest(Request req, String operation,play.mvc.Http.Request request) throws Exception {
         try {
-            return new RequestHandler().handleRequest(req, httpExecutionContext, operation,request);
+            return new RequestHandler().handleRequest(req, operation,request);
         } catch (BaseException ex) {
-            return (CompletionStage<Result>) RequestHandler.handleFailureResponse(ex, httpExecutionContext,request);
+            return (CompletionStage<Result>) RequestHandler.handleFailureResponse(ex, request);
         } catch (Exception ex) {
-            return (CompletionStage<Result>)RequestHandler.handleFailureResponse(ex, httpExecutionContext,request);
+            return (CompletionStage<Result>)RequestHandler.handleFailureResponse(ex, request);
         }
 
     }
@@ -148,13 +148,11 @@ public class BaseController extends Controller {
         try {
             request = (Request) RequestMapper.mapRequest(request(), Request.class);
         } catch (Exception ex) {
-            // ProjectLogger.log(String.format("%s:%s:exception occurred in mapping
-            // request", this.getClass().getSimpleName(), "handleLogRequest"),
-            // LoggerEnum.ERROR.name());
+            logger.error(String.format("%s:%s:exception occurred in mapping request", this.getClass().getSimpleName(), "handleLogRequest"),ex);
             return (CompletionStage<Result>)
-                    RequestHandler.handleFailureResponse(ex, httpExecutionContext, null);
+                    RequestHandler.handleFailureResponse(ex, null);
         }
         return (CompletionStage<Result>)
-                RequestHandler.handleSuccessResponse(response, httpExecutionContext, null);
+                RequestHandler.handleSuccessResponse(response, null);
     }
 }

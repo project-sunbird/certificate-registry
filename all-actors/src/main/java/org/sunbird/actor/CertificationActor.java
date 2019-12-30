@@ -5,6 +5,8 @@ import org.sunbird.BaseActor;
 import org.sunbird.BaseException;
 import org.sunbird.JsonKeys;
 import org.sunbird.actor.core.ActorConfig;
+import org.sunbird.common.factory.EsClientFactory;
+import org.sunbird.common.inf.ElasticSearchService;
 import org.sunbird.request.Request;
 import org.sunbird.response.Response;
 import org.sunbird.service.ICertService;
@@ -17,7 +19,11 @@ import org.sunbird.serviceimpl.CertsServiceImpl;
 )
 public class CertificationActor extends BaseActor {
     static Logger logger = Logger.getLogger(CertificationActor.class);
-    private static ICertService certService = new CertsServiceImpl();
+    private ICertService certService = getCertServiceImpl();
+
+    private ICertService getCertServiceImpl(){
+        return new CertsServiceImpl();
+    }
 
     @Override
     public void onReceive(Request request) throws BaseException {
