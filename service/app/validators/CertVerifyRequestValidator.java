@@ -42,6 +42,6 @@ public class CertVerifyRequestValidator implements IRequestValidator {
     private void validateId() throws BaseException {
         String id=(String)request.getRequest().get(JsonKeys.ID);
         if(StringUtils.isBlank(id) && error){
-            throw new BaseException(IResponseMessage.INVALID_REQUESTED_DATA, MessageFormat.format(IResponseMessage.MISSING_MANADATORY_PARAMS,"either:"+JsonKeys.DATA+":or:"+JsonKeys.ID), ResponseCode.CLIENT_ERROR.getCode());
+            throw new BaseException(IResponseMessage.INVALID_REQUESTED_DATA, MessageFormat.format(IResponseMessage.MISSING_MANDATORY_PARAMS,"either:"+JsonKeys.DATA+":or:"+JsonKeys.ID), ResponseCode.CLIENT_ERROR.getCode());
         }}
 }

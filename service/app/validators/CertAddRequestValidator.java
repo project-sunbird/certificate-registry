@@ -65,7 +65,7 @@ public class CertAddRequestValidator implements IRequestValidator {
         for (String param :mandatoryParamsList) {
             if(!certAddReqMap.containsKey(param)){
                 logger.error("CertAddRequestValidator:validateMandatoryParams:incorrect request provided");
-                throw new BaseException(IResponseMessage.INVALID_REQUESTED_DATA, MessageFormat.format(IResponseMessage.MISSING_MANADATORY_PARAMS,param), ResponseCode.CLIENT_ERROR.getCode());
+                throw new BaseException(IResponseMessage.INVALID_REQUESTED_DATA, MessageFormat.format(IResponseMessage.MISSING_MANDATORY_PARAMS,param), ResponseCode.CLIENT_ERROR.getCode());
             }
             if(!(certAddReqMap.get(param) instanceof String)){
                 logger.error("CertAddRequestValidator:validateMandatoryParams:incorrect request provided");
@@ -89,7 +89,7 @@ public class CertAddRequestValidator implements IRequestValidator {
         }
         Map<String,Object>relatedMap=(Map)request.getRequest().get(JsonKeys.RELATED);
         if(!relatedMap.containsKey(JsonKeys.TYPE)){
-            throw new BaseException(IResponseMessage.INVALID_REQUESTED_DATA, MessageFormat.format(IResponseMessage.MISSING_MANADATORY_PARAMS, JsonKeys.TYPE.concat(" inside related map")), ResponseCode.CLIENT_ERROR.getCode());
+            throw new BaseException(IResponseMessage.INVALID_REQUESTED_DATA, MessageFormat.format(IResponseMessage.MISSING_MANDATORY_PARAMS, JsonKeys.TYPE.concat(" inside related map")), ResponseCode.CLIENT_ERROR.getCode());
         }
         String relatedType=(String)relatedMap.get(JsonKeys.TYPE);
         if(StringUtils.isBlank(relatedType)){

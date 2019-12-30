@@ -5,39 +5,55 @@ import java.util.concurrent.CompletionStage;
 import javax.inject.Inject;
 
 import akka.actor.ActorRef;
+
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+
+import org.apache.log4j.Logger;
 import org.sunbird.Application;
 import org.sunbird.BaseException;
 import org.sunbird.message.Localizer;
 import org.sunbird.request.Request;
+import org.sunbird.response.Response;
+
 import play.libs.Json;
 import play.libs.concurrent.HttpExecutionContext;
 import play.mvc.Controller;
 import play.mvc.Result;
 import play.mvc.Results;
-import utils.JsonKey;
 import utils.RequestMapper;
-import validators.IRequestValidator;
+import utils.RequestValidatorFunction;
 
 /**
- * This controller we can use for writing some common method to handel api request.
- * CompletableFuture: A Future that may be explicitly completed (setting its value and status), and
- * may be used as a CompletionStage, supporting dependent functions and actions that trigger upon
- * its completion. CompletionStage: A stage of a possibly asynchronous computation, that performs an
- * action or computes a value when another CompletionStage completes
+ * This controller we can use for writing some common method to handel api
+ * request. CompletableFuture: A Future that may be explicitly completed
+ * (setting its value and status), and may be used as a CompletionStage,
+ * supporting dependent functions and actions that trigger upon its completion.
+ * CompletionStage: A stage of a possibly asynchronous computation, that
+ * performs an action or computes a value when another CompletionStage completes
  *
  * @author Anmol
  */
 public class BaseController extends Controller {
-
-    protected static ObjectMapper mapper = new ObjectMapper();
+    Logger logger = Logger.getLogger(BaseController.class);
     /**
      * We injected HttpExecutionContext to decrease the response time of APIs.
      */
     @Inject
-    private HttpExecutionContext httpExecutionContext;
-    protected static Localizer localizerObject = Localizer.getInstance();
+    protected HttpExecutionContext httpExecutionContext;
+    protected final static Localizer localizerObject = Localizer.getInstance();
+    public static final String RESPONSE = "Response";
+    public static final String SUCCESS = "Success";
+
+
+    public CompletionStage<Result> handleRequest() {
+        startTrace("handelRequest");
+        CompletableFuture<JsonNode> future = new CompletableFuture<>();
+        Response response = new Response();
+        response.put(RESPONSE, SUCCESS);
+        future.complete(Json.toJson(response));
+        endTrace("handelRequest");
+        return future.thenApplyAsync(Results::ok, httpExecutionContext.current());
+    }
 
     /**
      * This method will return the current timestamp.
@@ -48,56 +64,57 @@ public class BaseController extends Controller {
         return System.currentTimeMillis();
     }
 
+    /**
+     * This method we used to print the logs of starting time of methods
+     *
+     * @param tag
+     */
+    public void startTrace(String tag) {
+        logger.info("Method call started.");
+    }
+
+    /**
+     * This method we used to print the logs of ending time of methods
+     *
+     * @param tag
+     */
+    public void endTrace(String tag) {
+        logger.info("Method call ended.");
+    }
+
     protected ActorRef getActorRef(String operation) throws BaseException {
         return Application.getInstance().getActorRef(operation);
     }
 
     /**
-     * this method will take org.sunbird.Request and a validation function and lastly operation(Actor operation)
-     * this method is validating the request and ,
-     * this method is used to handle all the request type which has requestBody
-     *
-     * @param request
-     * @param requestValidator
-     * @param operation
-     * @return
-     */
-    public CompletionStage<Result> handleRequest(Request request, IRequestValidator requestValidator, String operation) {
-        try {
-            if (requestValidator != null) {
-                requestValidator.validate(request);
-            }
-            return new RequestHandler().handleRequest(request, httpExecutionContext, operation);
-        } catch (BaseException ex) {
-            return RequestHandler.handleFailureResponse(ex, httpExecutionContext);
-        } catch (Exception ex) {
-            return RequestHandler.handleFailureResponse(ex, httpExecutionContext);
-        }
-    }
-
-    /**
-     * this method will take play.mv.http request and a validation function and lastly operation(Actor operation)
-     * this method is validating the request and ,
-     * it will map the request to our sunbird Request class and make a call to requestHandler which is internally calling ask to actor
-     * this method is used to handle all the request type which has requestBody
+     * this method will take play.mv.http request and a validation function and
+     * lastly operation(Actor operation) this method is validating the request and ,
+     * it will map the request to our sunbird Request class and make a call to
+     * requestHandler which is internally calling ask to actor this method is used
+     * to handle all the request type which has requestBody
      *
      * @param req
-     * @param requestValidator
+     * @param validatorFunction
      * @param operation
      * @return
      */
-    public CompletionStage<Result> handleRequest(play.mvc.Http.Request req, IRequestValidator requestValidator, String operation) {
+    public CompletionStage<Result> handleRequest(play.mvc.Http.Request req, RequestValidatorFunction validatorFunction,
+                                                 String operation) {
         try {
-            Request request = (Request) RequestMapper.mapRequest(req, Request.class);
-            if (requestValidator != null) {
-                requestValidator.validate(request);
+            Request request = new Request();
+            if (req.body() != null && req.body().asJson() != null) {
+                request = (Request) RequestMapper.mapRequest(req, Request.class);
             }
-            return new RequestHandler().handleRequest(request, httpExecutionContext, operation);
+            if (validatorFunction != null) {
+                validatorFunction.apply(request);
+            }
+            return new RequestHandler().handleRequest(request, operation,req);
         } catch (BaseException ex) {
-            return RequestHandler.handleFailureResponse(ex, httpExecutionContext);
+            return (CompletionStage<Result>) RequestHandler.handleFailureResponse(ex,req);
         } catch (Exception ex) {
-            return RequestHandler.handleFailureResponse(ex, httpExecutionContext);
+            return (CompletionStage<Result>)RequestHandler.handleFailureResponse(ex,req);
         }
+
     }
 
     /**
@@ -107,37 +124,35 @@ public class BaseController extends Controller {
      * @param operation
      * @return
      */
-    public CompletionStage<Result> handleRequest(Request req, String operation) {
+    public CompletionStage<Result> handleRequest(Request req, String operation,play.mvc.Http.Request request) throws Exception {
         try {
-            return new RequestHandler().handleRequest(req, httpExecutionContext, operation);
+            return new RequestHandler().handleRequest(req, operation,request);
         } catch (BaseException ex) {
-            return RequestHandler.handleFailureResponse(ex, httpExecutionContext);
+            return (CompletionStage<Result>) RequestHandler.handleFailureResponse(ex, request);
         } catch (Exception ex) {
-            return RequestHandler.handleFailureResponse(ex, httpExecutionContext);
+            return (CompletionStage<Result>)RequestHandler.handleFailureResponse(ex, request);
         }
-    }
 
-
-
-    public CompletionStage<Result> handleRequest() {
-        CompletableFuture<JsonNode> cf = new CompletableFuture<>();
-         String dummyResponse =
-                "{\"id\":\"api.service.health\",\"ver\":\"v1\",\"ts\":\"2019-01-17 16:53:26:286+0530\",\"params\":{\"resmsgid\":null,\"msgid\":\"8e27cbf5-e299-43b0-bca7-8347f7ejk5abcf\",\"err\":null,\"status\":\"success\",\"errmsg\":null},\"responseCode\":\"OK\",\"result\":{\"response\":{\"response\":\"SUCCESS\",\"errors\":[]}}}";
-        cf.complete(Json.toJson(dummyResponse));
-        return cf.thenApplyAsync(Results::ok);
     }
 
     /**
-     * This method is responsible to convert Response object into json
+     * This method is used specifically to handel Log Apis request this will set log
+     * levels and then return the CompletionStage of Result
      *
-     * @param response
-     * @return string
+     * @return
      */
-    public static String jsonify(Object response) {
+    public CompletionStage<Result> handleLogRequest() {
+        startTrace("handleLogRequest");
+        Response response = new Response();
+        Request request = null;
         try {
-            return mapper.writeValueAsString(response);
-        } catch (Exception e) {
-            return JsonKey.EMPTY_STRING;
+            request = (Request) RequestMapper.mapRequest(request(), Request.class);
+        } catch (Exception ex) {
+            logger.error(String.format("%s:%s:exception occurred in mapping request", this.getClass().getSimpleName(), "handleLogRequest"),ex);
+            return (CompletionStage<Result>)
+                    RequestHandler.handleFailureResponse(ex, null);
         }
+        return (CompletionStage<Result>)
+                RequestHandler.handleSuccessResponse(response, null);
     }
 }

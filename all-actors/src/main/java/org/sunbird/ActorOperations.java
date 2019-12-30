@@ -10,7 +10,8 @@ public enum ActorOperations {
     VALIDATE("validate"),
     DOWNLOAD("download"),
     GENERATE("generate"),
-    VERIFY("verify");
+    VERIFY("verify"),
+    ADD_CERT_ES("add_cert_es");
 
     private String operation;
 
