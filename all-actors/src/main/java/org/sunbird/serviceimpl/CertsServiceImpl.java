@@ -51,8 +51,6 @@ public class CertsServiceImpl implements ICertService {
             response =  CertificateUtil.deleteRecord((String)certAddReqMap.get(JsonKeys.OLD_ID));
             logger.info("ertsServiceImpl:delete Deleted the record from cert_registry table for id "+certAddReqMap.get(JsonKeys.OLD_ID));
         }
-        //Delete from ES
-
         return response;
     }
 
