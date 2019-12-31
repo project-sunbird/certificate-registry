@@ -16,7 +16,6 @@ import org.sunbird.cassandra.CassandraOperation;
 import org.sunbird.common.ElasticSearchHelper;
 import org.sunbird.common.factory.EsClientFactory;
 import org.sunbird.common.inf.ElasticSearchService;
-import org.sunbird.dto.SearchDTO;
 import org.sunbird.helper.ServiceFactory;
 import org.sunbird.message.IResponseMessage;
 import org.sunbird.message.Localizer;
@@ -25,10 +24,7 @@ import org.sunbird.request.Request;
 import org.sunbird.response.Response;
 
 import java.sql.Timestamp;
-import java.text.SimpleDateFormat;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.Future;
 
 
@@ -43,6 +39,17 @@ public class CertificateUtil {
     private static ObjectMapper mapper = new ObjectMapper();
     private static Localizer localizer = Localizer.getInstance();
 
+    public static void main(String[] args) throws JsonProcessingException {
+        List<Map<String,Object>> mapList = new ArrayList<>();
+        Map<String,Object> map2 = new HashMap<>();
+        map2.put("cert1","cert1");
+        map2.put("cert2","cert2");
+        mapList.add(map2);
+        Map<String,Object> respMap = new HashMap<>();
+        respMap.put("req",mapList);
+        System.out.println(mapper.writeValueAsString(respMap));
+    }
+
     public static boolean isIdPresent(String certificateId) {
         logger.info("CertificateUtil:isIdPresent:get id to search in ES:"+certificateId);
         Map<String,Object> response = (Map)ElasticSearchHelper.getResponseFromFuture(elasticSearchService.getDataByIdentifier(JsonKeys.CERT,certificateId));
@@ -53,6 +60,20 @@ public class CertificateUtil {
         return false;
     }
 
+    public static Response getCertRecordByID(String id) throws BaseException {
+        return cassandraOperation.getRecordById(JsonKeys.SUNBIRD,JsonKeys.CERT_REGISTRY,id);
+    }
+
+    public static Boolean deleteRecord(String id) throws BaseException {
+        Boolean bool = (Boolean)ElasticSearchHelper.getResponseFromFuture(elasticSearchService.delete(JsonKeys.CERT,id));
+        logger.info("Data deleted from ES for id "+id);
+        //Delete the data from cassandra
+        Request req = new Request();
+        req.setOperation(ActorOperations.DELETE_CERT_CASSANDRA.getOperation());
+        req.getRequest().put(JsonKeys.ID,id);
+        Application.getInstance().getActorRef(ActorOperations.DELETE_CERT_CASSANDRA.getOperation()).tell(req, ActorRef.noSender());
+        return bool;
+    }
 
     public static Response insertRecord(Map<String,Object>certAddReqMap) throws BaseException {
         Map<String,Object>certMap = new HashMap<>();
@@ -81,13 +102,6 @@ public class CertificateUtil {
 
     }
 
-
-    public static  Map<String,Object> getCertificate(SearchDTO searchDTO) {
-        logger.info("CertificateUtil:isIdPresent:get id to search in ES:"+searchDTO);
-        Map<String,Object> response = (Map)ElasticSearchHelper.getResponseFromFuture(elasticSearchService.search(searchDTO,JsonKeys.CERT));
-        logger.info("CertificateUtil:isIdPresent:got response from ES:"+response);
-        return response;
-    }
     public static  Map<String,Object> getCertificate(String certificateId) {
         logger.info("CertificateUtil:isIdPresent:get id to search in ES:"+certificateId);
         Map<String,Object> response = (Map)ElasticSearchHelper.getResponseFromFuture(elasticSearchService.getDataByIdentifier(JsonKeys.CERT,certificateId));
@@ -95,7 +109,7 @@ public class CertificateUtil {
         return response;
     }
 
-    public static Future<HttpResponse<JsonNode>> makeAsyncPostCall(String apiToCall,String requestBody,Map<String,String>headerMap){
+    public static Future<HttpResponse<JsonNode>> makeAsyncPostCall(String apiToCall, String requestBody, Map<String,String>headerMap){
         logger.info("CertificateUtil:makePostCall:get request to make post call for API:"+apiToCall+":"+requestBody);
         Future<HttpResponse<JsonNode>> jsonResponse
                     = Unirest.post(apiToCall)
@@ -104,12 +118,6 @@ public class CertificateUtil {
                     .asJsonAsync();
             return jsonResponse;
         }
-
-    public static SimpleDateFormat getDateFormatter() {
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss:SSSZ");
-        simpleDateFormat.setLenient(false);
-        return simpleDateFormat;
-    }
 
     private static String getLocalizedMessage(String key, Locale locale){
         return localizer.getMessage(key, locale);
