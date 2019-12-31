@@ -46,9 +46,10 @@ public class CertsServiceImpl implements ICertService {
     @Override
     public Response delete(Request request) throws BaseException {
         Map<String, Object> certAddReqMap = request.getRequest();
-        Response response = null;
+        Response response = new Response();
         if(StringUtils.isNotBlank((String)certAddReqMap.get(JsonKeys.OLD_ID))){
-            response =  CertificateUtil.deleteRecord((String)certAddReqMap.get(JsonKeys.OLD_ID));
+            boolean bool = CertificateUtil.deleteRecord((String)certAddReqMap.get(JsonKeys.OLD_ID));
+            response.getResult().put(JsonKeys.RESPONSE,bool);
             logger.info("CertsServiceImpl:delete Deleted the record from cert_registry table for id "+certAddReqMap.get(JsonKeys.OLD_ID));
         }
         return response;

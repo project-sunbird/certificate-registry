@@ -1,6 +1,7 @@
 package org.sunbird.utilities;
 
 import akka.actor.ActorRef;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
@@ -23,9 +24,7 @@ import org.sunbird.request.Request;
 import org.sunbird.response.Response;
 
 import java.sql.Timestamp;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.Future;
 
 
@@ -39,6 +38,17 @@ public class CertificateUtil {
     private static Logger logger=Logger.getLogger(CertificateUtil.class);
     private static ObjectMapper mapper = new ObjectMapper();
     private static Localizer localizer = Localizer.getInstance();
+
+    public static void main(String[] args) throws JsonProcessingException {
+        List<Map<String,Object>> mapList = new ArrayList<>();
+        Map<String,Object> map2 = new HashMap<>();
+        map2.put("cert1","cert1");
+        map2.put("cert2","cert2");
+        mapList.add(map2);
+        Map<String,Object> respMap = new HashMap<>();
+        respMap.put("req",mapList);
+        System.out.println(mapper.writeValueAsString(respMap));
+    }
 
     public static boolean isIdPresent(String certificateId) {
         logger.info("CertificateUtil:isIdPresent:get id to search in ES:"+certificateId);
@@ -54,14 +64,15 @@ public class CertificateUtil {
         return cassandraOperation.getRecordById(JsonKeys.SUNBIRD,JsonKeys.CERT_REGISTRY,id);
     }
 
-    public static Response deleteRecord(String id) throws BaseException {
-        Response response = cassandraOperation.deleteRecord(JsonKeys.SUNBIRD,JsonKeys.CERT_REGISTRY,id);
-        //Delete the data from ES
+    public static Boolean deleteRecord(String id) throws BaseException {
+        Boolean bool = (Boolean)ElasticSearchHelper.getResponseFromFuture(elasticSearchService.delete(JsonKeys.CERT,id));
+        logger.info("Data deleted from ES for id "+id);
+        //Delete the data from cassandra
         Request req = new Request();
-        req.setOperation(ActorOperations.DELETE_CERT_ES.getOperation());
+        req.setOperation(ActorOperations.DELETE_CERT_CASSANDRA.getOperation());
         req.getRequest().put(JsonKeys.ID,id);
-        Application.getInstance().getActorRef(ActorOperations.DELETE_CERT_ES.getOperation()).tell(req, ActorRef.noSender());
-        return response;
+        Application.getInstance().getActorRef(ActorOperations.DELETE_CERT_CASSANDRA.getOperation()).tell(req, ActorRef.noSender());
+        return bool;
     }
 
     public static Response insertRecord(Map<String,Object>certAddReqMap) throws BaseException {

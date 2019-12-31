@@ -12,7 +12,7 @@ public enum ActorOperations {
     GENERATE("generate"),
     VERIFY("verify"),
     ADD_CERT_ES("add_cert_es"),
-    DELETE_CERT_ES("delete_cert_es");
+    DELETE_CERT_CASSANDRA("delete_cert_cassandra");
 
     private String operation;
 

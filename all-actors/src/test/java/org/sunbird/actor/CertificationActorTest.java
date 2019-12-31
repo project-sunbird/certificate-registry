@@ -5,15 +5,13 @@ import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
 import akka.actor.Props;
 import akka.testkit.javadsl.TestKit;
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
-import com.mashape.unirest.http.ObjectMapper;
-import org.apache.commons.collections.MapUtils;
-import org.apache.commons.math3.analysis.function.Power;
 import org.apache.http.HttpStatus;
 import org.json.JSONObject;
-import org.junit.*;
+import org.junit.Assert;
+import org.junit.BeforeClass;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.powermock.api.mockito.PowerMockito;
@@ -21,7 +19,6 @@ import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.sunbird.ActorOperations;
-import org.sunbird.BaseActor;
 import org.sunbird.CertVars;
 import org.sunbird.JsonKeys;
 import org.sunbird.cassandra.CassandraOperation;
@@ -39,7 +36,10 @@ import org.sunbird.serviceimpl.CertsServiceImpl;
 import org.sunbird.utilities.CertificateUtil;
 import scala.concurrent.duration.Duration;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
@@ -57,8 +57,7 @@ import static org.powermock.api.mockito.PowerMockito.when;
         ElasticSearchService.class,
         CassandraOperation.class,
         CassandraDACImpl.class,
-        CertVars.class,
-        ObjectMapper.class})
+        CertVars.class})
 @PowerMockIgnore("javax.management.*")
 public class CertificationActorTest {
 
@@ -69,6 +68,7 @@ public class CertificationActorTest {
     public static void setUp() throws Exception {
     }
 
+    JSONObject object2 = null;
     //@Before
     public void beforeTestSetUp() throws Exception {
         PowerMockito.mockStatic(Localizer.class);
@@ -106,33 +106,25 @@ public class CertificationActorTest {
         final HttpResponse<JsonNode> mockedResponse = Mockito.mock(HttpResponse.class);
         when(mockedFuture.get()).thenReturn(mockedResponse);
         when(mockedResponse.getStatus()).thenReturn(HttpStatus.SC_OK);
-        //jsonResponse.getBody().getObject().getJSONObject(JsonKeys.RESULT).getString(JsonKeys.SIGNED_URL)
         final JsonNode node = Mockito.mock(JsonNode.class);
         when(mockedResponse.getBody()).thenReturn(node);
         final JSONObject object = Mockito.mock(JSONObject.class);
         when(node.getObject()).thenReturn(object);
-        final JSONObject object2 = Mockito.mock(JSONObject.class);
+        object2 = Mockito.mock(JSONObject.class);
         when(object.getJSONObject(JsonKeys.RESULT)).thenReturn(object2);
+
         when(object2.getString(JsonKeys.SIGNED_URL)).thenReturn("signed_url");
         when(certsService.download(Mockito.any(Request.class))).thenReturn(getValidateCertResponse());
         when(CertificateUtil.getCertificate(Mockito.anyString())).thenReturn(map);
 
         when(CertVars.getGenerateUri()).thenReturn("generate_uri");
-        List<Map<String,Object>> mapList = new ArrayList<>();
-        Map<String,Object> map2 = new HashMap<>();
-        map2.put("cert1","cert1");
-        map2.put("cert2","cert2");
-        mapList.add(map2);
-        Map<String,Object> respMap = new HashMap<>();
-        respMap.put("req",mapList);
-        ObjectMapper mapper1 = PowerMockito.mock(ObjectMapper.class);
-        //when(mapper1.readValue(Mockito.anyString(),new TypeReference<List<new TypeReference<Map<String,Object>>(){})).thenReturn(mapList);
-        when(object2.get(JsonKeys.RESPONSE)).thenReturn(respMap);
+
+
+       // when(object2.get(JsonKeys.RESPONSE)).thenReturn(respMap);
         when(certsService.generate(Mockito.any(Request.class))).thenReturn(getValidateCertResponse());
         when(CertificateUtil.getCertificate(Mockito.anyString())).thenReturn(map);
 
-        ObjectMapper mapper = PowerMockito.mock(ObjectMapper.class);
-        //when(mapper.readValue(Mockito.anyString(),Map.class)).thenReturn(map2);
+
         when(CertVars.getVerifyUri()).thenReturn("verify_uri");
         when(certsService.verify(Mockito.any(Request.class))).thenReturn(getValidateCertResponse());
         when(CertificateUtil.getCertificate(Mockito.anyString())).thenReturn(map);
@@ -195,12 +187,23 @@ public class CertificationActorTest {
         Response res = testKit.expectMsgClass(Duration.create(10, TimeUnit.SECONDS),Response.class);
         Assert.assertTrue(null != res && res.getResponseCode() == ResponseCode.OK);
     }
-    //@Test
+   // @Test
     public void verifyCertificate() throws Exception {
+        beforeTestSetUp();
+
+        List<Map<String,Object>> mapList = new ArrayList<>();
+        Map<String,Object> map2 = new HashMap<>();
+        map2.put("cert1","cert1");
+        map2.put("cert2","cert2");
+        mapList.add(map2);
+        Map<String,Object> respMap = new HashMap<>();
+        respMap.put("req",mapList);
+        when(object2.get(JsonKeys.RESPONSE)).thenReturn(mapList);
+        when(mapList.toString()).thenReturn("{\"req\":[{\"cert2\":\"cert2\",\"cert1\":\"cert1\"}]}");
 
         Request request = createVerifyCertRequest();
         request.setOperation(ActorOperations.VERIFY.getOperation());
-        beforeTestSetUp();
+
         TestKit testKit = new TestKit(system);
         ActorRef actorRef = system.actorOf(props);
         actorRef.tell(request, testKit.getRef());
