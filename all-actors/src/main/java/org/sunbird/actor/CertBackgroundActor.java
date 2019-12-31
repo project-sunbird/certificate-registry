@@ -2,23 +2,31 @@ package org.sunbird.actor;
 
 import org.apache.log4j.Logger;
 import org.sunbird.BaseActor;
+import org.sunbird.BaseException;
 import org.sunbird.JsonKeys;
 import org.sunbird.actor.core.ActorConfig;
+import org.sunbird.cassandra.CassandraOperation;
 import org.sunbird.common.ElasticSearchHelper;
 import org.sunbird.common.factory.EsClientFactory;
 import org.sunbird.common.inf.ElasticSearchService;
+import org.sunbird.helper.ServiceFactory;
 import org.sunbird.request.Request;
 
 import java.util.Map;
 
 @ActorConfig(
-        tasks = {"add_cert_es"},
+        tasks = {"add_cert_es","delete_cert_cassandra"},
         dispatcher = "",
         asyncTasks = {}
 )
 public class CertBackgroundActor extends BaseActor {
     static Logger logger = Logger.getLogger(CertBackgroundActor.class);
     private ElasticSearchService elasticSearchService = getESService();
+    private CassandraOperation cassandraOperation = getCassandraOperation();
+    private static CassandraOperation getCassandraOperation(){
+        return ServiceFactory.getInstance();
+    }
+
     private static ElasticSearchService getESService(){
         return EsClientFactory.getInstance();
     }
@@ -31,10 +39,25 @@ public class CertBackgroundActor extends BaseActor {
                 add(request);
                 break;
 
+            case "delete_cert_cassandra":
+                delete(request);
+                break;
+
             default:
                 onReceiveUnsupportedMessage("CertificationActor");
         }
     }
+
+    private void delete(Request request) throws BaseException {
+        String id = (String) request.getRequest().get(JsonKeys.ID);
+        try {
+            cassandraOperation.deleteRecord(JsonKeys.SUNBIRD, JsonKeys.CERT_REGISTRY, id);
+            logger.info("Data deleted from cassandra for id " + id);
+        }catch (Exception ex){
+            logger.error("Exception occurred while deleting data from cert_registry for id : "+id,ex);
+        }
+    }
+
 
     private void add(Request request) {
         Map<String,Object> certAddReqMap = (Map<String, Object>) request.getRequest().get(JsonKeys.REQUEST);

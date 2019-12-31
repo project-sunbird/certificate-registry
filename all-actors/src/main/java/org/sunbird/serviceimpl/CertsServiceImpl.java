@@ -1,9 +1,9 @@
 package org.sunbird.serviceimpl;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpStatus;
@@ -21,6 +21,7 @@ import org.sunbird.response.Response;
 import org.sunbird.service.ICertService;
 import org.sunbird.utilities.CertificateUtil;
 
+import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.List;
@@ -43,12 +44,61 @@ public class CertsServiceImpl implements ICertService {
     }
 
     @Override
+    public Response delete(Request request) throws BaseException {
+        Map<String, Object> certAddReqMap = request.getRequest();
+        Response response = new Response();
+        if(StringUtils.isNotBlank((String)certAddReqMap.get(JsonKeys.OLD_ID))){
+            boolean bool = CertificateUtil.deleteRecord((String)certAddReqMap.get(JsonKeys.OLD_ID));
+            response.getResult().put(JsonKeys.RESPONSE,bool);
+            logger.info("CertsServiceImpl:delete Deleted the record from cert_registry table for id "+certAddReqMap.get(JsonKeys.OLD_ID));
+        }
+        return response;
+    }
+
+    @Override
     public String add(Request request) throws BaseException {
+        Map<String,Object> reqMap = request.getRequest();
+        if(isPresentRecipientIdAndCertId(request)){
+            validateCertAndRecipientId(reqMap);
+            deleteOldCertificate((String) reqMap.get(JsonKeys.OLD_ID));
+        }
         Map<String, Object> certAddReqMap = request.getRequest();
         assureUniqueCertId((String) certAddReqMap.get(JsonKeys.ID));
         processRecord(certAddReqMap);
         logger.info("CertsServiceImpl:add:record successfully processed with request:"+certAddReqMap);
         return (String)certAddReqMap.get(JsonKeys.ID);
+    }
+
+    private void deleteOldCertificate(String oldCertId) throws BaseException {
+        CertificateUtil.deleteRecord(oldCertId);
+    }
+
+    private void validateCertAndRecipientId(Map<String,Object> reqMap) throws BaseException {
+        String certId = (String) reqMap.get(JsonKeys.OLD_ID);
+        String recipientId = (String) reqMap.get(JsonKeys.RECIPIENT_ID);
+        Response response = CertificateUtil.getCertRecordByID(certId);
+        List<Map<String, Object>> resultList = (List<Map<String, Object>>) response.getResult().get(JsonKeys.RESPONSE);
+        if(CollectionUtils.isNotEmpty(resultList)) {
+            Map<String, Object> result = resultList.get(0);
+            try {
+                Map<String,Object> recipient = requestMapper.readValue((String)result.get(JsonKeys.RECIPIENT), Map.class);
+                if(StringUtils.isNotBlank((String)recipient.get(JsonKeys.ID)) && !recipientId.equalsIgnoreCase((String)recipient.get(JsonKeys.ID))){
+                    throw new BaseException(IResponseMessage.INVALID_REQUESTED_DATA,localizer.getMessage(IResponseMessage.INVALID_REQUESTED_DATA,null),ResponseCode.BAD_REQUEST.getCode());
+                }
+            }catch (IOException ex){
+                throw new BaseException(IResponseMessage.SERVER_ERROR,getLocalizedMessage(IResponseMessage.SERVER_ERROR,null),ResponseCode.SERVER_ERROR.getCode());
+            }
+        }
+    }
+
+    private boolean isPresentRecipientIdAndCertId(Request request) {
+        Map<String,Object> reqMap = request.getRequest();
+        String certId = (String) reqMap.get(JsonKeys.OLD_ID);
+        String recipientId = (String) reqMap.get(JsonKeys.RECIPIENT_ID);
+        if(StringUtils.isNotBlank(certId) && StringUtils.isNotBlank(recipientId)){
+            return true;
+        }
+        return false;
     }
 
     private void assureUniqueCertId(String certificatedId) throws BaseException {

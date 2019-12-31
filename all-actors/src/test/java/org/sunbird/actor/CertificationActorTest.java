@@ -5,8 +5,13 @@ import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
 import akka.actor.Props;
 import akka.testkit.javadsl.TestKit;
-import org.apache.commons.math3.analysis.function.Power;
-import org.junit.*;
+import com.mashape.unirest.http.HttpResponse;
+import com.mashape.unirest.http.JsonNode;
+import org.apache.http.HttpStatus;
+import org.json.JSONObject;
+import org.junit.Assert;
+import org.junit.BeforeClass;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.powermock.api.mockito.PowerMockito;
@@ -14,7 +19,7 @@ import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.sunbird.ActorOperations;
-import org.sunbird.BaseActor;
+import org.sunbird.CertVars;
 import org.sunbird.JsonKeys;
 import org.sunbird.cassandra.CassandraOperation;
 import org.sunbird.cassandraimpl.CassandraDACImpl;
@@ -31,8 +36,11 @@ import org.sunbird.serviceimpl.CertsServiceImpl;
 import org.sunbird.utilities.CertificateUtil;
 import scala.concurrent.duration.Duration;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 import static org.powermock.api.mockito.PowerMockito.when;
@@ -48,7 +56,8 @@ import static org.powermock.api.mockito.PowerMockito.when;
         ElasticSearchRestHighImpl.class,
         ElasticSearchService.class,
         CassandraOperation.class,
-        CassandraDACImpl.class})
+        CassandraDACImpl.class,
+        CertVars.class})
 @PowerMockIgnore("javax.management.*")
 public class CertificationActorTest {
 
@@ -59,10 +68,13 @@ public class CertificationActorTest {
     public static void setUp() throws Exception {
     }
 
+    JSONObject object2 = null;
     //@Before
     public void beforeTestSetUp() throws Exception {
         PowerMockito.mockStatic(Localizer.class);
         when(Localizer.getInstance()).thenReturn(null);
+
+        PowerMockito.mockStatic(CertVars.class);
 
         PowerMockito.mockStatic(EsClientFactory.class);
         ElasticSearchService elasticSearchService = PowerMockito.mock(ElasticSearchService.class);
@@ -87,13 +99,33 @@ public class CertificationActorTest {
         Map<String,Object> map = new HashMap<>();
         map.put(JsonKeys.ACCESS_CODE,"access_code");
         when(CertificateUtil.getCertificate(Mockito.anyString())).thenReturn(map);
+        when(CertVars.getSERVICE_BASE_URL()).thenReturn("service_base_url");
+        when(CertVars.getDOWNLOAD_URI()).thenReturn("download_url");
+        final Future<HttpResponse<JsonNode>> mockedFuture = Mockito.mock(Future.class);
+        when(CertificateUtil.makeAsyncPostCall(Mockito.anyString(),Mockito.anyString(),Mockito.anyMap())).thenReturn(mockedFuture);
+        final HttpResponse<JsonNode> mockedResponse = Mockito.mock(HttpResponse.class);
+        when(mockedFuture.get()).thenReturn(mockedResponse);
+        when(mockedResponse.getStatus()).thenReturn(HttpStatus.SC_OK);
+        final JsonNode node = Mockito.mock(JsonNode.class);
+        when(mockedResponse.getBody()).thenReturn(node);
+        final JSONObject object = Mockito.mock(JSONObject.class);
+        when(node.getObject()).thenReturn(object);
+        object2 = Mockito.mock(JSONObject.class);
+        when(object.getJSONObject(JsonKeys.RESULT)).thenReturn(object2);
 
+        when(object2.getString(JsonKeys.SIGNED_URL)).thenReturn("signed_url");
         when(certsService.download(Mockito.any(Request.class))).thenReturn(getValidateCertResponse());
         when(CertificateUtil.getCertificate(Mockito.anyString())).thenReturn(map);
 
+        when(CertVars.getGenerateUri()).thenReturn("generate_uri");
+
+
+       // when(object2.get(JsonKeys.RESPONSE)).thenReturn(respMap);
         when(certsService.generate(Mockito.any(Request.class))).thenReturn(getValidateCertResponse());
         when(CertificateUtil.getCertificate(Mockito.anyString())).thenReturn(map);
 
+
+        when(CertVars.getVerifyUri()).thenReturn("verify_uri");
         when(certsService.verify(Mockito.any(Request.class))).thenReturn(getValidateCertResponse());
         when(CertificateUtil.getCertificate(Mockito.anyString())).thenReturn(map);
     }
@@ -131,7 +163,7 @@ public class CertificationActorTest {
         Assert.assertTrue(null != res && res.getResponseCode() == ResponseCode.OK);
     }
 
-    //@Test
+    @Test
     public void downloadCertificate() throws Exception {
 
         Request request = createDownloadCertRequest();
@@ -157,15 +189,34 @@ public class CertificationActorTest {
     }
    // @Test
     public void verifyCertificate() throws Exception {
-
-        Request request = createAddCertRequest();
-        request.setOperation(ActorOperations.VERIFY.getOperation());
         beforeTestSetUp();
+
+        List<Map<String,Object>> mapList = new ArrayList<>();
+        Map<String,Object> map2 = new HashMap<>();
+        map2.put("cert1","cert1");
+        map2.put("cert2","cert2");
+        mapList.add(map2);
+        Map<String,Object> respMap = new HashMap<>();
+        respMap.put("req",mapList);
+        when(object2.get(JsonKeys.RESPONSE)).thenReturn(mapList);
+        when(mapList.toString()).thenReturn("{\"req\":[{\"cert2\":\"cert2\",\"cert1\":\"cert1\"}]}");
+
+        Request request = createVerifyCertRequest();
+        request.setOperation(ActorOperations.VERIFY.getOperation());
+
         TestKit testKit = new TestKit(system);
         ActorRef actorRef = system.actorOf(props);
         actorRef.tell(request, testKit.getRef());
         Response res = testKit.expectMsgClass(Duration.create(10, TimeUnit.SECONDS),Response.class);
         Assert.assertTrue(null != res && res.getResponseCode() == ResponseCode.OK);
+    }
+
+    private Request createVerifyCertRequest() {
+        Request request = new Request();
+        request.getRequest().put(JsonKeys.ID,"some_id");
+        request.getRequest().put(JsonKeys.DATA,new HashMap<>());
+        request.setOperation(ActorOperations.VERIFY.getOperation());
+        return request;
     }
 
     private Response getValidateCertResponse(){

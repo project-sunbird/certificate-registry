@@ -77,4 +77,8 @@ public class JsonKeys {
     public static final String SUNBIRD = "sunbird";
     public static final String CERT_REGISTRY = "cert_registry";
     public static final String RECIPIENT="recipient";
+    public static final String OLD_ID="oldId";
+    public static final String IDENTITY="identity";
+    public static final String RECIPIENT_IDENTITY="recipient.id";
+    public static final String CONTENT = "content";
 }
