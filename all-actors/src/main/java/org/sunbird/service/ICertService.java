@@ -5,6 +5,8 @@ import org.sunbird.BaseException;
 import org.sunbird.request.Request;
 import org.sunbird.response.Response;
 
+import java.io.IOException;
+
 /**
  * this is an interface class for implementing certificate related operations
  * @author anmolgupta

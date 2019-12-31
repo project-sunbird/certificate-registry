@@ -1,5 +1,7 @@
 package org.sunbird.actor;
 
+import akka.dispatch.Mapper;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.sunbird.BaseActor;
 import org.sunbird.BaseException;
@@ -7,10 +9,19 @@ import org.sunbird.JsonKeys;
 import org.sunbird.actor.core.ActorConfig;
 import org.sunbird.common.factory.EsClientFactory;
 import org.sunbird.common.inf.ElasticSearchService;
+import org.sunbird.dto.SearchDTO;
+import org.sunbird.message.IResponseMessage;
+import org.sunbird.message.ResponseCode;
 import org.sunbird.request.Request;
 import org.sunbird.response.Response;
 import org.sunbird.service.ICertService;
 import org.sunbird.serviceimpl.CertsServiceImpl;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.Future;
+import java.util.function.Function;
 
 @ActorConfig(
         tasks = {"add","validate","download","generate","verify"},

@@ -1,13 +1,11 @@
 package org.sunbird.utilities;
 
 import akka.actor.ActorRef;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import org.apache.commons.collections.MapUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.sunbird.ActorOperations;
 import org.sunbird.Application;
@@ -17,7 +15,6 @@ import org.sunbird.cassandra.CassandraOperation;
 import org.sunbird.common.ElasticSearchHelper;
 import org.sunbird.common.factory.EsClientFactory;
 import org.sunbird.common.inf.ElasticSearchService;
-import org.sunbird.dto.SearchDTO;
 import org.sunbird.helper.ServiceFactory;
 import org.sunbird.message.IResponseMessage;
 import org.sunbird.message.Localizer;
@@ -26,7 +23,6 @@ import org.sunbird.request.Request;
 import org.sunbird.response.Response;
 
 import java.sql.Timestamp;
-import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -53,6 +49,11 @@ public class CertificateUtil {
         }
         return false;
     }
+
+    public static Response getCertRecordByID(String id) throws BaseException {
+        return cassandraOperation.getRecordById(JsonKeys.SUNBIRD,JsonKeys.CERT_REGISTRY,id);
+    }
+
     public static Response deleteRecord(String id) throws BaseException {
         Response response = cassandraOperation.deleteRecord(JsonKeys.SUNBIRD,JsonKeys.CERT_REGISTRY,id);
         //Delete the data from ES
@@ -62,7 +63,6 @@ public class CertificateUtil {
         Application.getInstance().getActorRef(ActorOperations.DELETE_CERT_ES.getOperation()).tell(req, ActorRef.noSender());
         return response;
     }
-
 
     public static Response insertRecord(Map<String,Object>certAddReqMap) throws BaseException {
         Map<String,Object>certMap = new HashMap<>();
@@ -91,13 +91,6 @@ public class CertificateUtil {
 
     }
 
-
-    public static  Map<String,Object> getCertificate(SearchDTO searchDTO) {
-        logger.info("CertificateUtil:isIdPresent:get id to search in ES:"+searchDTO);
-        Map<String,Object> response = (Map)ElasticSearchHelper.getResponseFromFuture(elasticSearchService.search(searchDTO,JsonKeys.CERT));
-        logger.info("CertificateUtil:isIdPresent:got response from ES:"+response);
-        return response;
-    }
     public static  Map<String,Object> getCertificate(String certificateId) {
         logger.info("CertificateUtil:isIdPresent:get id to search in ES:"+certificateId);
         Map<String,Object> response = (Map)ElasticSearchHelper.getResponseFromFuture(elasticSearchService.getDataByIdentifier(JsonKeys.CERT,certificateId));
@@ -105,7 +98,7 @@ public class CertificateUtil {
         return response;
     }
 
-    public static Future<HttpResponse<JsonNode>> makeAsyncPostCall(String apiToCall,String requestBody,Map<String,String>headerMap){
+    public static Future<HttpResponse<JsonNode>> makeAsyncPostCall(String apiToCall, String requestBody, Map<String,String>headerMap){
         logger.info("CertificateUtil:makePostCall:get request to make post call for API:"+apiToCall+":"+requestBody);
         Future<HttpResponse<JsonNode>> jsonResponse
                     = Unirest.post(apiToCall)
@@ -114,12 +107,6 @@ public class CertificateUtil {
                     .asJsonAsync();
             return jsonResponse;
         }
-
-    public static SimpleDateFormat getDateFormatter() {
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss:SSSZ");
-        simpleDateFormat.setLenient(false);
-        return simpleDateFormat;
-    }
 
     private static String getLocalizedMessage(String key, Locale locale){
         return localizer.getMessage(key, locale);
