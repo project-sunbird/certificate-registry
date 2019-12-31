@@ -55,20 +55,6 @@ public class BaseController extends Controller {
         return future.thenApplyAsync(Results::ok, httpExecutionContext.current());
     }
 
-    /**
-     * This method will return the current timestamp.
-     *
-     * @return long
-     */
-    public long getTimeStamp() {
-        return System.currentTimeMillis();
-    }
-
-    /**
-     * This method we used to print the logs of starting time of methods
-     *
-     * @param tag
-     */
     public void startTrace(String tag) {
         logger.info("Method call started.");
     }
@@ -109,50 +95,8 @@ public class BaseController extends Controller {
                 validatorFunction.apply(request);
             }
             return new RequestHandler().handleRequest(request, operation,req);
-        } catch (BaseException ex) {
-            return (CompletionStage<Result>) RequestHandler.handleFailureResponse(ex,req);
         } catch (Exception ex) {
-            return (CompletionStage<Result>)RequestHandler.handleFailureResponse(ex,req);
-        }
-
-    }
-
-    /**
-     * this method is used to handle the only GET requests.
-     *
-     * @param req
-     * @param operation
-     * @return
-     */
-    public CompletionStage<Result> handleRequest(Request req, String operation,play.mvc.Http.Request request) throws Exception {
-        try {
-            return new RequestHandler().handleRequest(req, operation,request);
-        } catch (BaseException ex) {
-            return (CompletionStage<Result>) RequestHandler.handleFailureResponse(ex, request);
-        } catch (Exception ex) {
-            return (CompletionStage<Result>)RequestHandler.handleFailureResponse(ex, request);
-        }
-
-    }
-
-    /**
-     * This method is used specifically to handel Log Apis request this will set log
-     * levels and then return the CompletionStage of Result
-     *
-     * @return
-     */
-    public CompletionStage<Result> handleLogRequest() {
-        startTrace("handleLogRequest");
-        Response response = new Response();
-        Request request = null;
-        try {
-            request = (Request) RequestMapper.mapRequest(request(), Request.class);
-        } catch (Exception ex) {
-            logger.error(String.format("%s:%s:exception occurred in mapping request", this.getClass().getSimpleName(), "handleLogRequest"),ex);
-            return (CompletionStage<Result>)
-                    RequestHandler.handleFailureResponse(ex, null);
-        }
-        return (CompletionStage<Result>)
-                RequestHandler.handleSuccessResponse(response, null);
-    }
-}
+            return CompletableFuture.supplyAsync(() -> {
+                return RequestHandler.handleFailureResponse(ex,req);
+            });
+        }}}

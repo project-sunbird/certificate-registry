@@ -3,15 +3,18 @@ package controllers;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.http.HttpStatus;
 import org.junit.Before;
 import org.junit.Test;
 import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.sunbird.JsonKeys;
 import org.sunbird.message.ResponseCode;
 import org.sunbird.request.HeaderParam;
 import play.libs.Json;
 import play.mvc.Http;
 import play.mvc.Result;
 import play.test.Helpers;
+import utils.JsonKey;
 import utils.module.OnRequestHandler;
 
 import java.io.IOException;
@@ -24,35 +27,104 @@ import static org.junit.Assert.assertEquals;
 
 @PrepareForTest({OnRequestHandler.class,BaseController.class})
 public class CertificateControllerTest extends BaseApplicationTest {
-
-    public static Map<String, List<String>> headerMap;
     @Before
     public void before() {
         setup(DummyActor.class);
-        headerMap = new HashMap<>();
-        headerMap.put(HeaderParam.X_Consumer_ID.getName(), Arrays.asList("Some consumer ID"));
-        headerMap.put(HeaderParam.X_Device_ID.getName(), Arrays.asList("Some device ID"));
-        headerMap.put(
-                HeaderParam.X_Authenticated_Userid.getName(), Arrays.asList("Some authenticated user ID"));
-        headerMap.put(HeaderParam.X_APP_ID.getName(), Arrays.asList("Some app Id"));
     }
 
-   // @Test
+   @Test
     public void testAddCertificateSuccess() {
         Result result =
                 performTest(
                         "/certs/v1/registry/add",
                         "POST",
-                        createCertRequest());
-        assertEquals(getResponseCode(result), ResponseCode.getResponseCode(200));
+                        createCertRequest(false));
+        assertEquals(getResponseStatus(result), HttpStatus.SC_OK);
     }
 
-    private Map<String,Object> createCertRequest() {
+    @Test
+    public void testAddCertificateFailure() {
+        Result result =
+                performTest(
+                        "/certs/v1/registry/add",
+                        "POST",
+                        createCertRequest(true));
+        assertEquals(getResponseStatus(result), HttpStatus.SC_BAD_REQUEST);
+    }
+
+    @Test
+    public void testDownloadCertificateSuccess() {
+        Result result =
+                performTest(
+                        "/certs/v1/registry/download",
+                        "POST",
+                        getCertDownloadReq(false));
+        assertEquals(getResponseStatus(result), HttpStatus.SC_OK);
+    }
+
+    @Test
+    public void testDownloadCertificateFailure() {
+        Result result =
+                performTest(
+                        "/certs/v1/registry/download",
+                        "POST",
+                        getCertDownloadReq(true));
+        assertEquals(getResponseStatus(result), HttpStatus.SC_BAD_REQUEST);
+    }
+
+    @Test
+    public void testValidateCertificateSuccess() {
+        Result result =
+                performTest(
+                        "/certs/v1/registry/validate",
+                        "POST",
+                        getCertValidateMap(false));
+        assertEquals(getResponseStatus(result), HttpStatus.SC_OK);
+    }
+    @Test
+    public void testValidateCertificateFailure() {
+        Result result =
+                performTest(
+                        "/certs/v1/registry/validate",
+                        "POST",
+                        getCertValidateMap(true));
+        assertEquals(getResponseStatus(result), HttpStatus.SC_BAD_REQUEST);
+    }
+
+    @Test
+    public void testVerifyCertificateFailure() {
+        Result result =
+                performTest(
+                        "/certs/v1/registry/verify",
+                        "POST",
+                        getCertVerifyMap(true));
+        assertEquals(getResponseStatus(result), HttpStatus.SC_BAD_REQUEST);
+    }
+
+    @Test
+    public void testVerifyCertificateSuccess() {
+        Result result =
+                performTest(
+                        "/certs/v1/registry/verify",
+                        "POST",
+                        getCertVerifyMap(false));
+        assertEquals(getResponseStatus(result), HttpStatus.SC_OK);
+    }
+
+
+
+
+
+
+
+    private Map<String,Object> createCertRequest(boolean isBad) {
         Map<String,Object> reqMap = new HashMap<>();
         Map<String,Object> innerMap = new HashMap<>();
         innerMap.put("recipientId", "b69b056d-1d7d-47a9-a3b6-584fce840fd3");
         innerMap.put("recipientName", "Akash Kumar");
-        innerMap.put("id", "id5dd4");
+        if(!isBad) {
+            innerMap.put("id", "id5dd4");
+        }
         innerMap.put("accessCode", "EANAB13");
         Map<String,Object> jsonData = new HashMap<>();
         jsonData.put("id", "http://localhost:8080/_schemas/Certificate/d5a28280-98ac-4294-a508-21075dc7d475");
@@ -80,6 +152,40 @@ public class CertificateControllerTest extends BaseApplicationTest {
         return reqMap;
     }
 
+    private Map<String,Object> getCertDownloadReq(boolean isBad){
+        Map<String,Object>reqMap = new HashMap<>();
+        Map<String,Object>request = new HashMap<>();
+        if(!isBad) {
+            request.put(JsonKeys.PDF_URL, "ANYpDFuR;");
+        }
+        reqMap.put(JsonKeys.REQUEST,request);
+        return reqMap;
+    }
+
+
+    private Map<String,Object> getCertValidateMap(boolean isBad){
+        Map<String,Object>reqMap = new HashMap<>();
+        Map<String,Object>request = new HashMap<>();
+        if(!isBad) {
+            request.put(JsonKeys.CERT_ID, "anyCertId");
+            request.put(JsonKeys.ACCESS_CODE,"anyAccessCode");
+        }
+        reqMap.put(JsonKeys.REQUEST,request);
+        return reqMap;
+    }
+
+    private Map<String,Object> getCertVerifyMap(boolean isBad){
+        Map<String,Object>reqMap = new HashMap<>();
+        Map<String,Object>request = new HashMap<>();
+        if(!isBad) {
+            request.put(JsonKeys.ID, "anyCertId;");
+        }
+        reqMap.put(JsonKeys.REQUEST,request);
+        return reqMap;
+    }
+
+
+
     public Result performTest(String url, String method, Map map) {
         String data = mapToJson(map);
         Http.RequestBuilder req;
@@ -89,7 +195,6 @@ public class CertificateControllerTest extends BaseApplicationTest {
         } else {
             req = new Http.RequestBuilder().uri(url).method(method);
         }
-        //req.headers(new Http.Headers(headerMap));
         Result result = Helpers.route(application, req);
         return result;
     }
