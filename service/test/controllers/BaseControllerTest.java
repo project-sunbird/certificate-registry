@@ -1,28 +1,17 @@
 package controllers;
 
 import akka.actor.ActorRef;
-
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Test;
-
 import org.junit.runner.RunWith;
-import org.mockito.Mockito;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
-
 import org.sunbird.BaseException;
-import org.sunbird.message.IResponseMessage;
-import org.sunbird.message.Localizer;
 import org.sunbird.response.Response;
-import play.Application;
 import scala.concurrent.Await;
-import scala.concurrent.Future;
-import scala.concurrent.duration.FiniteDuration;
 import utils.JsonKey;
-
-import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 
@@ -32,43 +21,17 @@ import static org.junit.Assert.assertEquals;
 @PowerMockIgnore({"javax.management.*", "javax.net.ssl.*", "javax.security.*"})
 
 public class BaseControllerTest {
-  public static Application app;
-  public static Map<String, String[]> headerMap;
   private org.sunbird.Application application;
-  private static ActorRef actorRef;
-  private static BaseController baseController;
 
   public BaseControllerTest() throws BaseException {
     baseControllerTestsetUp();
   }
 
   public void baseControllerTestsetUp() throws BaseException {
-
     application = PowerMockito.mock(org.sunbird.Application.class);
     PowerMockito.mockStatic(org.sunbird.Application.class);
     PowerMockito.when(org.sunbird.Application.getInstance()).thenReturn(application);
     application.init();
-    mockRequestHandler();
-  }
-
-  public void mockRequestHandler() {
-
-    try {
-      baseController = Mockito.mock(BaseController.class);
-      actorRef = Mockito.mock(ActorRef.class);
-      Mockito.when(baseController.getActorRef(Mockito.anyString())).thenReturn(actorRef);
-      PowerMockito.mockStatic(Await.class);
-      PowerMockito.when(Await.result(Mockito.any(Future.class), Mockito.any(FiniteDuration.class)))
-              .thenReturn(getResponseObject());
-    }catch (Exception ex) {
-    }
-  }
-
-  private Response getResponseObject() {
-
-    Response response = new Response();
-    response.put("ResponseCode", "success");
-    return response;
   }
 
   @Test
