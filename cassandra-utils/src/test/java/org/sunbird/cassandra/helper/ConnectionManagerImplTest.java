@@ -2,23 +2,16 @@
 package org.sunbird.cassandra.helper;
 
 import com.datastax.driver.core.*;
-import org.apache.commons.math3.analysis.function.Power;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
-import org.sunbird.BaseException;
-import org.sunbird.JsonKeys;
-import org.sunbird.common.CassandraUtil;
 import org.sunbird.common.Constants;
 import org.sunbird.helper.CassandraConnectionManagerImpl;
-import org.sunbird.helper.CassandraConnectionMngrFactory;
 import org.sunbird.helper.PropertiesCache;
 import org.sunbird.message.ResponseCode;
 
@@ -28,9 +21,7 @@ import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.reset;
 import static org.powermock.api.mockito.PowerMockito.when;
-import static org.powermock.api.mockito.PowerMockito.whenNew;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({
@@ -47,19 +38,14 @@ import static org.powermock.api.mockito.PowerMockito.whenNew;
 })
 @PowerMockIgnore("javax.management.*")
 public class ConnectionManagerImplTest {
-
-
-  @BeforeClass
-  public static void init() throws BaseException {
-
-
-  }
+ PropertiesCache cache = null;
 
   @Before
   public void setUp() throws Exception {
     PowerMockito.mockStatic(PropertiesCache.class);
+    cache = PowerMockito.mock(PropertiesCache.class);
     PowerMockito.when(PropertiesCache.getConfigValue(Constants.SUNBIRD_CASSANDRA_CONSISTENCY_LEVEL)).thenReturn(null);
-    PropertiesCache cache = PowerMockito.mock(PropertiesCache.class);
+    when(PropertiesCache.getInstance()).thenReturn(cache);
     when(cache.getProperty(Constants.CORE_CONNECTIONS_PER_HOST_FOR_LOCAL)).thenReturn("1");
     when(cache.getProperty(Constants.MAX_CONNECTIONS_PER_HOST_FOR_LOCAl)).thenReturn("1");
     when(cache.getProperty(Constants.CORE_CONNECTIONS_PER_HOST_FOR_REMOTE)).thenReturn("1");
@@ -74,9 +60,15 @@ public class ConnectionManagerImplTest {
     PoolingOptions poolingOptions = PowerMockito.mock(PoolingOptions.class);
     PowerMockito.whenNew(PoolingOptions.class).withNoArguments().thenReturn(poolingOptions);
     PowerMockito.mockStatic(Cluster.class);
-    PowerMockito.mockStatic(Cluster.Builder.class);
     Cluster cluster = PowerMockito.mock(Cluster.class);
     Cluster.Builder builder = PowerMockito.mock(Cluster.Builder.class);
+    PowerMockito.when(Cluster.builder()).thenReturn(builder);
+    PowerMockito.when(builder.addContactPoints(Mockito.anyString())).thenReturn(builder);
+    PowerMockito.when(builder.withPort(Mockito.anyInt())).thenReturn(builder);
+    PowerMockito.when(builder.withProtocolVersion(Mockito.anyObject())).thenReturn(builder);
+    PowerMockito.when(builder.withRetryPolicy(Mockito.anyObject())).thenReturn(builder);
+    PowerMockito.when(builder.withTimestampGenerator(Mockito.anyObject())).thenReturn(builder);
+    PowerMockito.when(builder.withPoolingOptions(Mockito.anyObject())).thenReturn(builder);
     PowerMockito.when(builder.build()).thenReturn(cluster);
     QueryLogger queryLogger = PowerMockito.mock(QueryLogger.class);
     QueryLogger.Builder builder1 = PowerMockito.mock(QueryLogger.Builder.class);
@@ -98,9 +90,8 @@ public class ConnectionManagerImplTest {
     PowerMockito.when(host.getAddress()).thenReturn(inetAddress);
   }
 
-  //@Test
+  @Test
   public void testCreateConnectionSuccessWithoutUsernameAndPassword() throws Exception {
-
     boolean bool = new CassandraConnectionManagerImpl(Constants.STANDALONE_MODE).createConnection("127.0.0.1", "9042", null, null, "cassandraKeySpace");
     assertEquals(true, bool);
   }
@@ -108,16 +99,15 @@ public class ConnectionManagerImplTest {
   @Test
   public void testCreateConnectionSuccessWithUserNameAndPassword() throws Exception {
 
-   // Boolean bool =
-   //     connectionManager.createConnection(host, port, "cassandra", "password", cassandraKeySpace);
-   // assertEquals(true, bool);
+    Boolean bool =
+            new CassandraConnectionManagerImpl(Constants.STANDALONE_MODE).createConnection("127.0.0.1", "9042", "cassandra", "password", "cassandraKeySpace");
+    assertEquals(true, bool);
   }
 
   @Test
   public void testCreateConnectionFailure() {
-
     try {
-    //  connectionManager.createConnection("127.0.0.1", "9042", "cassandra", "pass", "eySpace");
+     new CassandraConnectionManagerImpl(Constants.STANDALONE_MODE).createConnection("127.0.0.1", "9042", "cassandra", "pass", "eySpace");
     } catch (Exception ex) {
     }
     assertTrue(500 == ResponseCode.SERVER_ERROR.getCode());
