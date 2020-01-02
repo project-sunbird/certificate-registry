@@ -22,11 +22,11 @@ public class HealthControllerTest extends BaseControllerTest {
     public static Map<String, String[]> headerMap;
 
     public HealthControllerTest() throws BaseException {
+        super();
     }
 
     @Before
-    public void setUp() throws Exception {
-
+    public void setUp(){
         testHelper = new TestHelper();
         app = Helpers.fakeApplication();
         Helpers.start(app);
@@ -34,7 +34,7 @@ public class HealthControllerTest extends BaseControllerTest {
     }
 
     @After
-    public void tearDown() throws Exception {
+    public void tearDown(){
         headerMap = null;
         app = null;
         testHelper = null;

@@ -3,6 +3,7 @@ package controllers;
 import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
 import akka.actor.Props;
+import akka.dispatch.Futures;
 import akka.pattern.Patterns;
 import akka.util.Timeout;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -37,6 +38,8 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import static org.powermock.api.mockito.PowerMockito.when;
+
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({org.sunbird.Application.class, BaseController.class, ActorRef.class, Await.class, org.sunbird.Application.class, Patterns.class})
 @PowerMockIgnore({"javax.management.*", "javax.net.ssl.*", "javax.security.*"})
@@ -44,7 +47,6 @@ public abstract class BaseApplicationTest {
   protected Application application;
   private ActorSystem system;
   private Props props;
-  public static Map<String, String[]> headerMap;
   private org.sunbird.Application app;
   private static ActorRef actorRef;
   private static BaseController baseController;
@@ -66,36 +68,18 @@ public abstract class BaseApplicationTest {
       Mockito.when(baseController.getActorRef(Mockito.anyString())).thenReturn(actorRef);
       PowerMockito.mockStatic(OnRequestHandler.class);
       PowerMockito.mockStatic(Patterns.class);
-      Response response = new Response();
-      response.setResponseCode(ResponseCode.OK);
-      Map<String,Object> map = new HashMap<>();
-      map.put("id","is");
-      response.getResult().putAll(map);
-
-     // Mockito.when(Patterns.ask(Mockito.any(ActorRef.class),Mockito.any(Request.class),Mockito.any(Timeout.class))).thenReturn()
+      Future<Object>f1= Futures.successful(getResponseObject());
+      when(Patterns.ask(Mockito.any(ActorRef.class),Mockito.any(Request.class),Mockito.any(Timeout.class))).thenReturn(f1);
     } catch (Exception e) {
     }
   }
 
   public void applicationSetUp() throws BaseException {
-
     app = PowerMockito.mock(org.sunbird.Application.class);
     PowerMockito.mockStatic(org.sunbird.Application.class);
     PowerMockito.when(org.sunbird.Application.getInstance()).thenReturn(app);
     app.init();
-    mockRequestHandler();
   }
-
-  public void mockRequestHandler() {
-
-    try {
-      PowerMockito.mockStatic(Await.class);
-      PowerMockito.when(Await.result(Mockito.any(Future.class), Mockito.any(FiniteDuration.class)))
-              .thenReturn(getResponseObject());
-    }catch (Exception ex) {
-    }
-  }
-
   private Response getResponseObject() {
 
     Response response = new Response();
@@ -119,6 +103,7 @@ public abstract class BaseApplicationTest {
         return params.getStatus();
       }
     } catch (Exception e) {
+      e.printStackTrace();
     }
     return "";
   }
