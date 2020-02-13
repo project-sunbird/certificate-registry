@@ -81,6 +81,18 @@ public class CertificateControllerTest extends BaseApplicationTest {
                         getCertValidateMap(false));
         assertEquals(getResponseStatus(result), HttpStatus.SC_OK);
     }
+
+    @Test
+    public void testSearchCertificateSuccess() {
+        Result result =
+                performTest(
+                        "/certs/v1/registry/search",
+                        "POST",
+                        getCertValidateMap(false));
+        assertEquals(getResponseStatus(result), HttpStatus.SC_OK);
+    }
+
+
     @Test
     public void testValidateCertificateFailure() {
         Result result =
