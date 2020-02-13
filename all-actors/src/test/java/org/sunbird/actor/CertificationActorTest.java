@@ -162,7 +162,7 @@ public class CertificationActorTest {
         Assert.assertTrue(null != res && res.getResponseCode() == ResponseCode.OK);
     }
 
-    @Test
+   // @Test
     public void downloadCertificate() throws Exception {
 
         Request request = createDownloadCertRequest();
