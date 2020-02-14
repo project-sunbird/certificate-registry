@@ -70,7 +70,7 @@ public class CertGenerateValidator implements IRequestValidator{
             List<Map<String, Object>> data, String parentKey, List<String> keys) throws BaseException {
         if (CollectionUtils.isEmpty(data)) {
             throw new BaseException("MANDATORY_PARAMETER_MISSING",
-                    MessageFormat.format(IResponseMessage.MISSING_MANADATORY_PARAMS, parentKey),
+                    MessageFormat.format(IResponseMessage.MISSING_MANDATORY_PARAMS, parentKey),
                     ResponseCode.CLIENT_ERROR.getCode());
         }
         for (Map<String, Object> map : data) {
@@ -83,7 +83,7 @@ public class CertGenerateValidator implements IRequestValidator{
             Map<String, Object> data, String parentKey, List<String> keys) throws BaseException {
         if (MapUtils.isEmpty(data)) {
             throw new BaseException("MANDATORY_PARAMETER_MISSING",
-                    MessageFormat.format(IResponseMessage.MISSING_MANADATORY_PARAMS, parentKey),
+                    MessageFormat.format(IResponseMessage.MISSING_MANDATORY_PARAMS, parentKey),
                     ResponseCode.CLIENT_ERROR.getCode());
         }
         checkChildrenMapMandatoryParams(data, keys, parentKey);
@@ -94,7 +94,7 @@ public class CertGenerateValidator implements IRequestValidator{
         for (String key : keys) {
             if (StringUtils.isBlank((String) data.get(key))) {
                 throw new BaseException("MANDATORY_PARAMETER_MISSING",
-                        MessageFormat.format(IResponseMessage.MISSING_MANADATORY_PARAMS, parentKey + "." + key),
+                        MessageFormat.format(IResponseMessage.MISSING_MANDATORY_PARAMS, parentKey + "." + key),
                         ResponseCode.CLIENT_ERROR.getCode());
             }
         }

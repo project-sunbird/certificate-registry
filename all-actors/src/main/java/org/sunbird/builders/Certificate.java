@@ -1,6 +1,7 @@
 package org.sunbird.builders;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.Map;
 
@@ -22,6 +23,7 @@ public class Certificate {
     private boolean isRevoked;
     private String reason;
     private String accessCode;
+
     public Certificate(){}
 
     private Certificate(Builder builder) {
@@ -75,6 +77,7 @@ public class Certificate {
         return updatedBy;
     }
 
+    @JsonProperty(value = "isRevoked")
     public boolean isRevoked() {
         return isRevoked;
     }

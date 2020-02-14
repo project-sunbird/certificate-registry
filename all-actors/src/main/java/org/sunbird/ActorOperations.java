@@ -10,7 +10,9 @@ public enum ActorOperations {
     VALIDATE("validate"),
     DOWNLOAD("download"),
     GENERATE("generate"),
-    VERIFY("verify");
+    VERIFY("verify"),
+    ADD_CERT_ES("add_cert_es"),
+    DELETE_CERT_CASSANDRA("delete_cert_cassandra");
 
     private String operation;
 

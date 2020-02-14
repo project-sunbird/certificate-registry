@@ -5,12 +5,16 @@ import org.sunbird.BaseException;
 import org.sunbird.request.Request;
 import org.sunbird.response.Response;
 
+import java.io.IOException;
+
 /**
  * this is an interface class for implementing certificate related operations
  * @author anmolgupta
  *
  */
 public interface ICertService{
+
+    Response delete(Request request) throws BaseException;
 
     String add(Request request) throws BaseException;
 
