@@ -11,6 +11,7 @@ import org.apache.http.HttpStatus;
 import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
@@ -59,6 +60,7 @@ import static org.powermock.api.mockito.PowerMockito.when;
         CassandraDACImpl.class,
         CertVars.class})
 @PowerMockIgnore("javax.management.*")
+@Ignore
 public class CertificationActorTest {
 
 
