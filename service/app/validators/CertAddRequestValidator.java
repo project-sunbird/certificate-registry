@@ -22,7 +22,7 @@ public class CertAddRequestValidator implements IRequestValidator {
     static Logger logger=Logger.getLogger(CertAddRequestValidator.class);
     private Request request;
     static List<String> mandatoryParamsList = Lists.newArrayList(JsonKeys.ID, JsonKeys.ACCESS_CODE, JsonKeys.PDF_URL,JsonKeys.RECIPIENT_TYPE);
-    static List<String>allowedRelatedTypes=Lists.newArrayList(JsonKeys.COURSE_COMPLETION, JsonKeys.ASSESSMENT,JsonKeys.COURSE_PERFORMANCE,JsonKeys.OFFLINE_COURSE);
+    static List<String>allowedRelatedTypes=Lists.newArrayList(JsonKeys.COURSE_COMPLETION, JsonKeys.ASSESSMENT,JsonKeys.COURSE_PERFORMANCE,JsonKeys.OFFLINE_COURSE,JsonKeys.BEST_SCHOOL,JsonKeys.BEST_STUDENT,JsonKeys.BEST_TEACHER);
     static List<String> allowedRecipientsType=Lists.newArrayList(JsonKeys.INDIVIDUAL,JsonKeys.ENTITY);
     public CertAddRequestValidator() {
     }
