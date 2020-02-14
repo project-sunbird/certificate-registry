@@ -70,4 +70,19 @@ public class CertificateController extends BaseController {
                     return null;
                 }, JsonKeys.CERT_VERIFY);
     }
+
+    /**
+     * this action method will be called for verify certificate
+     * @return CompletionStage of Result
+     */
+    public CompletionStage<Result> search()
+    {
+        IRequestValidator requestValidator=new CertSearchRequestValidator();
+        return handleRequest(request(),
+                request -> {
+                    Request req = (Request) request;
+                    requestValidator.validate(req);
+                    return null;
+                }, JsonKeys.SEARCH);
+    }
 }

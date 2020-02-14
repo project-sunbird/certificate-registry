@@ -81,4 +81,6 @@ public class JsonKeys {
     public static final String IDENTITY="identity";
     public static final String RECIPIENT_IDENTITY="recipient.id";
     public static final String CONTENT = "content";
+    public static final String SEARCH = "search";
+    public static final String HITS ="hits";
 }

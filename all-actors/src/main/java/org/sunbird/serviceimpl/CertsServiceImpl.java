@@ -275,4 +275,29 @@ public class CertsServiceImpl implements ICertService {
     private static String getLocalizedMessage(String key, Locale locale){
         return localizer.getMessage(key, locale);
     }
+
+
+    @Override
+    public Response search(Request request) throws BaseException{
+        Response response = new Response();
+        try {
+            String requestBody = requestMapper.writeValueAsString(request.getRequest());
+            logger.info("CertsServiceImpl:search:request body found:" + requestBody);
+            String apiToCall = CertVars.ES_SEARCH_API;
+            logger.info("CertsServiceImpl:search:complete url found:" + apiToCall);
+            Future<HttpResponse<JsonNode>> responseFuture = CertificateUtil.makeAsyncPostCall(apiToCall, requestBody, headerMap);
+            HttpResponse<JsonNode> jsonResponse = responseFuture.get();
+            if (jsonResponse != null && jsonResponse.getStatus() == HttpStatus.SC_OK) {
+                String jsonArray = jsonResponse.getBody().getObject().getJSONObject(JsonKeys.HITS).toString();
+                Map<String,Object> apiResp=requestMapper.readValue(jsonArray,Map.class);
+                response.put(JsonKeys.RESPONSE, apiResp);
+            } else {
+                throw new BaseException(IResponseMessage.INVALID_REQUESTED_DATA, jsonResponse.getBody().toString(), ResponseCode.CLIENT_ERROR.getCode());
+            }
+        } catch (Exception e) {
+            logger.error("CertsServiceImpl:search:exception occurred:" + e);
+            throw new BaseException(IResponseMessage.INTERNAL_ERROR, IResponseMessage.INTERNAL_ERROR, ResponseCode.SERVER_ERROR.getCode());
+        }
+        return response;
+    }
 }
