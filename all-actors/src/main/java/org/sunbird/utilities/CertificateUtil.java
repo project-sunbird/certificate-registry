@@ -1,7 +1,6 @@
 package org.sunbird.utilities;
 
 import akka.actor.ActorRef;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
@@ -38,17 +37,6 @@ public class CertificateUtil {
     private static Logger logger=Logger.getLogger(CertificateUtil.class);
     private static ObjectMapper mapper = new ObjectMapper();
     private static Localizer localizer = Localizer.getInstance();
-
-    public static void main(String[] args) throws JsonProcessingException {
-        List<Map<String,Object>> mapList = new ArrayList<>();
-        Map<String,Object> map2 = new HashMap<>();
-        map2.put("cert1","cert1");
-        map2.put("cert2","cert2");
-        mapList.add(map2);
-        Map<String,Object> respMap = new HashMap<>();
-        respMap.put("req",mapList);
-        System.out.println(mapper.writeValueAsString(respMap));
-    }
 
     public static boolean isIdPresent(String certificateId) {
         logger.info("CertificateUtil:isIdPresent:get id to search in ES:"+certificateId);
