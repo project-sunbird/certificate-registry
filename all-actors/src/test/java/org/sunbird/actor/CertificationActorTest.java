@@ -11,7 +11,6 @@ import org.apache.http.HttpStatus;
 import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
@@ -36,10 +35,7 @@ import org.sunbird.service.ICertService;
 import org.sunbird.serviceimpl.CertsServiceImpl;
 import org.sunbird.utilities.CertificateUtil;
 import scala.concurrent.duration.Duration;
-
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
@@ -60,7 +56,6 @@ import static org.powermock.api.mockito.PowerMockito.when;
         CassandraDACImpl.class,
         CertVars.class})
 @PowerMockIgnore("javax.management.*")
-@Ignore
 public class CertificationActorTest {
 
 
@@ -72,24 +67,18 @@ public class CertificationActorTest {
     }
 
     JSONObject object2 = null;
-    //@Before
     public void beforeTestSetUp() throws Exception {
         PowerMockito.mockStatic(Localizer.class);
         when(Localizer.getInstance()).thenReturn(null);
-
         PowerMockito.mockStatic(CertVars.class);
-
         PowerMockito.mockStatic(EsClientFactory.class);
-        ElasticSearchService elasticSearchService = PowerMockito.mock(ElasticSearchService.class);
         ElasticSearchRestHighImpl elasticSearchRestHigh = PowerMockito.mock(ElasticSearchRestHighImpl.class);
         PowerMockito.whenNew(ElasticSearchRestHighImpl.class).withNoArguments().thenReturn(elasticSearchRestHigh);
         when(EsClientFactory.getInstance()).thenReturn(elasticSearchRestHigh);
-
         PowerMockito.mockStatic(ServiceFactory.class);
         PowerMockito.mock(CassandraOperation.class);
         CassandraDACImpl cassandraDAC = PowerMockito.mock(CassandraDACImpl.class);
         PowerMockito.whenNew(CassandraDACImpl.class).withNoArguments().thenReturn(cassandraDAC);
-
         PowerMockito.mockStatic(CertificateUtil.class);
         when(CertificateUtil.isIdPresent(Mockito.anyString())).thenReturn(false);
         CertsServiceImpl certsService = PowerMockito.mock(CertsServiceImpl.class);
@@ -111,28 +100,25 @@ public class CertificationActorTest {
         when(mockedResponse.getBody()).thenReturn(node);
         final JSONObject object = Mockito.mock(JSONObject.class);
         when(node.getObject()).thenReturn(object);
+        JSONObject jsonObject=new JSONObject();
+        jsonObject.put("value","value1");
+        when(object.getJSONObject(JsonKeys.HITS)).thenReturn(jsonObject);
         object2 = Mockito.mock(JSONObject.class);
         when(object.getJSONObject(JsonKeys.RESULT)).thenReturn(object2);
 
         when(object2.getString(JsonKeys.SIGNED_URL)).thenReturn("signed_url");
+        when(object2.get(JsonKeys.RESPONSE)).thenReturn(map);
         when(certsService.download(Mockito.any(Request.class))).thenReturn(getValidateCertResponse());
         when(CertificateUtil.getCertificate(Mockito.anyString())).thenReturn(map);
 
         when(CertVars.getGenerateUri()).thenReturn("generate_uri");
-
-
-       // when(object2.get(JsonKeys.RESPONSE)).thenReturn(respMap);
         when(certsService.generate(Mockito.any(Request.class))).thenReturn(getValidateCertResponse());
         when(CertificateUtil.getCertificate(Mockito.anyString())).thenReturn(map);
-
-
         when(CertVars.getVerifyUri()).thenReturn("verify_uri");
         when(certsService.verify(Mockito.any(Request.class))).thenReturn(getValidateCertResponse());
         when(CertificateUtil.getCertificate(Mockito.anyString())).thenReturn(map);
     }
 
-
-    //@AfterClass
     public static void tearDown() throws Exception {
         Duration duration = Duration.create(10L, TimeUnit.SECONDS);
         TestKit.shutdownActorSystem(system, duration, true);
@@ -151,7 +137,7 @@ public class CertificationActorTest {
         Assert.assertTrue(null != res && res.getResponseCode() == ResponseCode.OK);
     }
 
-    //@Test
+    @Test
     public void validateCertificate() throws Exception {
 
         Request request = createValidateCertRequest();
@@ -164,7 +150,7 @@ public class CertificationActorTest {
         Assert.assertTrue(null != res && res.getResponseCode() == ResponseCode.OK);
     }
 
-    //@Test
+    @Test
     public void downloadCertificate() throws Exception {
 
         Request request = createDownloadCertRequest();
@@ -176,39 +162,29 @@ public class CertificationActorTest {
         Response res = testKit.expectMsgClass(Duration.create(1000, TimeUnit.SECONDS),Response.class);
         Assert.assertTrue(null != res && res.getResponseCode() == ResponseCode.OK);
     }
-    //@Test
-    public void generateCertificate() throws Exception {
 
-        Request request = createAddCertRequest();
-        request.setOperation(ActorOperations.GENERATE.getOperation());
+    @Test
+    public void testSearchCertificate() throws Exception {
+        Request request = createDownloadCertRequest();
+        request.setOperation(ActorOperations.SEARCH.getOperation());
         beforeTestSetUp();
         TestKit testKit = new TestKit(system);
         ActorRef actorRef = system.actorOf(props);
         actorRef.tell(request, testKit.getRef());
-        Response res = testKit.expectMsgClass(Duration.create(10, TimeUnit.SECONDS),Response.class);
+        Response res = testKit.expectMsgClass(Duration.create(1000, TimeUnit.SECONDS), Response.class);
         Assert.assertTrue(null != res && res.getResponseCode() == ResponseCode.OK);
     }
-   // @Test
-    public void verifyCertificate() throws Exception {
-        beforeTestSetUp();
 
-        List<Map<String,Object>> mapList = new ArrayList<>();
-        Map<String,Object> map2 = new HashMap<>();
-        map2.put("cert1","cert1");
-        map2.put("cert2","cert2");
-        mapList.add(map2);
-        Map<String,Object> respMap = new HashMap<>();
-        respMap.put("req",mapList);
-        when(object2.get(JsonKeys.RESPONSE)).thenReturn(mapList);
-        when(mapList.toString()).thenReturn("{\"req\":[{\"cert2\":\"cert2\",\"cert1\":\"cert1\"}]}");
 
+  //  @Test
+    public void testVerifyCertificate() throws Exception {
         Request request = createVerifyCertRequest();
         request.setOperation(ActorOperations.VERIFY.getOperation());
-
+        beforeTestSetUp();
         TestKit testKit = new TestKit(system);
         ActorRef actorRef = system.actorOf(props);
         actorRef.tell(request, testKit.getRef());
-        Response res = testKit.expectMsgClass(Duration.create(10, TimeUnit.SECONDS),Response.class);
+        Response res = testKit.expectMsgClass(Duration.create(1000, TimeUnit.SECONDS), Response.class);
         Assert.assertTrue(null != res && res.getResponseCode() == ResponseCode.OK);
     }
 

@@ -292,7 +292,7 @@ public class CertsServiceImpl implements ICertService {
                 Map<String,Object> apiResp=requestMapper.readValue(jsonArray,Map.class);
                 response.put(JsonKeys.RESPONSE, apiResp);
             } else {
-                throw new BaseException(IResponseMessage.INVALID_REQUESTED_DATA, jsonResponse.getBody().toString(), ResponseCode.CLIENT_ERROR.getCode());
+                throw new BaseException(IResponseMessage.INVALID_REQUESTED_DATA,jsonResponse.getBody().toString(), ResponseCode.CLIENT_ERROR.getCode());
             }
         } catch (Exception e) {
             logger.error("CertsServiceImpl:search:exception occurred:" + e);
