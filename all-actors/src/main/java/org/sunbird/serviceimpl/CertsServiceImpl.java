@@ -283,7 +283,7 @@ public class CertsServiceImpl implements ICertService {
         try {
             String requestBody = requestMapper.writeValueAsString(request.getRequest());
             logger.info("CertsServiceImpl:search:request body found:" + requestBody);
-            String apiToCall = CertVars.ES_SEARCH_API;
+            String apiToCall = CertVars.getEsSearchUri();
             logger.info("CertsServiceImpl:search:complete url found:" + apiToCall);
             Future<HttpResponse<JsonNode>> responseFuture = CertificateUtil.makeAsyncPostCall(apiToCall, requestBody, headerMap);
             HttpResponse<JsonNode> jsonResponse = responseFuture.get();

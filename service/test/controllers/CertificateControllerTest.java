@@ -89,7 +89,7 @@ public class CertificateControllerTest extends BaseApplicationTest {
                         "/certs/v1/registry/search",
                         "POST",
                         getCertValidateMap(false));
-        assertEquals(getResponseStatus(result), HttpStatus.SC_OK);
+        assertEquals(HttpStatus.SC_OK,getResponseStatus(result));
     }
 
 

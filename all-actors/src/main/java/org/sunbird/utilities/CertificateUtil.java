@@ -38,6 +38,11 @@ public class CertificateUtil {
     private static ObjectMapper mapper = new ObjectMapper();
     private static Localizer localizer = Localizer.getInstance();
 
+
+    private CertificateUtil(){}
+
+
+
     public static boolean isIdPresent(String certificateId) {
         logger.info("CertificateUtil:isIdPresent:get id to search in ES:"+certificateId);
         Map<String,Object> response = (Map)ElasticSearchHelper.getResponseFromFuture(elasticSearchService.getDataByIdentifier(JsonKeys.CERT,certificateId));

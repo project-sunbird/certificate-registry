@@ -91,6 +91,7 @@ public class CertificationActorTest {
         when(CertificateUtil.getCertificate(Mockito.anyString())).thenReturn(map);
         when(CertVars.getSERVICE_BASE_URL()).thenReturn("service_base_url");
         when(CertVars.getDOWNLOAD_URI()).thenReturn("download_url");
+        when(CertVars.getEsSearchUri()).thenReturn("es_search_uri");
         final Future<HttpResponse<JsonNode>> mockedFuture = Mockito.mock(Future.class);
         when(CertificateUtil.makeAsyncPostCall(Mockito.anyString(),Mockito.anyString(),Mockito.anyMap())).thenReturn(mockedFuture);
         final HttpResponse<JsonNode> mockedResponse = Mockito.mock(HttpResponse.class);
