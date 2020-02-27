@@ -45,7 +45,7 @@ public class CertificateUtil {
 
     public static boolean isIdPresent(String certificateId) {
         logger.info("CertificateUtil:isIdPresent:get id to search in ES:"+certificateId);
-        Map<String,Object> response = (Map)ElasticSearchHelper.getResponseFromFuture(elasticSearchService.getDataByIdentifier(JsonKeys.CERT,certificateId));
+        Map<String,Object> response = (Map)ElasticSearchHelper.getResponseFromFuture(elasticSearchService.getDataByIdentifier(JsonKeys.CERT_ALIAS,certificateId));
         logger.info("CertificateUtil:isIdPresent:got response from ES:"+response);
         if (MapUtils.isNotEmpty(response)) {
                 return true;
@@ -58,7 +58,7 @@ public class CertificateUtil {
     }
 
     public static Boolean deleteRecord(String id) throws BaseException {
-        Boolean bool = (Boolean)ElasticSearchHelper.getResponseFromFuture(elasticSearchService.delete(JsonKeys.CERT,id));
+        Boolean bool = (Boolean)ElasticSearchHelper.getResponseFromFuture(elasticSearchService.delete(JsonKeys.CERT_ALIAS,id));
         logger.info("Data deleted from ES for id "+id);
         //Delete the data from cassandra
         Request req = new Request();
@@ -97,7 +97,7 @@ public class CertificateUtil {
 
     public static  Map<String,Object> getCertificate(String certificateId) {
         logger.info("CertificateUtil:isIdPresent:get id to search in ES:"+certificateId);
-        Map<String,Object> response = (Map)ElasticSearchHelper.getResponseFromFuture(elasticSearchService.getDataByIdentifier(JsonKeys.CERT,certificateId));
+        Map<String,Object> response = (Map)ElasticSearchHelper.getResponseFromFuture(elasticSearchService.getDataByIdentifier(JsonKeys.CERT_ALIAS,certificateId));
         logger.info("CertificateUtil:isIdPresent:got response from ES:"+response);
         return response;
     }

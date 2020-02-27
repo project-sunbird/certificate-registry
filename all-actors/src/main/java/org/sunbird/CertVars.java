@@ -41,7 +41,7 @@ public class CertVars {
 
 
     public static String getEsSearchUri(){
-        String esApi=String.format("http://%s:9200/%s/_search",getPropsFromEnvs(SUNBIRD_ES_IP).split(",")[0],JsonKeys.CERT);
+        String esApi=String.format("http://%s:9200/%s/_search",getPropsFromEnvs(SUNBIRD_ES_IP).split(",")[0],JsonKeys.CERT_ALIAS);
         logger.info("CertVars:getEsSearchUri:es uri formed:"+esApi);
         return esApi;
     }

@@ -83,4 +83,5 @@ public class JsonKeys {
     public static final String CONTENT = "content";
     public static final String SEARCH = "search";
     public static final String HITS ="hits";
+    public static final String CERT_ALIAS ="certs";
 }

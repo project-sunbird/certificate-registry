@@ -61,7 +61,7 @@ public class CertBackgroundActor extends BaseActor {
 
     private void add(Request request) {
         Map<String,Object> certAddReqMap = (Map<String, Object>) request.getRequest().get(JsonKeys.REQUEST);
-        String id = (String)ElasticSearchHelper.getResponseFromFuture(elasticSearchService.save(JsonKeys.CERT,(String)certAddReqMap.get(JsonKeys.ID),certAddReqMap));
+        String id = (String)ElasticSearchHelper.getResponseFromFuture(elasticSearchService.save(JsonKeys.CERT_ALIAS,(String)certAddReqMap.get(JsonKeys.ID),certAddReqMap));
         logger.info("ES save response for id "+id);
     }
 }
