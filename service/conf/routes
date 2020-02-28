@@ -12,6 +12,7 @@ POST  /certs/v1/registry/add                          @controllers.CertificateCo
 POST /certs/v1/registry/validate                      @controllers.CertificateController.validate()
 POST  /certs/v1/registry/download                     @controllers.CertificateController.download()
 POST  /certs/v1/registry/verify                       @controllers.CertificateController.verify()
+POST  /certs/v1/registry/search                       @controllers.CertificateController.search()
 
 
 
