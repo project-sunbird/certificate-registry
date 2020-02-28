@@ -10,7 +10,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>sb-actor</artifactId>
-
+    <version>1.0.0</version>
     <dependencies>
         <dependency>
             <groupId>com.typesafe.akka</groupId>
