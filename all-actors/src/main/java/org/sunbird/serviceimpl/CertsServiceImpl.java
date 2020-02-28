@@ -266,7 +266,7 @@ public class CertsServiceImpl implements ICertService {
         Map<String,Object>esCertData=CertificateUtil.getCertificate(id);
         logger.info("CertServiceImpl:read:esCert data is :"+esCertData);
         if(MapUtils.isEmpty(esCertData)){
-            throw new BaseException(IResponseMessage.INVALID_REQUESTED_DATA,IResponseMessage.INVALID_ID_PROVIDED, ResponseCode.CLIENT_ERROR.getCode());
+            throw new BaseException(IResponseMessage.RESOURCE_NOT_FOUND,localizer.getMessage(IResponseMessage.RESOURCE_NOT_FOUND,null), ResponseCode.RESOURCE_NOT_FOUND.getCode());
         }
         Certificate certificate=getCertObject(esCertData);
         Response response=new Response();
