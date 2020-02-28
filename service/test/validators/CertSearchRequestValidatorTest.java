@@ -1,20 +1,17 @@
 package validators;
 
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.sunbird.BaseException;
 import org.sunbird.request.Request;
-import utils.JsonKey;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import static org.junit.Assert.*;
 
-public class CertVerifyRequestValidatorTest {
-
+public class CertSearchRequestValidatorTest {
     private Request request;
     private IRequestValidator requestValidator;
     private Map<String, Object> reqMap;
@@ -25,7 +22,7 @@ public class CertVerifyRequestValidatorTest {
         reqMap= new HashMap<>();
         request = new Request();
         request.setRequest(reqMap);
-       requestValidator=new CertVerifyRequestValidator();
+        requestValidator=new CertSearchRequestValidator();
     }
 
     @After

@@ -13,6 +13,7 @@ POST /certs/v1/registry/validate                      @controllers.CertificateCo
 POST  /certs/v1/registry/download                     @controllers.CertificateController.download()
 POST  /certs/v1/registry/verify                       @controllers.CertificateController.verify()
 GET  /certs/v1/registry/read/:id                      @controllers.CertificateController.read(id:String)
+POST  /certs/v1/registry/search                       @controllers.CertificateController.search()
 
 
 

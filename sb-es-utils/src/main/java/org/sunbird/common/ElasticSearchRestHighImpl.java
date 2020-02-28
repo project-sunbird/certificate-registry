@@ -42,8 +42,8 @@ import java.util.stream.Collectors;
 /**
  * This class will provide all required operation for elastic search.
  *
- * @author github.com/iostream04
- */
+ **/
+
 public class ElasticSearchRestHighImpl implements ElasticSearchService {
   private static final String ERROR = "ERROR";
   static Logger logger=Logger.getLogger(ElasticSearchRestHighImpl.class);

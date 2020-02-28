@@ -1,7 +1,6 @@
 package org.sunbird.utilities;
 
 import akka.actor.ActorRef;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
@@ -39,20 +38,14 @@ public class CertificateUtil {
     private static ObjectMapper mapper = new ObjectMapper();
     private static Localizer localizer = Localizer.getInstance();
 
-    public static void main(String[] args) throws JsonProcessingException {
-        List<Map<String,Object>> mapList = new ArrayList<>();
-        Map<String,Object> map2 = new HashMap<>();
-        map2.put("cert1","cert1");
-        map2.put("cert2","cert2");
-        mapList.add(map2);
-        Map<String,Object> respMap = new HashMap<>();
-        respMap.put("req",mapList);
-        System.out.println(mapper.writeValueAsString(respMap));
-    }
+
+    private CertificateUtil(){}
+
+
 
     public static boolean isIdPresent(String certificateId) {
         logger.info("CertificateUtil:isIdPresent:get id to search in ES:"+certificateId);
-        Map<String,Object> response = (Map)ElasticSearchHelper.getResponseFromFuture(elasticSearchService.getDataByIdentifier(JsonKeys.CERT,certificateId));
+        Map<String,Object> response = (Map)ElasticSearchHelper.getResponseFromFuture(elasticSearchService.getDataByIdentifier(JsonKeys.CERT_ALIAS,certificateId));
         logger.info("CertificateUtil:isIdPresent:got response from ES:"+response);
         if (MapUtils.isNotEmpty(response)) {
                 return true;
@@ -65,7 +58,7 @@ public class CertificateUtil {
     }
 
     public static Boolean deleteRecord(String id) throws BaseException {
-        Boolean bool = (Boolean)ElasticSearchHelper.getResponseFromFuture(elasticSearchService.delete(JsonKeys.CERT,id));
+        Boolean bool = (Boolean)ElasticSearchHelper.getResponseFromFuture(elasticSearchService.delete(JsonKeys.CERT_ALIAS,id));
         logger.info("Data deleted from ES for id "+id);
         //Delete the data from cassandra
         Request req = new Request();
@@ -104,7 +97,7 @@ public class CertificateUtil {
 
     public static  Map<String,Object> getCertificate(String certificateId) {
         logger.info("CertificateUtil:isIdPresent:get id to search in ES:"+certificateId);
-        Map<String,Object> response = (Map)ElasticSearchHelper.getResponseFromFuture(elasticSearchService.getDataByIdentifier(JsonKeys.CERT,certificateId));
+        Map<String,Object> response = (Map)ElasticSearchHelper.getResponseFromFuture(elasticSearchService.getDataByIdentifier(JsonKeys.CERT_ALIAS,certificateId));
         logger.info("CertificateUtil:isIdPresent:got response from ES:"+response);
         return response;
     }

@@ -60,8 +60,11 @@ public class RequestHandler extends BaseController {
             response.setTs(System.currentTimeMillis() + "");
             if (ex.getResponseCode() == Results.badRequest().status()) {
                 return Results.badRequest(Json.toJson(response));
-            } else {
-                return Results.internalServerError();
+            }else if (ex.getResponseCode() == Results.notFound().status()) {
+                return Results.notFound(Json.toJson(response));
+            }
+            else {
+                return Results.internalServerError(Json.toJson(response));
             }
         } else {
             response.setResponseCode(ResponseCode.SERVER_ERROR);
