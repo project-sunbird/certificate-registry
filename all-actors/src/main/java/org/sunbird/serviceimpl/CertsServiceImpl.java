@@ -264,7 +264,7 @@ public class CertsServiceImpl implements ICertService {
         String id=(String)request.getRequest().get(JsonKeys.ID);
         logger.info("CertServiceImpl:read:idProvided:"+id);
         Map<String,Object>esCertData=CertificateUtil.getCertificate(id);
-        logger.info("CertServiceImpl:read:escert data is :"+esCertData);
+        logger.info("CertServiceImpl:read:esCert data is :"+esCertData);
         if(MapUtils.isEmpty(esCertData)){
             throw new BaseException(IResponseMessage.INVALID_REQUESTED_DATA,IResponseMessage.INVALID_ID_PROVIDED, ResponseCode.CLIENT_ERROR.getCode());
         }
