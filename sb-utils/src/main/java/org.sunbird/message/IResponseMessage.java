@@ -24,4 +24,7 @@ public interface IResponseMessage extends IUserResponseMessage, IOrgResponseMess
   String DB_UPDATE_FAIL = "DB_UPDATE_FAIL";
   String DB_INSERTION_FAIL = "DB_INSERTION_FAIL";
   String INVALID_CONFIGURATION = "INVALID_CONFIGURATION";
+  String RESOURCE_NOT_FOUND = "RESOURCE_NOT_FOUND";
+
+
 }

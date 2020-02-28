@@ -24,6 +24,8 @@ public interface ICertService{
 
     Response verify(Request request) throws  BaseException;
 
+    Response read(Request request) throws  BaseException;
+
     Response search(Request request) throws BaseException;
 
 }

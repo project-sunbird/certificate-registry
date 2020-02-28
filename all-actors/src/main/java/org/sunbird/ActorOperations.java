@@ -13,6 +13,7 @@ public enum ActorOperations {
     VERIFY("verify"),
     ADD_CERT_ES("add_cert_es"),
     DELETE_CERT_CASSANDRA("delete_cert_cassandra"),
+    READ("read"),
     SEARCH("search");
 
     private String operation;

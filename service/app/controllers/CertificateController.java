@@ -72,9 +72,23 @@ public class CertificateController extends BaseController {
     }
 
     /**
-     * this action method will be called for verify certificate
+     * this action method will be called for reading certificate with id
      * @return CompletionStage of Result
      */
+    public CompletionStage<Result> read(String id) {
+        IRequestValidator requestValidator = new CertReadRequestValidator();
+        return handleRequest(request(),
+                request -> {
+                    Request req = (Request) request;
+                    req.getRequest().put(JsonKeys.ID, id);
+                    requestValidator.validate(req);
+                    return null;
+                }, JsonKeys.READ);
+
+
+    }
+
+
     public CompletionStage<Result> search()
     {
         IRequestValidator requestValidator=new CertSearchRequestValidator();

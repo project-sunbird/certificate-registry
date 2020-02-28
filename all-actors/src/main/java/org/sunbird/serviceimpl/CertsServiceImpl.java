@@ -259,6 +259,21 @@ public class CertsServiceImpl implements ICertService {
         return response;
     }
 
+    @Override
+    public Response read(Request request) throws BaseException {
+        String id=(String)request.getRequest().get(JsonKeys.ID);
+        logger.info("CertServiceImpl:read:idProvided:"+id);
+        Map<String,Object>esCertData=CertificateUtil.getCertificate(id);
+        logger.info("CertServiceImpl:read:esCert data is :"+esCertData);
+        if(MapUtils.isEmpty(esCertData)){
+            throw new BaseException(IResponseMessage.RESOURCE_NOT_FOUND,localizer.getMessage(IResponseMessage.RESOURCE_NOT_FOUND,null), ResponseCode.RESOURCE_NOT_FOUND.getCode());
+        }
+        Certificate certificate=getCertObject(esCertData);
+        Response response=new Response();
+        response.put(JsonKeys.RESPONSE,certificate);
+        return response;
+    }
+
     private Map<String,Object> composeCertVerifyRequest(Request request){
         Map<String,Object>certificate=new HashMap<>();
         Map<String,Object>certVerifyMap=new HashMap<>();

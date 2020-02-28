@@ -39,7 +39,7 @@ public class CertificateControllerTest extends BaseApplicationTest {
                         "/certs/v1/registry/add",
                         "POST",
                         createCertRequest(false));
-        assertEquals(getResponseStatus(result), HttpStatus.SC_OK);
+        assertEquals(HttpStatus.SC_OK, getResponseStatus(result));
     }
 
     @Test
@@ -49,7 +49,7 @@ public class CertificateControllerTest extends BaseApplicationTest {
                         "/certs/v1/registry/add",
                         "POST",
                         createCertRequest(true));
-        assertEquals(getResponseStatus(result), HttpStatus.SC_BAD_REQUEST);
+        assertEquals(HttpStatus.SC_BAD_REQUEST, getResponseStatus(result));
     }
 
     @Test
@@ -59,7 +59,7 @@ public class CertificateControllerTest extends BaseApplicationTest {
                         "/certs/v1/registry/download",
                         "POST",
                         getCertDownloadReq(false));
-        assertEquals(getResponseStatus(result), HttpStatus.SC_OK);
+        assertEquals(HttpStatus.SC_OK, getResponseStatus(result));
     }
 
     @Test
@@ -69,7 +69,7 @@ public class CertificateControllerTest extends BaseApplicationTest {
                         "/certs/v1/registry/download",
                         "POST",
                         getCertDownloadReq(true));
-        assertEquals(getResponseStatus(result), HttpStatus.SC_BAD_REQUEST);
+        assertEquals(HttpStatus.SC_BAD_REQUEST, getResponseStatus(result));
     }
 
     @Test
@@ -79,7 +79,7 @@ public class CertificateControllerTest extends BaseApplicationTest {
                         "/certs/v1/registry/validate",
                         "POST",
                         getCertValidateMap(false));
-        assertEquals(getResponseStatus(result), HttpStatus.SC_OK);
+        assertEquals(HttpStatus.SC_OK, getResponseStatus(result));
     }
 
     @Test
@@ -100,7 +100,7 @@ public class CertificateControllerTest extends BaseApplicationTest {
                         "/certs/v1/registry/validate",
                         "POST",
                         getCertValidateMap(true));
-        assertEquals(getResponseStatus(result), HttpStatus.SC_BAD_REQUEST);
+        assertEquals(HttpStatus.SC_BAD_REQUEST, getResponseStatus(result));
     }
 
     @Test
@@ -110,7 +110,17 @@ public class CertificateControllerTest extends BaseApplicationTest {
                         "/certs/v1/registry/verify",
                         "POST",
                         getCertVerifyMap(true));
-        assertEquals(getResponseStatus(result), HttpStatus.SC_BAD_REQUEST);
+        assertEquals(HttpStatus.SC_BAD_REQUEST, getResponseStatus(result));
+    }
+
+    @Test
+    public void testReadCertificateSuccess() {
+        Result result =
+                performTest(
+                        "/certs/v1/registry/read/123",
+                        "GET",
+                        null);
+        assertEquals(HttpStatus.SC_OK, getResponseStatus(result));
     }
 
     @Test
@@ -120,13 +130,8 @@ public class CertificateControllerTest extends BaseApplicationTest {
                         "/certs/v1/registry/verify",
                         "POST",
                         getCertVerifyMap(false));
-        assertEquals(getResponseStatus(result), HttpStatus.SC_OK);
+        assertEquals(HttpStatus.SC_OK, getResponseStatus(result));
     }
-
-
-
-
-
 
 
     private Map<String,Object> createCertRequest(boolean isBad) {

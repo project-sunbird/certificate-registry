@@ -115,4 +115,8 @@ public class CertificateUtil {
     private static String getLocalizedMessage(String key, Locale locale){
         return localizer.getMessage(key, locale);
     }
+
 }
+
+
+
