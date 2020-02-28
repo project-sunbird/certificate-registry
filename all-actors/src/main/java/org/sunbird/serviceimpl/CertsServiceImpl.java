@@ -291,6 +291,7 @@ public class CertsServiceImpl implements ICertService {
                 String jsonArray = jsonResponse.getBody().getObject().getJSONObject(JsonKeys.HITS).toString();
                 Map<String,Object> apiResp=requestMapper.readValue(jsonArray,Map.class);
                 response.put(JsonKeys.RESPONSE, apiResp);
+
             } else {
                 throw new BaseException(IResponseMessage.INVALID_REQUESTED_DATA,jsonResponse.getBody().toString(), ResponseCode.CLIENT_ERROR.getCode());
             }
