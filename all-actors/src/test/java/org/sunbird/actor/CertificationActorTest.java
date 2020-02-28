@@ -179,7 +179,7 @@ public class CertificationActorTest {
 
     @Test
     public void testReadCertificate() throws Exception {
-        Request request = createReadCertRequest();
+        Request request = createCertReadRequest();
         request.setOperation(ActorOperations.READ.getOperation());
         beforeTestSetUp();
         TestKit testKit = new TestKit(system);
@@ -250,10 +250,10 @@ public class CertificationActorTest {
         return reqObj;
     }
 
-    private Request createReadCertRequest() {
+    private Request createCertReadRequest() {
         Request reqObj = new Request();
         Map<String,Object> reqMap = new HashMap<>();
-        reqMap.put(JsonKeys.ID,"anyMockIc");
+        reqMap.put(JsonKeys.ID,"anyMockId");
         reqObj.getRequest().putAll(reqMap);
         return reqObj;
     }
