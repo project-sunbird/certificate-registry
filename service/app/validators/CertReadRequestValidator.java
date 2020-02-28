@@ -1,6 +1,5 @@
 package validators;
 
-import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.sunbird.BaseException;
 import org.sunbird.JsonKeys;
@@ -26,10 +25,9 @@ public class CertReadRequestValidator implements IRequestValidator {
         validateId();
     }
 
-
     private void validateId() throws BaseException {
         String id=(String)request.getRequest().get(JsonKeys.ID);
         if(StringUtils.isBlank(id)){
-            throw new BaseException(IResponseMessage.INVALID_REQUESTED_DATA, MessageFormat.format(IResponseMessage.MISSING_MANDATORY_PARAMS,JsonKeys.ID), ResponseCode.CLIENT_ERROR.getCode());
+            throw new BaseException(IResponseMessage.INVALID_REQUESTED_DATA, MessageFormat.format(localizer.getMessage(IResponseMessage.MISSING_MANDATORY_PARAMS,null),JsonKeys.ID), ResponseCode.CLIENT_ERROR.getCode());
         }}
 }
