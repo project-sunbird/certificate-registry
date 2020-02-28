@@ -175,6 +175,20 @@ public class CertificationActorTest {
         Response res = testKit.expectMsgClass(Duration.create(1000, TimeUnit.SECONDS),Response.class);
         Assert.assertTrue(null != res && res.getResponseCode() == ResponseCode.OK);
     }
+
+
+    @Test
+    public void testReadCertificate() throws Exception {
+        Request request = createReadCertRequest();
+        request.setOperation(ActorOperations.READ.getOperation());
+        beforeTestSetUp();
+        TestKit testKit = new TestKit(system);
+        ActorRef actorRef = system.actorOf(props);
+        actorRef.tell(request, testKit.getRef());
+        Response res = testKit.expectMsgClass(Duration.create(1000, TimeUnit.SECONDS),Response.class);
+        Assert.assertTrue(null != res && res.getResponseCode() == ResponseCode.OK);
+    }
+
     //@Test
     public void generateCertificate() throws Exception {
 
@@ -232,6 +246,14 @@ public class CertificationActorTest {
         Request reqObj = new Request();
         Map<String,Object> reqMap = new HashMap<>();
         reqMap.put(JsonKeys.PDF_URL,"pdf_url");
+        reqObj.getRequest().putAll(reqMap);
+        return reqObj;
+    }
+
+    private Request createReadCertRequest() {
+        Request reqObj = new Request();
+        Map<String,Object> reqMap = new HashMap<>();
+        reqMap.put(JsonKeys.ID,"anyMockIc");
         reqObj.getRequest().putAll(reqMap);
         return reqObj;
     }

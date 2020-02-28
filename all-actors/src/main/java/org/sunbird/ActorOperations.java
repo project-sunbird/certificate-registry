@@ -12,7 +12,8 @@ public enum ActorOperations {
     GENERATE("generate"),
     VERIFY("verify"),
     ADD_CERT_ES("add_cert_es"),
-    DELETE_CERT_CASSANDRA("delete_cert_cassandra");
+    DELETE_CERT_CASSANDRA("delete_cert_cassandra"),
+    READ("read");
 
     private String operation;
 
