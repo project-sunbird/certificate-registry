@@ -20,6 +20,7 @@ import org.sunbird.request.Request;
 import org.sunbird.response.Response;
 import org.sunbird.service.ICertService;
 import org.sunbird.utilities.CertificateUtil;
+import org.sunbird.utilities.ESResponseMapper;
 
 import java.io.IOException;
 import java.text.MessageFormat;
@@ -305,8 +306,8 @@ public class CertsServiceImpl implements ICertService {
             if (jsonResponse != null && jsonResponse.getStatus() == HttpStatus.SC_OK) {
                 String jsonArray = jsonResponse.getBody().getObject().getJSONObject(JsonKeys.HITS).toString();
                 Map<String,Object> apiResp=requestMapper.readValue(jsonArray,Map.class);
-                response.put(JsonKeys.RESPONSE, apiResp);
-
+                ESResponseMapper mappedResponse = new ObjectMapper().convertValue(apiResp,ESResponseMapper.class);
+                response.put(JsonKeys.RESPONSE, mappedResponse);
             } else {
                 throw new BaseException(IResponseMessage.INVALID_REQUESTED_DATA,jsonResponse.getBody().toString(), ResponseCode.CLIENT_ERROR.getCode());
             }
