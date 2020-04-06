@@ -7,11 +7,13 @@ import org.apache.log4j.Logger;
 import org.sunbird.BaseException;
 import org.sunbird.JsonKeys;
 import org.sunbird.message.IResponseMessage;
+import org.sunbird.message.Localizer;
 import org.sunbird.message.ResponseCode;
 import org.sunbird.request.Request;
 
 import java.text.MessageFormat;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 /**
@@ -20,7 +22,7 @@ import java.util.Map;
  */
 public class CertValidateRequestValidator implements IRequestValidator {
 
-
+    private static Localizer localizer = Localizer.getInstance();
     static Logger logger=Logger.getLogger(CertValidateRequestValidator.class);
     private Request request;
     static List<String> mandatoryParamsList = Lists.newArrayList(JsonKeys.CERT_ID, JsonKeys.ACCESS_CODE);
@@ -34,16 +36,16 @@ public class CertValidateRequestValidator implements IRequestValidator {
         Map<String,Object> certValMap=request.getRequest();
         if(MapUtils.isEmpty(request.getRequest())){
             logger.error("CertValidateRequestValidator:validateMandatoryParams:incorrect request provided");
-            throw new BaseException(IResponseMessage.INVALID_REQUESTED_DATA, IResponseMessage.INVALID_REQUESTED_DATA, ResponseCode.CLIENT_ERROR.getCode());
+            throw new BaseException(IResponseMessage.INVALID_REQUESTED_DATA, getLocalizedMessage(IResponseMessage.INVALID_REQUESTED_DATA,null), ResponseCode.CLIENT_ERROR.getCode());
         }
         for (String param :mandatoryParamsList) {
             if(!certValMap.containsKey(param)){
                 logger.error("CertValidateRequestValidator:validateMandatoryParams:incorrect request provided");
-                throw new BaseException(IResponseMessage.INVALID_REQUESTED_DATA, MessageFormat.format(IResponseMessage.MISSING_MANADATORY_PARAMS,param), ResponseCode.CLIENT_ERROR.getCode());
+                throw new BaseException(IResponseMessage.INVALID_REQUESTED_DATA, MessageFormat.format(getLocalizedMessage(IResponseMessage.MISSING_MANDATORY_PARAMS,null),param), ResponseCode.CLIENT_ERROR.getCode());
             }
             if(!(certValMap.get(param) instanceof String)){
                 logger.error("CertValidateRequestValidator:validateMandatoryParams:incorrect request provided");
-                throw new BaseException(IResponseMessage.INVALID_REQUESTED_DATA, MessageFormat.format(IResponseMessage.DATA_TYPE_ERROR,param,"string"), ResponseCode.CLIENT_ERROR.getCode());
+                throw new BaseException(IResponseMessage.INVALID_REQUESTED_DATA, MessageFormat.format(getLocalizedMessage(IResponseMessage.DATA_TYPE_ERROR,null),param,"string"), ResponseCode.CLIENT_ERROR.getCode());
             }
             validatePresence(param,(String)certValMap.get(param));
         }
@@ -54,7 +56,11 @@ public class CertValidateRequestValidator implements IRequestValidator {
     private void validatePresence(String key,String value) throws BaseException {
         if (StringUtils.isBlank(value)) {
             logger.error("CertValidateRequestValidator:validateMandatoryParams:incorrect request provided");
-            throw new BaseException(IResponseMessage.INVALID_REQUESTED_DATA, MessageFormat.format(IResponseMessage.EMPTY_MANDATORY_PARAM,key), ResponseCode.CLIENT_ERROR.getCode());
+            throw new BaseException(IResponseMessage.INVALID_REQUESTED_DATA, MessageFormat.format(getLocalizedMessage(IResponseMessage.EMPTY_MANDATORY_PARAM,null),key), ResponseCode.CLIENT_ERROR.getCode());
         }
+    }
+
+    private static String getLocalizedMessage(String key, Locale locale){
+        return localizer.getMessage(key, locale);
     }
 }

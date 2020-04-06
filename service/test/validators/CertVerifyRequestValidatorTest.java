@@ -36,7 +36,7 @@ public class CertVerifyRequestValidatorTest {
     }
 
     @Test(expected = BaseException.class)
-    public void testValidateWhenMandatoryParamMissing() throws BaseException {
+    public void testVerifyWhenMandatoryParamMissing() throws BaseException {
         requestValidator.validate(request);
     }
 }
