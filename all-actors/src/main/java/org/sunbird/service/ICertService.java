@@ -12,6 +12,8 @@ import org.sunbird.response.Response;
  */
 public interface ICertService{
 
+    Response delete(Request request) throws BaseException;
+
     String add(Request request) throws BaseException;
 
     Response  validate(Request request) throws BaseException;
@@ -21,5 +23,9 @@ public interface ICertService{
     Response generate(Request request) throws BaseException;
 
     Response verify(Request request) throws  BaseException;
+
+    Response read(Request request) throws  BaseException;
+
+    Response search(Request request) throws BaseException;
 
 }

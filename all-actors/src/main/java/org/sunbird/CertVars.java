@@ -15,6 +15,7 @@ public class CertVars {
     private static final String DOWNLOAD_URI= "/v1/user/certs/download";
     private static final String GENERATE_URI="/v1/certs/generate";
     private static final String VERIFY_URI="/v1/certs/verify";
+    public static final String SUNBIRD_ES_IP = "sunbird_es_host";
 
 
     public static String getVerifyUri() { return VERIFY_URI; }
@@ -36,5 +37,12 @@ public class CertVars {
     private static String getPropsFromEnvs(String props){
         String propValue=System.getenv(props);
         return propValue;
+    }
+
+
+    public static String getEsSearchUri(){
+        String esApi=String.format("http://%s:9200/%s/_search",getPropsFromEnvs(SUNBIRD_ES_IP).split(",")[0],JsonKeys.CERT_ALIAS);
+        logger.info("CertVars:getEsSearchUri:es uri formed:"+esApi);
+        return esApi;
     }
 }
