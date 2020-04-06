@@ -26,6 +26,7 @@ import utils.RequestMapper;
 import utils.RequestValidatorFunction;
 import utils.module.SignalHandler;
 
+
 /**
  * This controller we can use for writing some common method to handel api
  * request. CompletableFuture: A Future that may be explicitly completed
@@ -38,8 +39,10 @@ import utils.module.SignalHandler;
  */
 public class BaseController extends Controller {
     Logger logger = Logger.getLogger(BaseController.class);
+
     @Inject
     SignalHandler signalHandler;
+
     /**
      * We injected HttpExecutionContext to decrease the response time of APIs.
      */
@@ -48,7 +51,6 @@ public class BaseController extends Controller {
     protected final static Localizer locale = Localizer.getInstance();
     public static final String RESPONSE = "Response";
     public static final String SUCCESS = "Success";
-
 
     public CompletionStage<Result> handleRequest(play.mvc.Http.Request req) {
         try {
@@ -62,7 +64,7 @@ public class BaseController extends Controller {
             return future.thenApplyAsync(Results::ok, httpExecutionContext.current());
         } catch (Exception e) {
             return CompletableFuture.supplyAsync(() -> {
-                return RequestHandler.handleFailureResponse(e,req);
+                return RequestHandler.handleFailureResponse(e, req);
             });
         }
     }

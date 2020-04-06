@@ -2,8 +2,6 @@ package controllers;
 
 import akka.pattern.Patterns;
 import akka.util.Timeout;
-
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
@@ -74,8 +72,7 @@ public class RequestHandler extends BaseController {
             }
         } else {
             response.setResponseCode(ResponseCode.SERVER_ERROR);
-            response.put(
-                    JsonKey.MESSAGE, locale.getMessage(IResponseMessage.INTERNAL_ERROR, null));
+            response.put(JsonKey.MESSAGE, locale.getMessage(IResponseMessage.INTERNAL_ERROR, null));
             return Results.internalServerError(Json.toJson(response));
         }
     }
