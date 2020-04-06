@@ -5,10 +5,12 @@ import org.apache.commons.lang3.StringUtils;
 import org.sunbird.BaseException;
 import org.sunbird.JsonKeys;
 import org.sunbird.message.IResponseMessage;
+import org.sunbird.message.Localizer;
 import org.sunbird.message.ResponseCode;
 import org.sunbird.request.Request;
 
 import java.text.MessageFormat;
+import java.util.Locale;
 import java.util.Map;
 
 /**
@@ -17,6 +19,7 @@ import java.util.Map;
  */
 public class CertVerifyRequestValidator implements IRequestValidator {
 
+    private Localizer localizer = Localizer.getInstance();
     private boolean error=false;
     private Request request;
 
@@ -42,6 +45,10 @@ public class CertVerifyRequestValidator implements IRequestValidator {
     private void validateId() throws BaseException {
         String id=(String)request.getRequest().get(JsonKeys.ID);
         if(StringUtils.isBlank(id) && error){
-            throw new BaseException(IResponseMessage.INVALID_REQUESTED_DATA, MessageFormat.format(IResponseMessage.MISSING_MANADATORY_PARAMS,"either:"+JsonKeys.DATA+":or:"+JsonKeys.ID), ResponseCode.CLIENT_ERROR.getCode());
+            throw new BaseException(IResponseMessage.INVALID_REQUESTED_DATA, MessageFormat.format(getLocalizedMessage(IResponseMessage.MISSING_MANDATORY_PARAMS,null),"either:"+JsonKeys.DATA+":or:"+JsonKeys.ID), ResponseCode.CLIENT_ERROR.getCode());
         }}
+
+    private String getLocalizedMessage(String key, Locale locale){
+        return localizer.getMessage(key, locale);
+    }
 }
