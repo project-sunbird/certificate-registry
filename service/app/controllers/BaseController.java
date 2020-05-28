@@ -11,7 +11,9 @@ import com.fasterxml.jackson.databind.JsonNode;
 import org.apache.log4j.Logger;
 import org.sunbird.Application;
 import org.sunbird.BaseException;
+import org.sunbird.message.IResponseMessage;
 import org.sunbird.message.Localizer;
+import org.sunbird.message.ResponseCode;
 import org.sunbird.request.Request;
 import org.sunbird.response.Response;
 
@@ -22,6 +24,8 @@ import play.mvc.Result;
 import play.mvc.Results;
 import utils.RequestMapper;
 import utils.RequestValidatorFunction;
+import utils.module.SignalHandler;
+
 
 /**
  * This controller we can use for writing some common method to handel api
@@ -35,24 +39,34 @@ import utils.RequestValidatorFunction;
  */
 public class BaseController extends Controller {
     Logger logger = Logger.getLogger(BaseController.class);
+
+    @Inject
+    SignalHandler signalHandler;
+
     /**
      * We injected HttpExecutionContext to decrease the response time of APIs.
      */
     @Inject
     protected HttpExecutionContext httpExecutionContext;
-    protected final static Localizer localizerObject = Localizer.getInstance();
+    protected final static Localizer locale = Localizer.getInstance();
     public static final String RESPONSE = "Response";
     public static final String SUCCESS = "Success";
 
-
-    public CompletionStage<Result> handleRequest() {
-        startTrace("handelRequest");
-        CompletableFuture<JsonNode> future = new CompletableFuture<>();
-        Response response = new Response();
-        response.put(RESPONSE, SUCCESS);
-        future.complete(Json.toJson(response));
-        endTrace("handelRequest");
-        return future.thenApplyAsync(Results::ok, httpExecutionContext.current());
+    public CompletionStage<Result> handleRequest(play.mvc.Http.Request req) {
+        try {
+            handleSigTerm();
+            startTrace("handelRequest");
+            CompletableFuture<JsonNode> future = new CompletableFuture<>();
+            Response response = new Response();
+            response.put(RESPONSE, SUCCESS);
+            future.complete(Json.toJson(response));
+            endTrace("handelRequest");
+            return future.thenApplyAsync(Results::ok, httpExecutionContext.current());
+        } catch (Exception e) {
+            return CompletableFuture.supplyAsync(() -> {
+                return RequestHandler.handleFailureResponse(e, req);
+            });
+        }
     }
 
     public void startTrace(String tag) {
@@ -99,4 +113,15 @@ public class BaseController extends Controller {
             return CompletableFuture.supplyAsync(() -> {
                 return RequestHandler.handleFailureResponse(ex,req);
             });
-        }}}
+        }}
+
+    private void handleSigTerm() throws BaseException {
+        if (signalHandler.isShuttingDown()) {
+            logger.info(
+                    "SIGTERM is "
+                            + signalHandler.isShuttingDown()
+                            + ", So play server will not allow any new request.");
+            throw new BaseException(IResponseMessage.SERVICE_UNAVAILABLE, IResponseMessage.SERVICE_UNAVAILABLE, ResponseCode.SERVICE_UNAVAILABLE.getCode());
+        }
+    }
+}
