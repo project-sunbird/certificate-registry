@@ -26,7 +26,7 @@ public abstract class BaseActor extends UntypedAbstractActor {
     @Override
     public void onReceive(Object message) throws Throwable {
         Map<String, Object> mdc = new HashMap<>();
-        mdc.put(JsonKeys.REQ_ID, UUID.randomUUID());
+        mdc.put(JsonKeys.REQ_ID, UUID.randomUUID().toString());
         logger.setMDC(mdc);
         //set mdc for non Actor
         new BaseLogger().setReqId(logger.getMDC());
