@@ -4,8 +4,9 @@ package utils.module;
 import java.lang.reflect.Method;
 import java.util.concurrent.CompletionStage;
 
-import org.apache.log4j.Logger;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import play.http.ActionCreator;
 import play.mvc.Action;
 import play.mvc.Http;
@@ -18,7 +19,7 @@ import play.mvc.Result;
  *
  */
 public class OnRequestHandler implements ActionCreator {
-    Logger logger = Logger.getLogger(OnRequestHandler.class);
+    Logger logger = LoggerFactory.getLogger(OnRequestHandler.class);
     @Override
     public Action createAction(Http.Request request, Method method) {
         return new Action.Simple() {

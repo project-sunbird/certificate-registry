@@ -6,7 +6,8 @@ import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import org.apache.commons.collections.MapUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.sunbird.ActorOperations;
 import org.sunbird.Application;
 import org.sunbird.BaseException;
@@ -34,7 +35,7 @@ import java.util.concurrent.Future;
 public class CertificateUtil {
     private static final ElasticSearchService elasticSearchService= EsClientFactory.getInstance();
     private static final CassandraOperation cassandraOperation = ServiceFactory.getInstance();
-    private static Logger logger=Logger.getLogger(CertificateUtil.class);
+    private static Logger logger= LoggerFactory.getLogger(CertificateUtil.class);
     private static ObjectMapper mapper = new ObjectMapper();
     private static Localizer localizer = Localizer.getInstance();
 

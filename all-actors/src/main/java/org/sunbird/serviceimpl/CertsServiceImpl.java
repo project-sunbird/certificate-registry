@@ -7,7 +7,8 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpStatus;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.sunbird.BaseException;
 import org.sunbird.CertVars;
 import org.sunbird.JsonKeys;
@@ -36,7 +37,7 @@ import java.util.concurrent.Future;
  * @author anmolgupta
  */
 public class CertsServiceImpl implements ICertService {
-    private static Logger logger = Logger.getLogger(CertsServiceImpl.class);
+    private static Logger logger = LoggerFactory.getLogger(CertsServiceImpl.class);
     private static Localizer localizer = Localizer.getInstance();
     private static ObjectMapper requestMapper = new ObjectMapper();
     static Map<String, String> headerMap = new HashMap<>();

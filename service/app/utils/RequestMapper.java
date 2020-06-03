@@ -4,7 +4,8 @@
 package utils;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.sunbird.ActorServiceException;
 import org.sunbird.BaseException;
 import org.sunbird.message.IResponseMessage;
@@ -19,7 +20,7 @@ import play.libs.Json;
  */
 public class RequestMapper {
 
-    private static Logger logger = Logger.getLogger(RequestMapper.class);
+    private static Logger logger = LoggerFactory.getLogger(RequestMapper.class);
 
     /**
      * Method to map request
