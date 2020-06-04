@@ -8,6 +8,7 @@ import com.mashape.unirest.http.Unirest;
 import org.apache.commons.collections.MapUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 import org.sunbird.ActorOperations;
 import org.sunbird.Application;
 import org.sunbird.BaseException;
@@ -21,6 +22,7 @@ import org.sunbird.message.IResponseMessage;
 import org.sunbird.message.Localizer;
 import org.sunbird.message.ResponseCode;
 import org.sunbird.request.Request;
+import org.sunbird.request.RequestParams;
 import org.sunbird.response.Response;
 
 import java.sql.Timestamp;
@@ -65,6 +67,9 @@ public class CertificateUtil {
         Request req = new Request();
         req.setOperation(ActorOperations.DELETE_CERT_CASSANDRA.getOperation());
         req.getRequest().put(JsonKeys.ID,id);
+        RequestParams params = new RequestParams();
+        params.setMsgid(MDC.get(JsonKeys.REQ_ID));
+        req.setParams(params);
         Application.getInstance().getActorRef(ActorOperations.DELETE_CERT_CASSANDRA.getOperation()).tell(req, ActorRef.noSender());
         return bool;
     }
@@ -89,6 +94,9 @@ public class CertificateUtil {
         logger.info("CertificateUtil:insertRecord: record successfully inserted with id"+certAddReqMap.get(JsonKeys.ID));
         //index data to ES
         Request req = new Request();
+        RequestParams params = new RequestParams();
+        params.setMsgid(MDC.get(JsonKeys.REQ_ID));
+        req.setParams(params);
         req.setOperation(ActorOperations.ADD_CERT_ES.getOperation());
         req.getRequest().put(JsonKeys.REQUEST,certAddReqMap);
         Application.getInstance().getActorRef(ActorOperations.ADD_CERT_ES.getOperation()).tell(req, ActorRef.noSender());
