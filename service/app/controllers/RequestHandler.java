@@ -11,6 +11,7 @@ import org.sunbird.message.IResponseMessage;
 import org.sunbird.message.ResponseCode;
 import org.sunbird.request.Request;
 import org.sunbird.response.Response;
+import org.sunbird.response.ResponseParams;
 import play.libs.Json;
 import play.mvc.Result;
 import play.mvc.Results;
@@ -52,7 +53,7 @@ public class RequestHandler extends BaseController {
         Response response = new Response();
         if (exception instanceof BaseException) {
             BaseException ex = (BaseException) exception;
-            response.setResponseCode(ResponseCode.valueOf(ex.getCode()));
+            response.setResponseCode(ResponseCode.getResponseCode(ex.getResponseCode()));
             response.put(JsonKey.MESSAGE, ex.getMessage());
             String apiId = getApiId(req.path());
             response.setId(apiId);
@@ -62,16 +63,36 @@ public class RequestHandler extends BaseController {
                 return Results.badRequest(Json.toJson(response));
             }else if (ex.getResponseCode() == Results.notFound().status()) {
                 return Results.notFound(Json.toJson(response));
-            }
-            else {
+            } else if (ex.getResponseCode() == 503) {
+                return Results.status(
+                        ex.getResponseCode(),
+                        Json.toJson(createResponseOnException(ex)));
+            } else {
                 return Results.internalServerError(Json.toJson(response));
             }
         } else {
             response.setResponseCode(ResponseCode.SERVER_ERROR);
-            response.put(
-                    JsonKey.MESSAGE, localizerObject.getMessage(IResponseMessage.INTERNAL_ERROR, null));
+            response.put(JsonKey.MESSAGE, locale.getMessage(IResponseMessage.INTERNAL_ERROR, null));
             return Results.internalServerError(Json.toJson(response));
         }
+    }
+
+
+    public static Response createResponseOnException(BaseException exception) {
+        Response response = new Response();
+        response.setResponseCode(ResponseCode.getResponseCode(exception.getResponseCode()));
+        response.setParams(createResponseParamObj(response.getResponseCode(), exception.getMessage()));
+        return response;
+    }
+
+    public static ResponseParams createResponseParamObj(ResponseCode code, String message) {
+        ResponseParams params = new ResponseParams();
+        if (code.getCode() != 200) {
+            params.setErr(code.name());
+            params.setErrmsg(StringUtils.isNotBlank(message) ? message : code.name());
+        }
+        params.setStatus(ResponseCode.getResponseCode(code.getCode()).name());
+        return params;
     }
 
     /**
