@@ -13,7 +13,7 @@ import java.util.Map;
 public class Certificate {
 
     private String id;
-    private String pdfUrl;
+    private String qrCodeUrl;
     private String jsonUrl;
     private Recipient recipient;
     private Map<String, Object> data;
@@ -28,7 +28,7 @@ public class Certificate {
 
     private Certificate(Builder builder) {
         this.id = builder.id;
-        this.pdfUrl = builder.pdfUrl;
+        this.qrCodeUrl = builder.qrCodeUrl;
         this.jsonUrl = builder.jsonUrl;
         this.recipient = builder.recipient;
         this.data = builder.data;
@@ -52,8 +52,8 @@ public class Certificate {
         return id;
     }
 
-    public String getPdfUrl() {
-        return pdfUrl;
+    public String getQrCodeUrl() {
+        return qrCodeUrl;
     }
 
     public String getJsonUrl() {
@@ -86,7 +86,7 @@ public class Certificate {
     public String toString() {
         return "Certificate{" +
                 "id='" + id + '\'' +
-                ", pdfUrl='" + pdfUrl + '\'' +
+                ", qrCodeUrl='" + qrCodeUrl + '\'' +
                 ", jsonUrl='" + jsonUrl + '\'' +
                 ", recipient=" + recipient +
                 ", data=" + data +
@@ -103,7 +103,7 @@ public class Certificate {
 
 
         private String id;
-        private String pdfUrl;
+        private String qrCodeUrl;
         private String jsonUrl;
         private Recipient recipient;
         private Map<String, Object> data;
@@ -140,8 +140,8 @@ public class Certificate {
             return this;
         }
 
-        public Builder setPdfUrl(String pdfUrl) {
-            this.pdfUrl = pdfUrl;
+        public Builder setQrCodeUrl(String qrCodeUrl) {
+            this.qrCodeUrl = qrCodeUrl;
             return this;
 
         }
