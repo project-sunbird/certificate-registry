@@ -24,7 +24,7 @@ public class CertAddRequestValidator implements IRequestValidator {
     static Logger logger=Logger.getLogger(CertAddRequestValidator.class);
     private Request request;
     private Localizer localizer = Localizer.getInstance();
-    static List<String> mandatoryParamsList = Lists.newArrayList(JsonKeys.ID, JsonKeys.ACCESS_CODE, JsonKeys.PDF_URL);
+    static List<String> mandatoryParamsList = Lists.newArrayList(JsonKeys.ID, JsonKeys.ACCESS_CODE, JsonKeys.QR_CODE_URL);
     static List<String> allowedRecipientsType=Lists.newArrayList(JsonKeys.INDIVIDUAL,JsonKeys.ENTITY);
     public CertAddRequestValidator() {
     }

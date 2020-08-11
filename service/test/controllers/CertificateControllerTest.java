@@ -36,7 +36,7 @@ public class CertificateControllerTest extends BaseApplicationTest {
     public void testAddCertificateSuccess() {
         Result result =
                 performTest(
-                        "/certs/v1/registry/add",
+                        "/certs/v2/registry/add",
                         "POST",
                         createCertRequest(false));
         assertEquals(HttpStatus.SC_OK, getResponseStatus(result));
@@ -46,7 +46,7 @@ public class CertificateControllerTest extends BaseApplicationTest {
     public void testAddCertificateFailure() {
         Result result =
                 performTest(
-                        "/certs/v1/registry/add",
+                        "/certs/v2/registry/add",
                         "POST",
                         createCertRequest(true));
         assertEquals(HttpStatus.SC_BAD_REQUEST, getResponseStatus(result));
@@ -124,6 +124,16 @@ public class CertificateControllerTest extends BaseApplicationTest {
     }
 
     @Test
+    public void testReadCertificateMetaDataSuccess() {
+        Result result =
+                performTest(
+                        "/certs/v1/registry/read/metadata/123",
+                        "GET",
+                        null);
+        assertEquals(HttpStatus.SC_OK, getResponseStatus(result));
+    }
+
+    @Test
     public void testVerifyCertificateSuccess() {
         Result result =
                 performTest(
@@ -156,7 +166,7 @@ public class CertificateControllerTest extends BaseApplicationTest {
         badge.put("name", "Sunbird installation");
         badge.put("description", "Certificate of Appreciation in National Level ITI Grading");
         jsonData.put("badge",badge);
-        innerMap.put("pdfUrl", "djdjd/r01284093466818969624/275acee4-1964-4986-9dc3-06e08e9a1aa0.pdf");
+        innerMap.put("qrCodeUrl", "djdjd/r01284093466818969624/275acee4-1964-4986-9dc3-06e08e9a1aa0.pdf");
         Map<String,Object> related = new HashMap<>();
         related.put("courseId", "course-idsd");
         related.put("type", "hell");

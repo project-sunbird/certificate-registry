@@ -28,4 +28,5 @@ public interface ICertService{
 
     Response search(Request request) throws BaseException;
 
+    Response readCertMetaData(Request request) throws  BaseException;
 }

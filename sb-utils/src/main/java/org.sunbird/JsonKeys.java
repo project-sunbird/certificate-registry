@@ -58,4 +58,13 @@ public class JsonKeys {
     public static final String SEARCH = "search";
     public static final String HITS ="hits";
     public static final String CERT_ALIAS ="certs";
+    public static final String READ_CERT_META_DATA = "readCertMetaData";
+    public static final String BADGE = "badge";
+    public static final String DESCRIPTION = "description";
+    public static final String SIGNATORY = "signatory";
+    public static final String ISSUED_ON = "issuedOn";
+    public static final String QR_CODE_URL = "qrCodeUrl";
+    public static final String IDENTITY = "identity";
+    public static final String IMAGE = "image";
+
 }

@@ -11,7 +11,7 @@ import org.sunbird.service.ICertService;
 import org.sunbird.serviceimpl.CertsServiceImpl;
 
 @ActorConfig(
-        tasks = {"add","validate","download","generate","verify","search","read"},
+        tasks = {"add","validate","download","generate","verify","search","read", "readCertMetaData"},
         dispatcher = "",
         asyncTasks = {}
 )
@@ -49,6 +49,8 @@ public class CertificationActor extends BaseActor {
             case "search":
                 search(request);
                 break;
+            case "readCertMetaData":
+                readCertMetaData(request);
             default:
                 onReceiveUnsupportedMessage("CertificationActor");
         }
@@ -84,5 +86,9 @@ public class CertificationActor extends BaseActor {
     }
     private void search(Request request) throws BaseException{
         sender().tell(certService.search(request),self());
+    }
+
+    private void readCertMetaData(Request request) throws BaseException {
+        sender().tell(certService.readCertMetaData(request), self());
     }
 }
