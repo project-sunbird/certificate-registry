@@ -168,6 +168,19 @@ public class CertificationActorTest {
     }
 
     @Test
+    public void downloadV2Certificate() throws Exception {
+
+        Request request = createDownloadCertRequest();
+        request.setOperation(ActorOperations.DOWNLOADV2.getOperation());
+        beforeTestSetUp();
+        TestKit testKit = new TestKit(system);
+        ActorRef actorRef = system.actorOf(props);
+        actorRef.tell(request, testKit.getRef());
+        Response res = testKit.expectMsgClass(Duration.create(1000, TimeUnit.SECONDS),Response.class);
+        Assert.assertTrue(null != res && res.getResponseCode() == ResponseCode.OK);
+    }
+
+    @Test
     public void testReadCertificate() throws Exception {
         Request request = createCertReadRequest();
         request.setOperation(ActorOperations.READ.getOperation());
