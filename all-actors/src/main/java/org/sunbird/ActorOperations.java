@@ -9,6 +9,7 @@ public enum ActorOperations {
     ADD("add"),
     VALIDATE("validate"),
     DOWNLOAD("download"),
+    DOWNLOADV2("downloadV2"),
     GENERATE("generate"),
     VERIFY("verify"),
     ADD_CERT_ES("add_cert_es"),

@@ -6,7 +6,12 @@ public class JsonKeys {
     public static final String CERT_ADD = "add";
     public static final String CERT_VALIDATE = "validate";
     public static final String CERT_DOWNLOAD = "download";
+    public static final String CERT_DOWNLOAD_V2 = "downloadV2";
+    public static final String VERSION_1 = "v1";
+    public static final String VERSION_2 = "v2";
+    public static final String VERSION = "version";
     public static final String PDF_URL = "pdfUrl";
+    public static final String CERT_URL = "certUrl";
     public static final String JSON_DATA = "jsonData";
     public static final String ACCESS_CODE = "accessCode";
     public static final String ID = "id";

@@ -18,13 +18,16 @@ public class CertDownloadRequestValidatorTest {
     private Request request;
     private IRequestValidator requestValidator;
     private Map<String, Object> reqMap;
-
+    private Map<String, Object> reqContext;
 
     @Before
     public void setUp(){
         reqMap= new HashMap<>();
         request = new Request();
         request.setRequest(reqMap);
+        reqContext = new HashMap<>();
+        reqContext.put(JsonKeys.VERSION, JsonKeys.VERSION_1);
+        request.setContext(reqContext);
         requestValidator=new CertDownloadRequestValidator();
     }
 
@@ -43,6 +46,14 @@ public class CertDownloadRequestValidatorTest {
     public void testValidateWhenMandatoryParamIsPresent() throws BaseException {
         reqMap.put(JsonKeys.PDF_URL,"/pdf_uRL");
         request.setRequest(reqMap);
+        requestValidator.validate(request);
+
+    }
+
+    @Test(expected = BaseException.class)
+    public void testValidateWhenMandatoryParamMissingV2() throws BaseException {
+        request.setRequest(reqMap);
+        request.getContext().put(JsonKeys.VERSION, JsonKeys.VERSION_2);
         requestValidator.validate(request);
 
     }

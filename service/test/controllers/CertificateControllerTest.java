@@ -73,6 +73,26 @@ public class CertificateControllerTest extends BaseApplicationTest {
     }
 
     @Test
+    public void testDownloadV2CertificateSuccess() {
+        Result result =
+                performTest(
+                        "/certs/v2/registry/download",
+                        "POST",
+                        getCertDownloadReq(false));
+        assertEquals(HttpStatus.SC_OK, getResponseStatus(result));
+    }
+
+    @Test
+    public void testDownloadV2CertificateFailure() {
+        Result result =
+                performTest(
+                        "/certs/v2/registry/download",
+                        "POST",
+                        getCertDownloadReq(true));
+        assertEquals(HttpStatus.SC_BAD_REQUEST, getResponseStatus(result));
+    }
+
+    @Test
     public void testValidateCertificateSuccess() {
         Result result =
                 performTest(

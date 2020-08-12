@@ -5,6 +5,8 @@ import org.sunbird.request.Request;
 import play.mvc.Result;
 import validators.*;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.CompletionStage;
 
 /**
@@ -52,10 +54,32 @@ public class CertificateController extends BaseController {
         return handleRequest(request(),
                 request -> {
                     Request req = (Request) request;
+                    Map<String,Object> reqContext = new HashMap<>();
+                    reqContext.put(JsonKeys.VERSION, JsonKeys.VERSION_1);
+                    req.setContext(reqContext);
                     requestValidator.validate(req);
                     return null;
                 },  JsonKeys.CERT_DOWNLOAD);
     }
+
+    /**
+     * this action method will be called for downloading certificate
+     * @return CompletionStage of Result
+     */
+    public CompletionStage<Result> downloadV2()
+    {
+        IRequestValidator requestValidator=new CertDownloadRequestValidator();
+        return handleRequest(request(),
+                request -> {
+                    Request req = (Request) request;
+                    Map<String,Object> reqContext = new HashMap<>();
+                    reqContext.put(JsonKeys.VERSION, JsonKeys.VERSION_2);
+                    req.setContext(reqContext);
+                    requestValidator.validate(req);
+                    return null;
+                },  JsonKeys.CERT_DOWNLOAD_V2);
+    }
+
     /**
      * this action method will be called for verify certificate
      * @return CompletionStage of Result

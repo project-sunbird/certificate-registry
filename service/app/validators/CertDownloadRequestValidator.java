@@ -22,14 +22,25 @@ public class CertDownloadRequestValidator implements IRequestValidator {
     @Override
     public void validate(Request request) throws BaseException {
         this.request=request;
-        validateDownlaodFileData();
-
+        if(request.getContext().get(JsonKeys.VERSION).equals(JsonKeys.VERSION_2)){
+            validateDownloadV2FileData();
+        }else {
+            validateDownlaodFileData();
+        }
     }
 
 
     private void validateDownlaodFileData() throws BaseException {
-        if (StringUtils.isBlank((String)this.request.getRequest().get("pdfUrl"))) {
+        if (StringUtils.isBlank((String)this.request.getRequest().get(JsonKeys.PDF_URL))) {
             throw new BaseException(IResponseMessage.INVALID_REQUESTED_DATA, MessageFormat.format(getLocalizedMessage(IResponseMessage.MISSING_MANDATORY_PARAMS,null), JsonKeys.PDF_URL), ResponseCode.CLIENT_ERROR.getCode());
+        }
+    }
+
+    private void validateDownloadV2FileData() throws BaseException {
+        if (StringUtils.isBlank((String)this.request.getRequest().get(JsonKeys.PDF_URL)) && StringUtils.isBlank((String)this.request.getRequest().get(JsonKeys.CERT_URL))) {
+            throw new BaseException(IResponseMessage.INVALID_REQUESTED_DATA
+                    , getLocalizedMessage(IResponseMessage.INVALID_REQUESTED_DATA,null)
+                    , ResponseCode.CLIENT_ERROR.getCode());
         }
     }
 

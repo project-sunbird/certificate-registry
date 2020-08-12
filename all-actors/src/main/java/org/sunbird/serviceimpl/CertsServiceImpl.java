@@ -8,6 +8,7 @@ import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpStatus;
 import org.apache.log4j.Logger;
+import org.sunbird.ActorOperations;
 import org.sunbird.BaseException;
 import org.sunbird.CertVars;
 import org.sunbird.JsonKeys;
@@ -181,7 +182,19 @@ public class CertsServiceImpl implements ICertService {
         try {
             Map<String, Object> certReqMap = new HashMap<>();
             Map<String,String>requestMap=new HashMap<>();
-            requestMap.put(JsonKeys.PDF_URL,(String)request.getRequest().get(JsonKeys.PDF_URL));
+
+            if(ActorOperations.DOWNLOADV2.getOperation().equals(request.getOperation())) {
+                String certUrl = (String) request.getRequest().get(JsonKeys.CERT_URL);
+                String pdfUrl = (String) request.getRequest().get(JsonKeys.PDF_URL);
+
+                if (StringUtils.isNotEmpty(certUrl)) {
+                    requestMap.put(JsonKeys.PDF_URL, certUrl); //TODO-Change to CERT_URL if required
+                } else if (StringUtils.isNotEmpty(pdfUrl)) {
+                    requestMap.put(JsonKeys.PDF_URL, pdfUrl);
+                }
+            }else{
+                requestMap.put(JsonKeys.PDF_URL, (String) request.getRequest().get(JsonKeys.PDF_URL));
+            }
             certReqMap.put(JsonKeys.REQUEST,requestMap);
             String requestBody = requestMapper.writeValueAsString(certReqMap);
             logger.info("CertsServiceImpl:download:request body found:" + requestBody);
