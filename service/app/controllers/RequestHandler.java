@@ -57,7 +57,7 @@ public class RequestHandler extends BaseController {
             response.put(JsonKey.MESSAGE, ex.getMessage());
             String apiId = getApiId(req.path());
             response.setId(apiId);
-            response.setVer("v1");
+            response.setVer(getApiVersion(req.path()));
             response.setTs(System.currentTimeMillis() + "");
             if (ex.getResponseCode() == Results.badRequest().status()) {
                 return Results.badRequest(Json.toJson(response));
@@ -120,7 +120,7 @@ public class RequestHandler extends BaseController {
     public static Result handleSuccessResponse(Response response, play.mvc.Http.Request req) {
         String apiId = getApiId(req.path());
         response.setId(apiId);
-        response.setVer("v1");
+        response.setVer(getApiVersion(req.path()));
         response.setTs(System.currentTimeMillis() + "");
         return Results.ok(Json.toJson(response));
     }
@@ -130,13 +130,17 @@ public class RequestHandler extends BaseController {
         if (StringUtils.isNotBlank(uri)) {
             String temVal[] = uri.split("/");
             for (int i = 1; i < temVal.length; i++) {
-                if (i < temVal.length - 1) {
+                if (temVal[i].matches("[A-Za-z]+")) {
                     builder.append(temVal[i] + ".");
-                } else {
-                    builder.append(temVal[i]);
                 }
             }
-        }
+            builder.deleteCharAt(builder.length() - 1);
+            }
         return builder.toString();
+    }
+
+    public static String getApiVersion(String request) {
+
+        return request.split("[/]")[2];
     }
 }
