@@ -32,6 +32,26 @@ public class CertificateControllerTest extends BaseApplicationTest {
         setup(DummyActor.class);
     }
 
+    @Test
+    public void testAddCertificateV1Success() {
+        Result result =
+                performTest(
+                        "/certs/v1/registry/add",
+                        "POST",
+                        createCertRequest(false));
+        assertEquals(HttpStatus.SC_OK, getResponseStatus(result));
+    }
+
+    @Test
+    public void testAddCertificateV1Failure() {
+        Result result =
+                performTest(
+                        "/certs/v1/registry/add",
+                        "POST",
+                        createCertRequest(true));
+        assertEquals(HttpStatus.SC_BAD_REQUEST, getResponseStatus(result));
+    }
+
    @Test
     public void testAddCertificateSuccess() {
         Result result =
@@ -166,7 +186,7 @@ public class CertificateControllerTest extends BaseApplicationTest {
         badge.put("name", "Sunbird installation");
         badge.put("description", "Certificate of Appreciation in National Level ITI Grading");
         jsonData.put("badge",badge);
-        innerMap.put("qrCodeUrl", "djdjd/r01284093466818969624/275acee4-1964-4986-9dc3-06e08e9a1aa0.pdf");
+        innerMap.put("pdfUrl", "djdjd/r01284093466818969624/275acee4-1964-4986-9dc3-06e08e9a1aa0.pdf");
         Map<String,Object> related = new HashMap<>();
         related.put("courseId", "course-idsd");
         related.put("type", "hell");
