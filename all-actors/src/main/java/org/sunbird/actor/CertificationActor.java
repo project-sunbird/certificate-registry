@@ -11,7 +11,7 @@ import org.sunbird.service.ICertService;
 import org.sunbird.serviceimpl.CertsServiceImpl;
 
 @ActorConfig(
-        tasks = {"add","validate","download","generate","verify","search","read", "readCertMetaData"},
+        tasks = {"add","validate","download","generate","verify","search","read", "readCertMetaData", "addV2"},
         dispatcher = "",
         asyncTasks = {}
 )
@@ -31,6 +31,8 @@ public class CertificationActor extends BaseActor {
             case "add" :
                 add(request);
                 break;
+            case "addV2" :
+                add(request);
             case  "validate" :
                 validate(request);
                 break;

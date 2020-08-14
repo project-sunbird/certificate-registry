@@ -4,6 +4,7 @@ public class JsonKeys {
 
 
     public static final String CERT_ADD = "add";
+    public static final String CERT_ADD_V2 = "addV2";
     public static final String CERT_VALIDATE = "validate";
     public static final String CERT_DOWNLOAD = "download";
     public static final String PDF_URL = "pdfUrl";
@@ -66,5 +67,8 @@ public class JsonKeys {
     public static final String QR_CODE_URL = "qrCodeUrl";
     public static final String IDENTITY = "identity";
     public static final String IMAGE = "image";
+    public static final String VERSION_2 = "v2";
+    public static final String VERSION_1 = "v1";
+    public static final String VERSION = "version";
 
 }
