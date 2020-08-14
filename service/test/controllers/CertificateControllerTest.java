@@ -153,6 +153,17 @@ public class CertificateControllerTest extends BaseApplicationTest {
         assertEquals(HttpStatus.SC_OK, getResponseStatus(result));
     }
 
+
+    @Test
+    public void testDownloadV2CertificateSuccess() {
+        Result result =
+                performTest(
+                        "/certs/v2/registry/download/123",
+                        "GET",
+                        null);
+        assertEquals(HttpStatus.SC_OK, getResponseStatus(result));
+    }
+
     @Test
     public void testVerifyCertificateSuccess() {
         Result result =

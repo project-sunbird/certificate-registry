@@ -80,6 +80,24 @@ public class CertificateController extends BaseController {
                     return null;
                 },  JsonKeys.CERT_DOWNLOAD);
     }
+
+
+    /**
+     * this action method will be called for downloading certificate
+     *
+     * @return CompletionStage of Result
+     */
+    public CompletionStage<Result> downloadV2(String id) {
+        IRequestValidator requestValidator = new CertDownloadV2RequestValidator();
+        return handleRequest(request(),
+                request -> {
+                    Request req = (Request) request;
+                    req.getRequest().put(JsonKeys.ID, id);
+                    requestValidator.validate(req);
+                    return null;
+                }, JsonKeys.CERT_DOWNLOAD_V2);
+    }
+
     /**
      * this action method will be called for verify certificate
      * @return CompletionStage of Result
