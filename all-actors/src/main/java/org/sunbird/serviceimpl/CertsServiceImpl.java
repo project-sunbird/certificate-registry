@@ -115,11 +115,14 @@ public class CertsServiceImpl implements ICertService {
 
 
     private Response processRecord(Map<String, Object> certReqAddMap, String version) throws BaseException {
-        Certificate certificate=getCertificate(certReqAddMap, version);
+        Certificate certificate=getCertificate(certReqAddMap);
+        if(version.equalsIgnoreCase(JsonKeys.VERSION_1)) {
+            certificate.setPdfUrl((String)certReqAddMap.get(JsonKeys.PDF_URL));
+        }
         Map<String,Object>recordMap= requestMapper.convertValue(certificate,Map.class);
         return CertificateUtil.insertRecord(recordMap);
     }
-    private Certificate getCertificate(Map<String, Object> certReqAddMap, String version) {
+    private Certificate getCertificate(Map<String, Object> certReqAddMap) {
         Certificate certificate = new Certificate.Builder()
                 .setId((String) certReqAddMap.get(JsonKeys.ID))
                 .setData(getData(certReqAddMap))
@@ -130,9 +133,6 @@ public class CertsServiceImpl implements ICertService {
                 .setRelated((Map)certReqAddMap.get(JsonKeys.RELATED))
                 .setReason((String)certReqAddMap.get(JsonKeys.REASON))
                 .build();
-        if(version.equalsIgnoreCase(JsonKeys.VERSION_1)) {
-            certificate.setPdfUrl((String)certReqAddMap.get(JsonKeys.PDF_URL));
-        }
         logger.info("CertsServiceImpl:getCertificate:certificate object formed: "+certificate);
         return certificate;
     }
