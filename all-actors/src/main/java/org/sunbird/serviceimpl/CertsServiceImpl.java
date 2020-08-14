@@ -1,5 +1,8 @@
 package org.sunbird.serviceimpl;
 
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
@@ -201,6 +204,28 @@ public class CertsServiceImpl implements ICertService {
         } catch (Exception e) {
             logger.error("CertsServiceImpl:download:exception occurred:" + e);
             throw new BaseException(IResponseMessage.INTERNAL_ERROR, getLocalizedMessage(IResponseMessage.INTERNAL_ERROR,null), ResponseCode.SERVER_ERROR.getCode());
+        }
+        return response;
+    }
+
+    @Override
+    public Response downloadV2(Request request) throws BaseException {
+        String certId = (String) request.getRequest().get(JsonKeys.ID);
+        logger.info("CertServiceImpl:downloadV2:idProvided:" + certId);
+        Response certData = CertificateUtil.getCertRecordByID(certId);
+        Response response = new Response();
+        List<Map<String, Object>> resultList = (List<Map<String, Object>>) certData.getResult().get(JsonKeys.RESPONSE);
+        if (CollectionUtils.isNotEmpty(resultList) && MapUtils.isNotEmpty(resultList.get(0))) {
+            Map<String, Object> certInfo = resultList.get(0);
+            try {
+                Map<String, Object> data = requestMapper.readValue((String) certInfo.get(JsonKeys.DATA), new TypeReference<Map<String, Object>>() {});
+                response.put(JsonKeys.PRINT_URI, data.get(JsonKeys.PRINT_URI));
+            } catch (Exception e) {
+                logger.error("CertsServiceImpl:downloadV2:exception occurred:" + e);
+                throw new BaseException(IResponseMessage.INTERNAL_ERROR, getLocalizedMessage(IResponseMessage.INTERNAL_ERROR, null), ResponseCode.SERVER_ERROR.getCode());
+            }
+        } else {
+            throw new BaseException(IResponseMessage.RESOURCE_NOT_FOUND, localizer.getMessage(IResponseMessage.RESOURCE_NOT_FOUND, null), ResponseCode.RESOURCE_NOT_FOUND.getCode());
         }
         return response;
     }
