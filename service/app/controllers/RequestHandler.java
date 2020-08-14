@@ -7,6 +7,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import org.apache.commons.lang3.StringUtils;
 import org.sunbird.BaseException;
+import org.sunbird.JsonKeys;
 import org.sunbird.message.IResponseMessage;
 import org.sunbird.message.ResponseCode;
 import org.sunbird.request.Request;
@@ -136,7 +137,7 @@ public class RequestHandler extends BaseController {
             }
             builder.deleteCharAt(builder.length() - 1);
             }
-        return builder.toString();
+        return "api." + builder.toString();
     }
 
     public static String getApiVersion(String request) {
