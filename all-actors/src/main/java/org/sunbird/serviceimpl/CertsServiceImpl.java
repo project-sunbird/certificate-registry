@@ -67,8 +67,8 @@ public class CertsServiceImpl implements ICertService {
         }
         Map<String, Object> certAddReqMap = request.getRequest();
         assureUniqueCertId((String) certAddReqMap.get(JsonKeys.ID));
-        processRecord(certAddReqMap);
-        logger.info("CertsServiceImpl:add:record successfully processed with request:"+certAddReqMap);
+        processRecord(certAddReqMap,(String) request.getContext().get(JsonKeys.VERSION));
+        logger.info("CertsServiceImpl:add:record successfully processed with request:"+certAddReqMap.get(JsonKeys.ID));
         return (String)certAddReqMap.get(JsonKeys.ID);
     }
 
@@ -114,16 +114,15 @@ public class CertsServiceImpl implements ICertService {
     }
 
 
-    private Response processRecord(Map<String, Object> certReqAddMap) throws BaseException {
-        Certificate certificate=getCertificate(certReqAddMap);
+    private Response processRecord(Map<String, Object> certReqAddMap, String version) throws BaseException {
+        Certificate certificate=getCertificate(certReqAddMap, version);
         Map<String,Object>recordMap= requestMapper.convertValue(certificate,Map.class);
         return CertificateUtil.insertRecord(recordMap);
     }
-    private Certificate getCertificate(Map<String, Object> certReqAddMap) {
+    private Certificate getCertificate(Map<String, Object> certReqAddMap, String version) {
         Certificate certificate = new Certificate.Builder()
                 .setId((String) certReqAddMap.get(JsonKeys.ID))
                 .setData(getData(certReqAddMap))
-                .setQrCodeUrl((String)certReqAddMap.get(JsonKeys.QR_CODE_URL))
                 .setRevoked(false)
                 .setAccessCode((String)certReqAddMap.get(JsonKeys.ACCESS_CODE))
                 .setJsonUrl((String)certReqAddMap.get(JsonKeys.JSON_URL))
@@ -131,6 +130,9 @@ public class CertsServiceImpl implements ICertService {
                 .setRelated((Map)certReqAddMap.get(JsonKeys.RELATED))
                 .setReason((String)certReqAddMap.get(JsonKeys.REASON))
                 .build();
+        if(version.equalsIgnoreCase(JsonKeys.VERSION_1)) {
+            certificate.setPdfUrl((String)certReqAddMap.get(JsonKeys.PDF_URL));
+        }
         logger.info("CertsServiceImpl:getCertificate:certificate object formed: "+certificate);
         return certificate;
     }
@@ -157,7 +159,7 @@ public class CertsServiceImpl implements ICertService {
             Certificate certificate=getCertObject(esCertData);
             Map<String,Object>responseMap=new HashMap<>();
             responseMap.put(JsonKeys.JSON,certificate.getData());
-            responseMap.put(JsonKeys.QR_CODE_URL,certificate.getQrCodeUrl());
+            responseMap.put(JsonKeys.PDF_URL,certificate.getPdfUrl());
             responseMap.put(JsonKeys.RELATED,certificate.getRelated());
             Response response=new Response();
             response.put(JsonKeys.RESPONSE,responseMap);

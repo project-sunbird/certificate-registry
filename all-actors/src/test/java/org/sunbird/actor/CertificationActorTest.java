@@ -219,7 +219,6 @@ public class CertificationActorTest {
     private Response getCertReadResponse() {
         Map<String, Object> responseMap = new HashMap<>();
         responseMap.put(JsonKeys.DATA, "{\"id\":\"http://localhost:8080/_schemas/Certificate/d5a28280-98ac-4294-a508-21075dc7d475\",\"type\":[\"Assertion\",\"Extension\",\"extensions:CertificateExtension\"],\"issuedOn\":\"2019-08-31T12:52:25Z\",\"recipient\":{\"identity\":\"ntptest103\",\"type\":[\"phone\"],\"hashed\":false,\"name\":\"Aishwarya\",\"@context\":\"http://localhost:8080/_schemas/context.json\"},\"badge\":{\"id\":\"http://localhost:8080/_schemas/Badge.json\",\"type\":[\"BadgeClass\"],\"name\":\"Sunbird installation\",\"description\":\"Certificate of Appreciation in National Level ITI Grading\",\"image\":\"https://certs.example.gov/o/dgt/HJ5327VB1247G\",\"criteria\":{\"type\":[\"Criteria\"],\"id\":\"http://localhost:8080/_schemas/Certificate/d5a28280-98ac-4294-a508-21075dc7d475\",\"narrative\":\"For exhibiting outstanding performance\"},\"issuer\":{\"context\":\"http://localhost:8080/_schemas/context.json\",\"id\":\"http://localhost:8080/_schemas/Issuer.json\",\"type\":[\"Issuer\"],\"name\":\"NIIT\"},\"@context\":\"http://localhost:8080/_schemas/context.json\"},\"expires\":\"2019-09-30T12:52:25Z\",\"verification\":{\"type\":[\"SignedBadge\"],\"creator\":\"http://localhost:8080/_schemas/publicKey.json\"},\"revoked\":false,\"validFrom\":\"2019-06-21\",\"@context\":\"http://localhost:8080/_schemas/context.json\"}");
-        responseMap.put(JsonKeys.QR_CODE_URL, "qrCodeUrl url");
         responseMap.put(JsonKeys.RELATED, "{\"type\":\"course completion certificate prad\",\"batchId\":\"0130589602973368326\",\"courseId\":\"do_11305895730108006411643\"}");
         Response response = new Response();
         response.put(JsonKeys.RESPONSE, Lists.newArrayList(responseMap));
@@ -252,7 +251,6 @@ public class CertificationActorTest {
     private Response getValidateCertResponse(){
         Map<String,Object>responseMap=new HashMap<>();
         responseMap.put(JsonKeys.JSON,new HashMap<>());
-        responseMap.put(JsonKeys.QR_CODE_URL,"qrcode url");
         responseMap.put(JsonKeys.RELATED,new HashMap<>());
         Response response=new Response();
         response.put(JsonKeys.RESPONSE,responseMap);
@@ -311,7 +309,10 @@ public class CertificationActorTest {
         related.put("completionUrl", "completionUrl");
         innerMap.put("related", related);
         innerMap.put("jsonData", jsonData);
+        Map<String, Object> context = new HashMap<>();
+        context.put(JsonKeys.VERSION, JsonKeys.VERSION_1);
         reqMap.put("request",innerMap);
+        reqObj.setContext(context);
         reqObj.getRequest().putAll(reqMap);
         return reqObj;
     }
