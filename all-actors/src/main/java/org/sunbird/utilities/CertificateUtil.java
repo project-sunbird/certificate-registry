@@ -89,6 +89,9 @@ public class CertificateUtil {
         //index data to ES
         Request req = new Request();
         req.setOperation(ActorOperations.ADD_CERT_ES.getOperation());
+        //We started with elastic search, The data object was the sole thing to start with. Then we added a Cassandra table.
+        //as certificate json size is now about 650 KB, so we should stop pushing the json data [object]
+        certAddReqMap.remove(JsonKeys.DATA);
         req.getRequest().put(JsonKeys.REQUEST,certAddReqMap);
         Application.getInstance().getActorRef(ActorOperations.ADD_CERT_ES.getOperation()).tell(req, ActorRef.noSender());
         return response;
