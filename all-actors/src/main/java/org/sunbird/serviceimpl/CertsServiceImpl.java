@@ -161,8 +161,6 @@ public class CertsServiceImpl implements ICertService {
         if (MapUtils.isNotEmpty(esCertData) && StringUtils.equalsIgnoreCase((String)esCertData.get(JsonKeys.ACCESS_CODE),accessCode)) {
             Certificate certificate=getCertObject(esCertData);
             Map<String,Object>responseMap=new HashMap<>();
-            responseMap.put(JsonKeys.JSON,certificate.getData());
-            responseMap.put(JsonKeys.PDF_URL,certificate.getPdfUrl());
             responseMap.put(JsonKeys.RELATED,certificate.getRelated());
             Response response=new Response();
             response.put(JsonKeys.RESPONSE,responseMap);
