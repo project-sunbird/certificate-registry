@@ -157,11 +157,19 @@ public class CertsServiceImpl implements ICertService {
         Map<String,Object> valCertReq = request.getRequest();
         String certificatedId = (String) valCertReq.get(JsonKeys.CERT_ID);
         String accessCode = (String) valCertReq.get(JsonKeys.ACCESS_CODE);
-        Map<String,Object>esCertData=CertificateUtil.getCertificate(certificatedId);
-        if (MapUtils.isNotEmpty(esCertData) && StringUtils.equalsIgnoreCase((String)esCertData.get(JsonKeys.ACCESS_CODE),accessCode)) {
-            Certificate certificate=getCertObject(esCertData);
+        Response certResponse = CertificateUtil.getCertRecordByID(certificatedId);
+        List<Map<String, Object>> resultList = (List<Map<String, Object>>) certResponse.getResult().get(JsonKeys.RESPONSE);
+        if (CollectionUtils.isNotEmpty(resultList) && MapUtils.isNotEmpty(resultList.get(0)) &&
+                StringUtils.equalsIgnoreCase((String) resultList.get(0).get(JsonKeys.ACCESS_CODE), accessCode)) {
+            Map<String, Object> result = resultList.get(0);
             Map<String,Object>responseMap=new HashMap<>();
-            responseMap.put(JsonKeys.RELATED,certificate.getRelated());
+            try {
+                responseMap.put(JsonKeys.RELATED, requestMapper.readValue((String) result.get(JsonKeys.RELATED), new TypeReference<Map<String, Object>>(){}));
+                responseMap.put(JsonKeys.JSON, requestMapper.readValue((String) result.get(JsonKeys.DATA), new TypeReference<Map<String, Object>>(){}));
+            } catch (Exception e) {
+                logger.error("CertsServiceImpl:validate:exception occurred:" + e);
+                throw new BaseException(IResponseMessage.INTERNAL_ERROR, getLocalizedMessage(IResponseMessage.INTERNAL_ERROR, null), ResponseCode.SERVER_ERROR.getCode());
+            }
             Response response=new Response();
             response.put(JsonKeys.RESPONSE,responseMap);
             return response;
