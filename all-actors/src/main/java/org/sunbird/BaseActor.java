@@ -3,17 +3,16 @@ package org.sunbird;
 import akka.actor.UntypedAbstractActor;
 import akka.event.DiagnosticLoggingAdapter;
 import akka.event.Logging;
-import org.slf4j.MDC;
 import org.sunbird.message.IResponseMessage;
 import org.sunbird.message.Localizer;
 import org.sunbird.message.ResponseCode;
 import org.sunbird.request.Request;
 
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
-import java.util.UUID;
 
 /**
  * @author Amit Kumar
@@ -28,21 +27,21 @@ public abstract class BaseActor extends UntypedAbstractActor {
 
         if (message instanceof Request) {
             Request request = (Request) message;
-            Map<String, Object> mdc = new HashMap<>();
-            String requestId = request.getRequestId();
-            if(null == requestId){
-                requestId = UUID.randomUUID().toString();
+            Map<String, Object> trace = new HashMap<>();
+            if (request.getHeaders().containsKey(JsonKeys.REQUEST_MESSAGE_ID)) {
+                ArrayList<String> requestIds =
+                        (ArrayList<String>) request.getHeaders().get(JsonKeys.REQUEST_MESSAGE_ID);
+                trace.put(JsonKeys.REQUEST_MESSAGE_ID, requestIds.get(0));
+                logger.setMDC(trace);
+                // set mdc for non actors
+                new BaseLogger().setReqId(logger.getMDC());
             }
-            mdc.put(JsonKeys.REQ_ID,requestId);
-            logger.setMDC(mdc);
-            //set mdc for non Actor
-            new BaseLogger().setReqId(logger.getMDC());
             String operation = request.getOperation();
-            logger.info("onReceive called for operation:" + operation);
+            logger.info("onReceive called for operation: {}", operation);
             try {
-                logger.info("onReceive:method started at"+System.currentTimeMillis());
+                logger.info("onReceive:method {} started at {}", operation, System.currentTimeMillis());
                 onReceive(request);
-                logger.info("onReceive:method ended at"+System.currentTimeMillis());
+                logger.info("onReceive:method {} ended at {}", operation, System.currentTimeMillis());
             } catch (Exception e) {
                 logger.error("Exception : operation {} : message : {} {}", operation, e.getMessage(), e);
                 onReceiveException(operation, e);

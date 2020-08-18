@@ -4,6 +4,7 @@
 package utils;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sunbird.ActorServiceException;
@@ -39,6 +40,8 @@ public class RequestMapper {
         JsonNode requestData = null;
         try {
             requestData = req.body().asJson();
+            ObjectNode headerData = Json.mapper().valueToTree(req.getHeaders().toMap());
+            ((ObjectNode) requestData).set("headers", headerData);
             return Json.fromJson(requestData, obj);
         } catch (Exception e) {
             logger.error("RequestMapper:mapRequest: " + e.getMessage(), e);

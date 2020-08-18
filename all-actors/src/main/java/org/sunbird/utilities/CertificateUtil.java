@@ -68,7 +68,7 @@ public class CertificateUtil {
         req.setOperation(ActorOperations.DELETE_CERT_CASSANDRA.getOperation());
         req.getRequest().put(JsonKeys.ID,id);
         RequestParams params = new RequestParams();
-        params.setMsgid(MDC.get(JsonKeys.REQ_ID));
+        params.setMsgid(MDC.get(JsonKeys.REQUEST_MESSAGE_ID));
         req.setParams(params);
         Application.getInstance().getActorRef(ActorOperations.DELETE_CERT_CASSANDRA.getOperation()).tell(req, ActorRef.noSender());
         return bool;
@@ -95,9 +95,12 @@ public class CertificateUtil {
         //index data to ES
         Request req = new Request();
         RequestParams params = new RequestParams();
-        params.setMsgid(MDC.get(JsonKeys.REQ_ID));
+        params.setMsgid(MDC.get(JsonKeys.REQUEST_MESSAGE_ID));
         req.setParams(params);
         req.setOperation(ActorOperations.ADD_CERT_ES.getOperation());
+        //We started with elastic search, The data object was the sole thing to start with. Then we added a Cassandra table.
+        //as certificate json size is now about 650 KB, so we should stop pushing the json data [object]
+        certAddReqMap.remove(JsonKeys.DATA);
         req.getRequest().put(JsonKeys.REQUEST,certAddReqMap);
         Application.getInstance().getActorRef(ActorOperations.ADD_CERT_ES.getOperation()).tell(req, ActorRef.noSender());
         return response;
