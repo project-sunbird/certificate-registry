@@ -1,8 +1,8 @@
 package org.sunbird.actor;
 
-import org.apache.log4j.Logger;
 import org.sunbird.BaseActor;
 import org.sunbird.BaseException;
+import org.sunbird.BaseLogger;
 import org.sunbird.JsonKeys;
 import org.sunbird.actor.core.ActorConfig;
 import org.sunbird.request.Request;
@@ -10,13 +10,15 @@ import org.sunbird.response.Response;
 import org.sunbird.service.ICertService;
 import org.sunbird.serviceimpl.CertsServiceImpl;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @ActorConfig(
         tasks = {"add","validate","download","generate","verify","search","read", "readCertMetaData", "addV2", "downloadV2"},
         dispatcher = "",
         asyncTasks = {}
 )
 public class CertificationActor extends BaseActor {
-    static Logger logger = Logger.getLogger(CertificationActor.class);
     private ICertService certService = getCertServiceImpl();
 
     private ICertService getCertServiceImpl(){
