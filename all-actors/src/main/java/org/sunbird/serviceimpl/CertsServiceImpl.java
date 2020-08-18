@@ -1,8 +1,6 @@
 package org.sunbird.serviceimpl;
 
-import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
@@ -23,10 +21,8 @@ import org.sunbird.message.ResponseCode;
 import org.sunbird.request.Request;
 import org.sunbird.response.Response;
 import org.sunbird.service.ICertService;
-import org.sunbird.utilities.CertificateMetaData;
 import org.sunbird.utilities.CertificateUtil;
 import org.sunbird.utilities.ESResponseMapper;
-import org.sunbird.utilities.TemplateVarResolver;
 
 import java.io.IOException;
 import java.text.MessageFormat;
@@ -308,24 +304,6 @@ public class CertsServiceImpl implements ICertService {
         Certificate certificate=getCertObject(esCertData);
         Response response=new Response();
         response.put(JsonKeys.RESPONSE,certificate);
-        return response;
-    }
-
-    @Override
-    public Response readCertMetaData(Request request) throws BaseException {
-        String certId = (String) request.getRequest().get(JsonKeys.ID);
-        logger.info("CertServiceImpl:read:idProvided:" + certId);
-        Response certData = CertificateUtil.getCertRecordByID(certId);
-        Response response = new Response();
-        List<Map<String, Object>> resultList = (List<Map<String, Object>>) certData.getResult().get(JsonKeys.RESPONSE);
-        if (CollectionUtils.isNotEmpty(resultList) && MapUtils.isNotEmpty(resultList.get(0))) {
-            Map<String, Object> certInfo = resultList.get(0);
-            TemplateVarResolver templateVarResolver = new TemplateVarResolver();
-            CertificateMetaData certificateMetaData = templateVarResolver.generateCertMetaData(certInfo);
-            response.put(JsonKeys.RESPONSE, requestMapper.convertValue(certificateMetaData, Map.class));
-        } else {
-            throw new BaseException(IResponseMessage.RESOURCE_NOT_FOUND, localizer.getMessage(IResponseMessage.RESOURCE_NOT_FOUND, null), ResponseCode.RESOURCE_NOT_FOUND.getCode());
-        }
         return response;
     }
 

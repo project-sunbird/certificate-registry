@@ -205,19 +205,6 @@ public class CertificationActorTest {
     }
 
     @Test
-    public void testReadCertificateMetaData() throws Exception {
-        Request request = createCertReadRequest();
-        request.setOperation(ActorOperations.READ_CERT_META_DATA.getOperation());
-        beforeTestSetUp();
-        TestKit testKit = new TestKit(system);
-        ActorRef actorRef = system.actorOf(props);
-        actorRef.tell(request, testKit.getRef());
-        Response res = testKit.expectMsgClass(Duration.create(1000, TimeUnit.SECONDS),Response.class);
-        Assert.assertTrue(null != res && res.getResponseCode() == ResponseCode.OK);
-    }
-
-
-    @Test
     public void testDownloadV2Certificate() throws Exception {
         Request request = createDownloadV2CertRequest();
         request.setOperation(ActorOperations.DOWNLOADV2.getOperation());
