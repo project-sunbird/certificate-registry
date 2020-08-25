@@ -295,15 +295,29 @@ public class CertsServiceImpl implements ICertService {
     @Override
     public Response read(Request request) throws BaseException {
         String id=(String)request.getRequest().get(JsonKeys.ID);
-        logger.info("CertServiceImpl:read:idProvided:"+id);
-        Map<String,Object>esCertData=CertificateUtil.getCertificate(id);
-        logger.info("CertServiceImpl:read:esCert data is :"+esCertData);
-        if(MapUtils.isEmpty(esCertData)){
-            throw new BaseException(IResponseMessage.RESOURCE_NOT_FOUND,localizer.getMessage(IResponseMessage.RESOURCE_NOT_FOUND,null), ResponseCode.RESOURCE_NOT_FOUND.getCode());
+        logger.info("CertServiceImpl:read:idProvided: {}",id);
+        Response cassandraResponse = CertificateUtil.getCertRecordByID(id);
+        Response response = new Response();
+        List<Map<String, Object>> resultList = (List<Map<String, Object>>) cassandraResponse.getResult().get(JsonKeys.RESPONSE);
+        if (CollectionUtils.isNotEmpty(resultList) && MapUtils.isNotEmpty(resultList.get(0))) {
+            Map<String, Object> certInfo = resultList.get(0);
+            try {
+                Map<String, Object> data = requestMapper.readValue((String) certInfo.get(JsonKeys.DATA), new TypeReference<Map<String, Object>>() {});
+                Map<String, Object> recipient = requestMapper.readValue((String) certInfo.get(JsonKeys.RECIPIENT), new TypeReference<Map<String, Object>>() {});
+                if (StringUtils.isNotEmpty((String) certInfo.get(JsonKeys.RELATED))) {
+                    Map<String, Object> related = requestMapper.readValue((String) certInfo.get(JsonKeys.RELATED), new TypeReference<Map<String, Object>>() {});
+                    certInfo.put(JsonKeys.RELATED, related);
+                }
+                certInfo.put(JsonKeys.DATA, data);
+                certInfo.put(JsonKeys.RECIPIENT, recipient);
+                response.put(JsonKeys.RESPONSE, certInfo);
+            } catch (Exception e) {
+                logger.error("CertsServiceImpl:read:exception occurred: {}", e.getMessage());
+                throw new BaseException(IResponseMessage.INTERNAL_ERROR, getLocalizedMessage(IResponseMessage.INTERNAL_ERROR, null), ResponseCode.SERVER_ERROR.getCode());
+            }
+        } else {
+            throw new BaseException(IResponseMessage.RESOURCE_NOT_FOUND, localizer.getMessage(IResponseMessage.RESOURCE_NOT_FOUND, null), ResponseCode.RESOURCE_NOT_FOUND.getCode());
         }
-        Certificate certificate=getCertObject(esCertData);
-        Response response=new Response();
-        response.put(JsonKeys.RESPONSE,certificate);
         return response;
     }
 
