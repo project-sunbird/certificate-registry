@@ -267,7 +267,7 @@ public class CertsServiceImpl implements ICertService {
             Map<String, Object> certVerifyReqMap = new HashMap<>();
             certVerifyReqMap.put(JsonKeys.REQUEST,composeCertVerifyRequest(request));
             String requestBody = requestMapper.writeValueAsString(certVerifyReqMap);
-            //logger.info("CertsServiceImpl:verify:request body prepared:" + requestBody);
+            logger.info("CertsServiceImpl:verify:request body prepared.");
             String apiToCall = CertVars.getSERVICE_BASE_URL().concat(CertVars.getVerifyUri());
             logger.info("CertsServiceImpl:verify:complete url prepared:" + apiToCall);
             Future<HttpResponse<JsonNode>>responseFuture=CertificateUtil.makeAsyncPostCall(apiToCall,requestBody,headerMap);
