@@ -115,7 +115,7 @@ public class CertificateUtil {
     }
 
     public static Future<HttpResponse<JsonNode>> makeAsyncPostCall(String apiToCall, String requestBody, Map<String,String>headerMap){
-        //logger.info("CertificateUtil:makePostCall:get request to make post call for API:"+apiToCall+":"+requestBody);
+        //CertificateUtil:isIdPresent:getlogger.info("CertificateUtil:makePostCall:get request to make post call for API:"+apiToCall+":"+requestBody);
         Future<HttpResponse<JsonNode>> jsonResponse
                     = Unirest.post(apiToCall)
                     .headers(headerMap)
