@@ -1,6 +1,5 @@
 package controllers;
 
-import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 import javax.inject.Inject;
@@ -24,7 +23,6 @@ import play.libs.concurrent.HttpExecutionContext;
 import play.mvc.Controller;
 import play.mvc.Result;
 import play.mvc.Results;
-import utils.JsonKey;
 import utils.RequestMapper;
 import utils.RequestValidatorFunction;
 import utils.module.SignalHandler;
