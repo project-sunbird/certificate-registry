@@ -133,7 +133,7 @@ public class CertsServiceImpl implements ICertService {
                 .setRelated((Map)certReqAddMap.get(JsonKeys.RELATED))
                 .setReason((String)certReqAddMap.get(JsonKeys.REASON))
                 .build();
-        logger.info("CertsServiceImpl:getCertificate:certificate object formed: "+certificate);
+        //logger.info("CertsServiceImpl:getCertificate:certificate object formed: "+certificate);
         return certificate;
     }
     private Recipient getCompositeReciepientObject(Map<String, Object> certAddRequestMap) {
