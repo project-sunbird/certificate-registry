@@ -45,7 +45,7 @@ public class RequestMapper {
             return Json.fromJson(requestData, obj);
         } catch (Exception e) {
             logger.error("RequestMapper:mapRequest: " + e.getMessage(), e);
-            logger.info("RequestMapper:mapRequest:Requested data " + requestData);
+            //logger.info("RequestMapper:mapRequest:Requested data " + requestData);
 
             throw new ActorServiceException.InvalidRequestData(
                     IResponseMessage.INVALID_REQUESTED_DATA,
