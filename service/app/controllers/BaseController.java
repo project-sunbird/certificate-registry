@@ -102,6 +102,7 @@ public class BaseController extends Controller {
     public CompletionStage<Result> handleRequest(play.mvc.Http.Request req, RequestValidatorFunction validatorFunction,
                                                  String operation) {
         try {
+          // logger.info("Request body "+ req.body());
             Request request = new Request();
             if (req.body() != null && req.body().asJson() != null) {
                 request = (Request) RequestMapper.mapRequest(req, Request.class);

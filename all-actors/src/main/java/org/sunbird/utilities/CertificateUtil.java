@@ -49,10 +49,10 @@ public class CertificateUtil {
     public static boolean isIdPresent(String certificateId) {
         logger.info("CertificateUtil:isIdPresent:get id to search in ES:"+certificateId);
         Map<String,Object> response = (Map)ElasticSearchHelper.getResponseFromFuture(elasticSearchService.getDataByIdentifier(JsonKeys.CERT_ALIAS,certificateId));
-        logger.info("CertificateUtil:isIdPresent:got response from ES:"+response);
         if (MapUtils.isNotEmpty(response)) {
                 return true;
         }
+        logger.info("CertificateUtil:isIdPresent: id not found");
         return false;
     }
 
