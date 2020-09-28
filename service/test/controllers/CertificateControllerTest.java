@@ -173,6 +173,7 @@ public class CertificateControllerTest extends BaseApplicationTest {
             innerMap.put("id", "id5dd4");
         }
         innerMap.put("accessCode", "EANAB13");
+        innerMap.put("jsonUrl", "http://localhost:9000/certs/0125450863553740809/d7707145-68bc-4005-8b05-d72c959e7886.json  dfrte fits");
         Map<String,Object> jsonData = new HashMap<>();
         jsonData.put("id", "http://localhost:8080/_schemas/Certificate/d5a28280-98ac-4294-a508-21075dc7d475");
         jsonData.put("type",new String[]{"Assertion","Extension"});
