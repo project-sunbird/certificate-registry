@@ -6,6 +6,7 @@ import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.MapUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpStatus;
 import org.slf4j.Logger;
@@ -25,6 +26,8 @@ import org.sunbird.utilities.CertificateUtil;
 import org.sunbird.utilities.ESResponseMapper;
 
 import java.io.IOException;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.List;
@@ -221,8 +224,16 @@ public class CertsServiceImpl implements ICertService {
         if (CollectionUtils.isNotEmpty(resultList) && MapUtils.isNotEmpty(resultList.get(0))) {
             Map<String, Object> certInfo = resultList.get(0);
             try {
-                Map<String, Object> data = requestMapper.readValue((String) certInfo.get(JsonKeys.DATA), new TypeReference<Map<String, Object>>() {});
-                response.put(JsonKeys.PRINT_URI, data.get(JsonKeys.PRINT_URI));
+                String jsonUrl = (String) certInfo.get(JsonKeys.JSON_URL);
+                String printUri;
+                if (StringUtils.isEmpty(jsonUrl)) {
+                    Map<String, Object> certificate = requestMapper.readValue((String) certInfo.get(JsonKeys.DATA), new TypeReference<Map<String, Object>>() {});
+                    printUri = (String) certificate.get(JsonKeys.PRINT_URI);
+                } else {
+                    String signedJsonUrl = getJsonSignedUrl((String) certInfo.get(JsonKeys.JSON_URL));
+                    printUri = getPrintUri(signedJsonUrl);
+                }
+                response.put(JsonKeys.PRINT_URI, printUri);
             } catch (Exception e) {
                 logger.error("CertsServiceImpl:downloadV2:exception occurred:" + e);
                 throw new BaseException(IResponseMessage.INTERNAL_ERROR, getLocalizedMessage(IResponseMessage.INTERNAL_ERROR, null), ResponseCode.SERVER_ERROR.getCode());
@@ -231,6 +242,44 @@ public class CertsServiceImpl implements ICertService {
             throw new BaseException(IResponseMessage.RESOURCE_NOT_FOUND, localizer.getMessage(IResponseMessage.RESOURCE_NOT_FOUND, null), ResponseCode.RESOURCE_NOT_FOUND.getCode());
         }
         return response;
+    }
+
+    private String getJsonSignedUrl(String jsonUrl) throws BaseException {
+        logger.info("getJsonSignedUrl: getting signedUrl for the url {}", jsonUrl);
+        String signedJsonUrl = null;
+        try {
+            Map<String, Object> certReqMap = new HashMap<>();
+            Map<String, String> requestMap = new HashMap<>();
+            requestMap.put(JsonKeys.PDF_URL, jsonUrl);
+            certReqMap.put(JsonKeys.REQUEST, requestMap);
+            String requestBody = requestMapper.writeValueAsString(certReqMap);
+            logger.info("getJsonSignedUrl:request body found.");
+            String apiToCall = CertVars.getSERVICE_BASE_URL().concat(CertVars.getDOWNLOAD_URI());
+            logger.info("getJsonSignedUrl:complete url found: {}", apiToCall);
+            Future<HttpResponse<JsonNode>> responseFuture = CertificateUtil.makeAsyncPostCall(apiToCall, requestBody, headerMap);
+            HttpResponse<JsonNode> jsonResponse = responseFuture.get();
+            if (jsonResponse != null && jsonResponse.getStatus() == HttpStatus.SC_OK) {
+                signedJsonUrl = jsonResponse.getBody().getObject().getJSONObject(JsonKeys.RESULT).getString(JsonKeys.SIGNED_URL);
+            }
+        } catch (Exception e) {
+            logger.error("getJsonSignedUrl:exception occurred: {} {}", e.getMessage(), e);
+            throw new BaseException(IResponseMessage.INTERNAL_ERROR, getLocalizedMessage(IResponseMessage.INTERNAL_ERROR, null), ResponseCode.SERVER_ERROR.getCode());
+        }
+        return signedJsonUrl;
+    }
+
+    private String getPrintUri(String signedJsonUrl) throws BaseException {
+        String printUri;
+        try {
+            URL url = new URL(signedJsonUrl);
+            String data = IOUtils.toString(url, StandardCharsets.UTF_8);
+            Map<String, Object> certificate = requestMapper.readValue(data, new TypeReference<Map<String, Object>>() {});
+            printUri = (String) certificate.get(JsonKeys.PRINT_URI);
+        } catch (IOException e) {
+            logger.error("getPrintUri:exception occurred {} {}", e.getMessage(), e);
+            throw new BaseException(IResponseMessage.INTERNAL_ERROR, getLocalizedMessage(e.getLocalizedMessage(), null), ResponseCode.SERVER_ERROR.getCode());
+        }
+        return printUri;
     }
 
     @Override

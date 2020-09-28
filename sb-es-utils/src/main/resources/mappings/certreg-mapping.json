@@ -41,6 +41,9 @@
       "search_analyzer": "cs_search_analyzer",
       "fielddata": true
     },
+    "data": {
+      "type": "object"
+    },
     "id": {
       "type": "text",
       "fields": {
