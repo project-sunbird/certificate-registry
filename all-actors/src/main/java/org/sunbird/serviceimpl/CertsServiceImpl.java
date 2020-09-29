@@ -226,7 +226,7 @@ public class CertsServiceImpl implements ICertService {
             try {
                 String jsonUrl = (String) certInfo.get(JsonKeys.JSON_URL);
                 String printUri;
-                //in-some cases jsonUrl was not filled(1.5.0 prior to fix), in some-cases jsonUrl is filled (because of svg content growth,now we are uploading cert to cloud)
+                //in-some cases jsonUrl was not filled(1.5.0 prior to fix), After fix jsonUrl is being filled (because of svg content growth,now we are uploading cert to cloud)
                 if (StringUtils.isEmpty(jsonUrl)) {
                     logger.info("getJsonSignedUrl: jsonUrl is empty , print uri is present in data object");
                     Map<String, Object> certificate = requestMapper.readValue((String) certInfo.get(JsonKeys.DATA), new TypeReference<Map<String, Object>>() {});
