@@ -34,7 +34,7 @@ public class CertAddRequestValidator implements IRequestValidator {
     public void validate(Request request) throws BaseException {
         this.request=request;
         if (((String) request.getContext().get(JsonKeys.VERSION)).equalsIgnoreCase(JsonKeys.VERSION_2)) {
-            mandatoryParamsList = Lists.newArrayList(JsonKeys.ID, JsonKeys.ACCESS_CODE);
+            mandatoryParamsList = Lists.newArrayList(JsonKeys.ID, JsonKeys.ACCESS_CODE, JsonKeys.JSON_URL);
         } else {
             mandatoryParamsList = Lists.newArrayList(JsonKeys.ID, JsonKeys.ACCESS_CODE, JsonKeys.PDF_URL);
         }

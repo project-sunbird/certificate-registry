@@ -8,6 +8,7 @@ import akka.testkit.javadsl.TestKit;
 import com.google.common.collect.Lists;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
+import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpStatus;
 import org.json.JSONObject;
 import org.junit.Assert;
@@ -38,6 +39,8 @@ import org.sunbird.serviceimpl.CertsServiceImpl;
 import org.sunbird.utilities.CertificateUtil;
 import scala.concurrent.duration.Duration;
 
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -58,7 +61,9 @@ import static org.powermock.api.mockito.PowerMockito.when;
         ElasticSearchService.class,
         CassandraOperation.class,
         CassandraDACImpl.class,
-        CertVars.class})
+        CertVars.class,
+        IOUtils.class,
+        URL.class})
 @PowerMockIgnore("javax.management.*")
 public class CertificationActorTest {
 
@@ -108,8 +113,8 @@ public class CertificationActorTest {
         when(object.getJSONObject(JsonKeys.HITS)).thenReturn(jsonObject);
         object2 = Mockito.mock(JSONObject.class);
         when(object.getJSONObject(JsonKeys.RESULT)).thenReturn(object2);
-
-        when(object2.getString(JsonKeys.SIGNED_URL)).thenReturn("signed_url");
+        String signedUrl ="http://localhost:9000/dev-e-credentials/0125450863553740809/4d88c2e4-212b-4c00-aa83-1cd3fde7b447.json";
+        when(object2.getString(JsonKeys.SIGNED_URL)).thenReturn(signedUrl);
         when(object2.get(JsonKeys.RESPONSE)).thenReturn(map);
         when(certsService.download(Mockito.any(Request.class))).thenReturn(getValidateCertResponse());
         when(CertificateUtil.getCertificate(Mockito.anyString())).thenReturn(map);
@@ -121,6 +126,10 @@ public class CertificationActorTest {
         when(certsService.verify(Mockito.any(Request.class))).thenReturn(getValidateCertResponse());
         when(CertificateUtil.getCertificate(Mockito.anyString())).thenReturn(map);
         when(CertificateUtil.getCertRecordByID(Mockito.anyString())).thenReturn(getCertReadResponse());
+        URL mockedURL = PowerMockito.mock(URL.class);
+        PowerMockito.whenNew(URL.class).withArguments(signedUrl).thenReturn(mockedURL);
+        PowerMockito.mockStatic(IOUtils.class);
+        when(IOUtils.toString(mockedURL, StandardCharsets.UTF_8)).thenReturn("{\"id\":\"http://localhost:8080/_schemas/Certificate/d5a28280-98ac-4294-a508-21075dc7d475\",\"type\":[\"Assertion\",\"Extension\",\"extensions:CertificateExtension\"],\"issuedOn\":\"2019-08-31T12:52:25Z\",\"recipient\":{\"identity\":\"ntptest103\",\"type\":[\"phone\"],\"hashed\":false,\"name\":\"Aishwarya\",\"@context\":\"http://localhost:8080/_schemas/context.json\"},\"badge\":{\"id\":\"http://localhost:8080/_schemas/Badge.json\",\"type\":[\"BadgeClass\"],\"name\":\"Sunbird installation\",\"description\":\"Certificate of Appreciation in National Level ITI Grading\",\"image\":\"https://certs.example.gov/o/dgt/HJ5327VB1247G\",\"criteria\":{\"type\":[\"Criteria\"],\"id\":\"http://localhost:8080/_schemas/Certificate/d5a28280-98ac-4294-a508-21075dc7d475\",\"narrative\":\"For exhibiting outstanding performance\"},\"issuer\":{\"context\":\"http://localhost:8080/_schemas/context.json\",\"id\":\"http://localhost:8080/_schemas/Issuer.json\",\"type\":[\"Issuer\"],\"name\":\"NIIT\"},\"@context\":\"http://localhost:8080/_schemas/context.json\"},\"expires\":\"2019-09-30T12:52:25Z\",\"verification\":{\"type\":[\"SignedBadge\"],\"creator\":\"http://localhost:8080/_schemas/publicKey.json\"},\"revoked\":false,\"validFrom\":\"2019-06-21\",\"@context\":\"http://localhost:8080/_schemas/context.json\",\"printUri\":\"data:image/svg+xml,%3Csvg ....\"}");
     }
 
     public static void tearDown() throws Exception {
@@ -237,6 +246,7 @@ public class CertificationActorTest {
         responseMap.put(JsonKeys.RELATED, "{\"type\":\"course completion certificate prad\",\"batchId\":\"0130589602973368326\",\"courseId\":\"do_11305895730108006411643\"}");
         responseMap.put(JsonKeys.RECIPIENT, "{\"name\":\"Test user\",\"email\":null,\"phone\":null,\"id\":null,\"type\":\"individual\"}");
         responseMap.put(JsonKeys.ACCESS_CODE, "access_code");
+        responseMap.put(JsonKeys.JSON_URL, "http://localhost:9000/certs/0125450863553740809/0ec760f3-a82e-4d3a-b97b-7be2e3a8298f.json");
         Response response = new Response();
         response.put(JsonKeys.RESPONSE, Lists.newArrayList(responseMap));
         return response;
