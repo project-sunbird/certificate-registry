@@ -226,11 +226,18 @@ public class CertsServiceImpl implements ICertService {
             try {
                 String jsonUrl = (String) certInfo.get(JsonKeys.JSON_URL);
                 String printUri;
+                //decided not to upload cert json into the cloud (1.5.0) as it was already storing in cassandra in the column data( jsonUrl was null), but due to the materialised
+                //view of svg which is of size 640kb ,it  is a part of cert data, which caused increase in cassandra disk space. Due to this issue now we decided that Cert-service shall upload the JSON (including the printURI) to the storage.
+                //So now the jsonUrl will not be empty. When a download is needed, cert-registry shall get a signed url to the json url and stream only the printURI portion as expected for SVG certificates.
                 if (StringUtils.isEmpty(jsonUrl)) {
                     Map<String, Object> certificate = requestMapper.readValue((String) certInfo.get(JsonKeys.DATA), new TypeReference<Map<String, Object>>() {});
                     printUri = (String) certificate.get(JsonKeys.PRINT_URI);
                 } else {
-                    String signedJsonUrl = getJsonSignedUrl((String) certInfo.get(JsonKeys.JSON_URL));
+                    Request req = new Request();
+                    req.put(JsonKeys.PDF_URL,certInfo.get(JsonKeys.JSON_URL));
+                    logger.info("getJsonSignedUrl: getting signedUrl for the url {}", certInfo.get(JsonKeys.JSON_URL));
+                    Response downloadRes = download(req);
+                    String signedJsonUrl = (String) downloadRes.getResult().get(JsonKeys.SIGNED_URL);
                     printUri = getPrintUri(signedJsonUrl);
                 }
                 response.put(JsonKeys.PRINT_URI, printUri);
@@ -242,30 +249,6 @@ public class CertsServiceImpl implements ICertService {
             throw new BaseException(IResponseMessage.RESOURCE_NOT_FOUND, localizer.getMessage(IResponseMessage.RESOURCE_NOT_FOUND, null), ResponseCode.RESOURCE_NOT_FOUND.getCode());
         }
         return response;
-    }
-
-    private String getJsonSignedUrl(String jsonUrl) throws BaseException {
-        logger.info("getJsonSignedUrl: getting signedUrl for the url {}", jsonUrl);
-        String signedJsonUrl = null;
-        try {
-            Map<String, Object> certReqMap = new HashMap<>();
-            Map<String, String> requestMap = new HashMap<>();
-            requestMap.put(JsonKeys.PDF_URL, jsonUrl);
-            certReqMap.put(JsonKeys.REQUEST, requestMap);
-            String requestBody = requestMapper.writeValueAsString(certReqMap);
-            logger.info("getJsonSignedUrl:request body found.");
-            String apiToCall = CertVars.getSERVICE_BASE_URL().concat(CertVars.getDOWNLOAD_URI());
-            logger.info("getJsonSignedUrl:complete url found: {}", apiToCall);
-            Future<HttpResponse<JsonNode>> responseFuture = CertificateUtil.makeAsyncPostCall(apiToCall, requestBody, headerMap);
-            HttpResponse<JsonNode> jsonResponse = responseFuture.get();
-            if (jsonResponse != null && jsonResponse.getStatus() == HttpStatus.SC_OK) {
-                signedJsonUrl = jsonResponse.getBody().getObject().getJSONObject(JsonKeys.RESULT).getString(JsonKeys.SIGNED_URL);
-            }
-        } catch (Exception e) {
-            logger.error("getJsonSignedUrl:exception occurred: {} {}", e.getMessage(), e);
-            throw new BaseException(IResponseMessage.INTERNAL_ERROR, getLocalizedMessage(IResponseMessage.INTERNAL_ERROR, null), ResponseCode.SERVER_ERROR.getCode());
-        }
-        return signedJsonUrl;
     }
 
     private String getPrintUri(String signedJsonUrl) throws BaseException {
