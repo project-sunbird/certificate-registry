@@ -226,9 +226,7 @@ public class CertsServiceImpl implements ICertService {
             try {
                 String jsonUrl = (String) certInfo.get(JsonKeys.JSON_URL);
                 String printUri;
-                //decided not to upload cert json into the cloud (1.5.0) as it was already storing in cassandra in the column data( jsonUrl was null), but due to the materialised
-                //view of svg which is of size 640kb ,it  is a part of cert data, which caused increase in cassandra disk space. Due to this issue now we decided that Cert-service shall upload the JSON (including the printURI) to the storage.
-                //So now the jsonUrl will not be empty. When a download is needed, cert-registry shall get a signed url to the json url and stream only the printURI portion as expected for SVG certificates.
+                //in-some cases jsonUrl was not filled(1.5.0 prior to fix), in some-cases jsonUrl is filled (because of svg content growth,now we are uploading cert to cloud)
                 if (StringUtils.isEmpty(jsonUrl)) {
                     logger.info("getJsonSignedUrl: jsonUrl is empty , print uri is present in data object");
                     Map<String, Object> certificate = requestMapper.readValue((String) certInfo.get(JsonKeys.DATA), new TypeReference<Map<String, Object>>() {});
