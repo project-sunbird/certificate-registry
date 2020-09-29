@@ -29,7 +29,7 @@ public class CertVars {
             logger.error("CertVars:getPropsFromEnvs:no suitable host found for downloadUri");
             System.exit(-1);
         }
-        return SERVICE_BASE_URL;
+        return "http://localhost:9001";
     }
     public static String getDOWNLOAD_URI() {
         return DOWNLOAD_URI;
