@@ -32,8 +32,8 @@ public class CertificateControllerTest extends BaseApplicationTest {
         setup(DummyActor.class);
     }
 
-   @Test
-    public void testAddCertificateSuccess() {
+    @Test
+    public void testAddCertificateV1Success() {
         Result result =
                 performTest(
                         "/certs/v1/registry/add",
@@ -43,10 +43,30 @@ public class CertificateControllerTest extends BaseApplicationTest {
     }
 
     @Test
-    public void testAddCertificateFailure() {
+    public void testAddCertificateV1Failure() {
         Result result =
                 performTest(
                         "/certs/v1/registry/add",
+                        "POST",
+                        createCertRequest(true));
+        assertEquals(HttpStatus.SC_BAD_REQUEST, getResponseStatus(result));
+    }
+
+   @Test
+    public void testAddCertificateSuccess() {
+        Result result =
+                performTest(
+                        "/certs/v2/registry/add",
+                        "POST",
+                        createCertRequest(false));
+        assertEquals(HttpStatus.SC_OK, getResponseStatus(result));
+    }
+
+    @Test
+    public void testAddCertificateFailure() {
+        Result result =
+                performTest(
+                        "/certs/v2/registry/add",
                         "POST",
                         createCertRequest(true));
         assertEquals(HttpStatus.SC_BAD_REQUEST, getResponseStatus(result));
@@ -124,6 +144,16 @@ public class CertificateControllerTest extends BaseApplicationTest {
     }
 
     @Test
+    public void testDownloadV2CertificateSuccess() {
+        Result result =
+                performTest(
+                        "/certs/v2/registry/download/123",
+                        "GET",
+                        null);
+        assertEquals(HttpStatus.SC_OK, getResponseStatus(result));
+    }
+
+    @Test
     public void testVerifyCertificateSuccess() {
         Result result =
                 performTest(
@@ -143,6 +173,7 @@ public class CertificateControllerTest extends BaseApplicationTest {
             innerMap.put("id", "id5dd4");
         }
         innerMap.put("accessCode", "EANAB13");
+        innerMap.put("jsonUrl", "http://localhost:9000/certs/0125450863553740809/d7707145-68bc-4005-8b05-d72c959e7886.json  dfrte fits");
         Map<String,Object> jsonData = new HashMap<>();
         jsonData.put("id", "http://localhost:8080/_schemas/Certificate/d5a28280-98ac-4294-a508-21075dc7d475");
         jsonData.put("type",new String[]{"Assertion","Extension"});

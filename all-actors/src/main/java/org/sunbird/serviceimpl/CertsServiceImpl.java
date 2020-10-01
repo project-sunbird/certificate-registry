@@ -1,13 +1,16 @@
 package org.sunbird.serviceimpl;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.MapUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpStatus;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.sunbird.BaseException;
 import org.sunbird.CertVars;
 import org.sunbird.JsonKeys;
@@ -23,6 +26,8 @@ import org.sunbird.utilities.CertificateUtil;
 import org.sunbird.utilities.ESResponseMapper;
 
 import java.io.IOException;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.List;
@@ -36,7 +41,7 @@ import java.util.concurrent.Future;
  * @author anmolgupta
  */
 public class CertsServiceImpl implements ICertService {
-    private static Logger logger = Logger.getLogger(CertsServiceImpl.class);
+    private static Logger logger = LoggerFactory.getLogger(CertsServiceImpl.class);
     private static Localizer localizer = Localizer.getInstance();
     private static ObjectMapper requestMapper = new ObjectMapper();
     static Map<String, String> headerMap = new HashMap<>();
@@ -65,8 +70,8 @@ public class CertsServiceImpl implements ICertService {
         }
         Map<String, Object> certAddReqMap = request.getRequest();
         assureUniqueCertId((String) certAddReqMap.get(JsonKeys.ID));
-        processRecord(certAddReqMap);
-        logger.info("CertsServiceImpl:add:record successfully processed with request:"+certAddReqMap);
+        processRecord(certAddReqMap,(String) request.getContext().get(JsonKeys.VERSION));
+        logger.info("CertsServiceImpl:add:record successfully processed with request:"+certAddReqMap.get(JsonKeys.ID));
         return (String)certAddReqMap.get(JsonKeys.ID);
     }
 
@@ -112,8 +117,11 @@ public class CertsServiceImpl implements ICertService {
     }
 
 
-    private Response processRecord(Map<String, Object> certReqAddMap) throws BaseException {
+    private Response processRecord(Map<String, Object> certReqAddMap, String version) throws BaseException {
         Certificate certificate=getCertificate(certReqAddMap);
+        if(version.equalsIgnoreCase(JsonKeys.VERSION_1)) {
+            certificate.setPdfUrl((String)certReqAddMap.get(JsonKeys.PDF_URL));
+        }
         Map<String,Object>recordMap= requestMapper.convertValue(certificate,Map.class);
         return CertificateUtil.insertRecord(recordMap);
     }
@@ -121,7 +129,6 @@ public class CertsServiceImpl implements ICertService {
         Certificate certificate = new Certificate.Builder()
                 .setId((String) certReqAddMap.get(JsonKeys.ID))
                 .setData(getData(certReqAddMap))
-                .setPdfUrl((String)certReqAddMap.get(JsonKeys.PDF_URL))
                 .setRevoked(false)
                 .setAccessCode((String)certReqAddMap.get(JsonKeys.ACCESS_CODE))
                 .setJsonUrl((String)certReqAddMap.get(JsonKeys.JSON_URL))
@@ -129,7 +136,7 @@ public class CertsServiceImpl implements ICertService {
                 .setRelated((Map)certReqAddMap.get(JsonKeys.RELATED))
                 .setReason((String)certReqAddMap.get(JsonKeys.REASON))
                 .build();
-        logger.info("CertsServiceImpl:getCertificate:certificate object formed: "+certificate);
+        logger.info("CertsServiceImpl:getCertificate:certificate object formed.");
         return certificate;
     }
     private Recipient getCompositeReciepientObject(Map<String, Object> certAddRequestMap) {
@@ -150,13 +157,19 @@ public class CertsServiceImpl implements ICertService {
         Map<String,Object> valCertReq = request.getRequest();
         String certificatedId = (String) valCertReq.get(JsonKeys.CERT_ID);
         String accessCode = (String) valCertReq.get(JsonKeys.ACCESS_CODE);
-        Map<String,Object>esCertData=CertificateUtil.getCertificate(certificatedId);
-        if (MapUtils.isNotEmpty(esCertData) && StringUtils.equalsIgnoreCase((String)esCertData.get(JsonKeys.ACCESS_CODE),accessCode)) {
-            Certificate certificate=getCertObject(esCertData);
+        Response certResponse = CertificateUtil.getCertRecordByID(certificatedId);
+        List<Map<String, Object>> resultList = (List<Map<String, Object>>) certResponse.getResult().get(JsonKeys.RESPONSE);
+        if (CollectionUtils.isNotEmpty(resultList) && MapUtils.isNotEmpty(resultList.get(0)) &&
+                StringUtils.equalsIgnoreCase((String) resultList.get(0).get(JsonKeys.ACCESS_CODE), accessCode)) {
+            Map<String, Object> result = resultList.get(0);
             Map<String,Object>responseMap=new HashMap<>();
-            responseMap.put(JsonKeys.JSON,certificate.getData());
-            responseMap.put(JsonKeys.PDF,certificate.getPdfUrl());
-            responseMap.put(JsonKeys.RELATED,certificate.getRelated());
+            try {
+                responseMap.put(JsonKeys.RELATED, requestMapper.readValue((String) result.get(JsonKeys.RELATED), new TypeReference<Map<String, Object>>(){}));
+                responseMap.put(JsonKeys.JSON, requestMapper.readValue((String) result.get(JsonKeys.DATA), new TypeReference<Map<String, Object>>(){}));
+            } catch (Exception e) {
+                logger.error("CertsServiceImpl:validate:exception occurred:" + e);
+                throw new BaseException(IResponseMessage.INTERNAL_ERROR, getLocalizedMessage(IResponseMessage.INTERNAL_ERROR, null), ResponseCode.SERVER_ERROR.getCode());
+            }
             Response response=new Response();
             response.put(JsonKeys.RESPONSE,responseMap);
             return response;
@@ -182,7 +195,7 @@ public class CertsServiceImpl implements ICertService {
             requestMap.put(JsonKeys.PDF_URL,(String)request.getRequest().get(JsonKeys.PDF_URL));
             certReqMap.put(JsonKeys.REQUEST,requestMap);
             String requestBody = requestMapper.writeValueAsString(certReqMap);
-            logger.info("CertsServiceImpl:download:request body found:" + requestBody);
+            logger.info("CertsServiceImpl:download:request body found.");
             String apiToCall = CertVars.getSERVICE_BASE_URL().concat(CertVars.getDOWNLOAD_URI());
             logger.info("CertsServiceImpl:download:complete url found:" + apiToCall);
             Future<HttpResponse<JsonNode>>responseFuture=CertificateUtil.makeAsyncPostCall(apiToCall,requestBody,headerMap);
@@ -202,13 +215,63 @@ public class CertsServiceImpl implements ICertService {
     }
 
     @Override
+    public Response downloadV2(Request request) throws BaseException {
+        String certId = (String) request.getRequest().get(JsonKeys.ID);
+        logger.info("CertServiceImpl:downloadV2:idProvided:" + certId);
+        Response certData = CertificateUtil.getCertRecordByID(certId);
+        Response response = new Response();
+        List<Map<String, Object>> resultList = (List<Map<String, Object>>) certData.getResult().get(JsonKeys.RESPONSE);
+        if (CollectionUtils.isNotEmpty(resultList) && MapUtils.isNotEmpty(resultList.get(0))) {
+            Map<String, Object> certInfo = resultList.get(0);
+            try {
+                String jsonUrl = (String) certInfo.get(JsonKeys.JSON_URL);
+                String printUri;
+                //in-some cases jsonUrl was not filled(1.5.0 prior to fix), After fix jsonUrl is being filled (because of svg content growth,now we are uploading cert to cloud)
+                if (StringUtils.isEmpty(jsonUrl)) {
+                    logger.info("getJsonSignedUrl: jsonUrl is empty , print uri is present in data object");
+                    Map<String, Object> certificate = requestMapper.readValue((String) certInfo.get(JsonKeys.DATA), new TypeReference<Map<String, Object>>() {});
+                    printUri = (String) certificate.get(JsonKeys.PRINT_URI);
+                } else {
+                    Request req = new Request();
+                    req.put(JsonKeys.PDF_URL,certInfo.get(JsonKeys.JSON_URL));
+                    logger.info("getJsonSignedUrl: getting signedUrl for the json url {}", certInfo.get(JsonKeys.JSON_URL));
+                    Response downloadRes = download(req);
+                    String signedJsonUrl = (String) downloadRes.getResult().get(JsonKeys.SIGNED_URL);
+                    printUri = getPrintUri(signedJsonUrl);
+                }
+                response.put(JsonKeys.PRINT_URI, printUri);
+            } catch (Exception e) {
+                logger.error("CertsServiceImpl:downloadV2:exception occurred:" + e);
+                throw new BaseException(IResponseMessage.INTERNAL_ERROR, getLocalizedMessage(IResponseMessage.INTERNAL_ERROR, null), ResponseCode.SERVER_ERROR.getCode());
+            }
+        } else {
+            throw new BaseException(IResponseMessage.RESOURCE_NOT_FOUND, localizer.getMessage(IResponseMessage.RESOURCE_NOT_FOUND, null), ResponseCode.RESOURCE_NOT_FOUND.getCode());
+        }
+        return response;
+    }
+
+    private String getPrintUri(String signedJsonUrl) throws BaseException {
+        String printUri;
+        try {
+            URL url = new URL(signedJsonUrl);
+            String data = IOUtils.toString(url, StandardCharsets.UTF_8);
+            Map<String, Object> certificate = requestMapper.readValue(data, new TypeReference<Map<String, Object>>() {});
+            printUri = (String) certificate.get(JsonKeys.PRINT_URI);
+        } catch (IOException e) {
+            logger.error("getPrintUri:exception occurred {} {}", e.getMessage(), e);
+            throw new BaseException(IResponseMessage.INTERNAL_ERROR, getLocalizedMessage(e.getLocalizedMessage(), null), ResponseCode.SERVER_ERROR.getCode());
+        }
+        return printUri;
+    }
+
+    @Override
     public Response generate(Request request) throws BaseException {
         Response response = new Response();
         try {
             Map<String, Object> certReqMap = new HashMap<>();
             certReqMap.put(JsonKeys.REQUEST,request.getRequest());
             String requestBody = requestMapper.writeValueAsString(certReqMap);
-            logger.info("CertsServiceImpl:generate:request body found:" + requestBody);
+            logger.info("CertsServiceImpl:generate:request body found.");
             String apiToCall = CertVars.getSERVICE_BASE_URL().concat(CertVars.getGenerateUri());
             logger.info("CertsServiceImpl:generate:complete url found:" + apiToCall);
             Future<HttpResponse<JsonNode>>responseFuture=CertificateUtil.makeAsyncPostCall(apiToCall,requestBody,headerMap);
@@ -235,7 +298,7 @@ public class CertsServiceImpl implements ICertService {
             Map<String, Object> certVerifyReqMap = new HashMap<>();
             certVerifyReqMap.put(JsonKeys.REQUEST,composeCertVerifyRequest(request));
             String requestBody = requestMapper.writeValueAsString(certVerifyReqMap);
-            logger.info("CertsServiceImpl:verify:request body prepared:" + requestBody);
+            logger.info("CertsServiceImpl:verify:request body prepared.");
             String apiToCall = CertVars.getSERVICE_BASE_URL().concat(CertVars.getVerifyUri());
             logger.info("CertsServiceImpl:verify:complete url prepared:" + apiToCall);
             Future<HttpResponse<JsonNode>>responseFuture=CertificateUtil.makeAsyncPostCall(apiToCall,requestBody,headerMap);
@@ -263,15 +326,29 @@ public class CertsServiceImpl implements ICertService {
     @Override
     public Response read(Request request) throws BaseException {
         String id=(String)request.getRequest().get(JsonKeys.ID);
-        logger.info("CertServiceImpl:read:idProvided:"+id);
-        Map<String,Object>esCertData=CertificateUtil.getCertificate(id);
-        logger.info("CertServiceImpl:read:esCert data is :"+esCertData);
-        if(MapUtils.isEmpty(esCertData)){
-            throw new BaseException(IResponseMessage.RESOURCE_NOT_FOUND,localizer.getMessage(IResponseMessage.RESOURCE_NOT_FOUND,null), ResponseCode.RESOURCE_NOT_FOUND.getCode());
+        logger.info("CertServiceImpl:read:idProvided: {}",id);
+        Response cassandraResponse = CertificateUtil.getCertRecordByID(id);
+        Response response = new Response();
+        List<Map<String, Object>> resultList = (List<Map<String, Object>>) cassandraResponse.getResult().get(JsonKeys.RESPONSE);
+        if (CollectionUtils.isNotEmpty(resultList) && MapUtils.isNotEmpty(resultList.get(0))) {
+            Map<String, Object> certInfo = resultList.get(0);
+            try {
+                Map<String, Object> data = requestMapper.readValue((String) certInfo.get(JsonKeys.DATA), new TypeReference<Map<String, Object>>() {});
+                Map<String, Object> recipient = requestMapper.readValue((String) certInfo.get(JsonKeys.RECIPIENT), new TypeReference<Map<String, Object>>() {});
+                if (StringUtils.isNotEmpty((String) certInfo.get(JsonKeys.RELATED))) {
+                    Map<String, Object> related = requestMapper.readValue((String) certInfo.get(JsonKeys.RELATED), new TypeReference<Map<String, Object>>() {});
+                    certInfo.put(JsonKeys.RELATED, related);
+                }
+                certInfo.put(JsonKeys.DATA, data);
+                certInfo.put(JsonKeys.RECIPIENT, recipient);
+                response.put(JsonKeys.RESPONSE, certInfo);
+            } catch (Exception e) {
+                logger.error("CertsServiceImpl:read:exception occurred: {}", e.getMessage());
+                throw new BaseException(IResponseMessage.INTERNAL_ERROR, getLocalizedMessage(IResponseMessage.INTERNAL_ERROR, null), ResponseCode.SERVER_ERROR.getCode());
+            }
+        } else {
+            throw new BaseException(IResponseMessage.RESOURCE_NOT_FOUND, localizer.getMessage(IResponseMessage.RESOURCE_NOT_FOUND, null), ResponseCode.RESOURCE_NOT_FOUND.getCode());
         }
-        Certificate certificate=getCertObject(esCertData);
-        Response response=new Response();
-        response.put(JsonKeys.RESPONSE,certificate);
         return response;
     }
 
@@ -298,7 +375,7 @@ public class CertsServiceImpl implements ICertService {
         Response response = new Response();
         try {
             String requestBody = requestMapper.writeValueAsString(request.getRequest());
-            logger.info("CertsServiceImpl:search:request body found:" + requestBody);
+            logger.info("CertsServiceImpl:search:request body found.");
             String apiToCall = CertVars.getEsSearchUri();
             logger.info("CertsServiceImpl:search:complete url found:" + apiToCall);
             Future<HttpResponse<JsonNode>> responseFuture = CertificateUtil.makeAsyncPostCall(apiToCall, requestBody, headerMap);
