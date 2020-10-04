@@ -1,6 +1,7 @@
 package org.sunbird.service;
 
 
+import akka.actor.ActorRef;
 import org.sunbird.BaseException;
 import org.sunbird.request.Request;
 import org.sunbird.response.Response;
@@ -12,9 +13,9 @@ import org.sunbird.response.Response;
  */
 public interface ICertService{
 
-    Response delete(Request request) throws BaseException;
+    Response delete(Request request, ActorRef certBackgroundActorRef) throws BaseException;
 
-    String add(Request request) throws BaseException;
+    String add(Request request, ActorRef certBackgroundActorRef) throws BaseException;
 
     Response  validate(Request request) throws BaseException;
 

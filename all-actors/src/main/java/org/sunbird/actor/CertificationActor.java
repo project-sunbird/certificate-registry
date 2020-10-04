@@ -1,25 +1,24 @@
 package org.sunbird.actor;
 
+import akka.actor.ActorRef;
 import org.sunbird.BaseActor;
 import org.sunbird.BaseException;
-import org.sunbird.BaseLogger;
 import org.sunbird.JsonKeys;
-import org.sunbird.actor.core.ActorConfig;
 import org.sunbird.request.Request;
 import org.sunbird.response.Response;
 import org.sunbird.service.ICertService;
 import org.sunbird.serviceimpl.CertsServiceImpl;
 
-import java.util.HashMap;
-import java.util.Map;
+import javax.inject.Inject;
+import javax.inject.Named;
 
-@ActorConfig(
-        tasks = {"add","validate","download","generate","verify","search","read", "addV2", "downloadV2"},
-        dispatcher = "",
-        asyncTasks = {}
-)
 public class CertificationActor extends BaseActor {
     private ICertService certService = getCertServiceImpl();
+
+    @Inject
+    @Named("certificate_background_actor")
+    private ActorRef certBackgroundActorRef;
+
 
     private ICertService getCertServiceImpl(){
         return new CertsServiceImpl();
@@ -63,7 +62,7 @@ public class CertificationActor extends BaseActor {
     }
 
     private void add(Request request) throws BaseException {
-        String id = certService.add(request);
+        String id = certService.add(request, certBackgroundActorRef);
         Response response = new Response();
         response.put(JsonKeys.ID, id);
         sender().tell(response, self());

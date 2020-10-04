@@ -90,7 +90,7 @@ public class CertificationActorTest {
         when(CertificateUtil.isIdPresent(Mockito.anyString())).thenReturn(false);
         CertsServiceImpl certsService = PowerMockito.mock(CertsServiceImpl.class);
         PowerMockito.whenNew(CertsServiceImpl.class).withNoArguments().thenReturn(certsService);
-        when(certsService.add(Mockito.any(Request.class))).thenReturn("id");
+        when(certsService.add(Mockito.any(Request.class), Mockito.any(ActorRef.class))).thenReturn("id");
 
         when(certsService.validate(Mockito.any(Request.class))).thenReturn(getValidateCertResponse());
         Map<String,Object> map = new HashMap<>();
