@@ -24,10 +24,10 @@ import org.sunbird.request.Request;
 import org.sunbird.request.RequestParams;
 import org.sunbird.response.Response;
 
-import javax.inject.Inject;
-import javax.inject.Named;
 import java.sql.Timestamp;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
 import java.util.concurrent.Future;
 
 
@@ -42,9 +42,6 @@ public class CertificateUtil {
     private static ObjectMapper mapper = new ObjectMapper();
     private static Localizer localizer = Localizer.getInstance();
 
-    @Inject
-    @Named("certificate_background_actor")
-    private ActorRef certBackgroundActorRe;
 
     private CertificateUtil(){}
 

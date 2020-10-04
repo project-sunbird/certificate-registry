@@ -36,7 +36,6 @@
         <module>cassandra-utils</module>
         <module>sb-es-utils</module>
         <module>all-actors</module>
-        <module>sb-actor</module>
         <module>service</module>
     </modules>
 </project>
