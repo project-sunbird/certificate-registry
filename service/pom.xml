@@ -24,6 +24,12 @@
     </pluginRepositories>
     <dependencies>
         <dependency>
+            <groupId>com.typesafe.play</groupId>
+            <artifactId>play-netty-server_${scala.major.version}</artifactId>
+            <version>${play2.version}</version>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
             <version>${jackson.version}</version>
@@ -56,12 +62,6 @@
             <groupId>com.typesafe.play</groupId>
             <artifactId>play-guice_${scala.major.version}</artifactId>
             <version>${play2.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.typesafe.play</groupId>
-            <artifactId>play-netty-server_${scala.major.version}</artifactId>
-            <version>${play2.version}</version>
-            <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>javax.ws.rs</groupId>
