@@ -26,7 +26,7 @@ import java.util.Map;
 import static play.inject.Bindings.bind;
 
 @RunWith(PowerMockRunner.class)
-@PowerMockIgnore({"javax.management.*", "javax.net.ssl.*", "javax.security.*"})
+@PowerMockIgnore({"javax.management.*", "javax.net.ssl.*", "javax.security.*", "jdk.internal.reflect.*"})
 public abstract class BaseApplicationTest {
   protected Application application;
 

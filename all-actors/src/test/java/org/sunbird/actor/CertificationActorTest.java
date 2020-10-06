@@ -64,7 +64,7 @@ import static org.powermock.api.mockito.PowerMockito.when;
         CertVars.class,
         IOUtils.class,
         URL.class})
-@PowerMockIgnore("javax.management.*")
+@PowerMockIgnore({"javax.management.*", "jdk.internal.reflect.*"})
 public class CertificationActorTest {
 
 
