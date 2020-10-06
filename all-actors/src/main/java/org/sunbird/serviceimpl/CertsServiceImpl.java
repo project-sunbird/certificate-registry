@@ -1,5 +1,6 @@
 package org.sunbird.serviceimpl;
 
+import akka.actor.ActorRef;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mashape.unirest.http.HttpResponse;
@@ -50,11 +51,11 @@ public class CertsServiceImpl implements ICertService {
     }
 
     @Override
-    public Response delete(Request request) throws BaseException {
+    public Response delete(Request request, ActorRef certBackgroundActorRef) throws BaseException {
         Map<String, Object> certAddReqMap = request.getRequest();
         Response response = new Response();
         if(StringUtils.isNotBlank((String)certAddReqMap.get(JsonKeys.OLD_ID))){
-            boolean bool = CertificateUtil.deleteRecord((String)certAddReqMap.get(JsonKeys.OLD_ID));
+            boolean bool = CertificateUtil.deleteRecord((String)certAddReqMap.get(JsonKeys.OLD_ID), certBackgroundActorRef);
             response.getResult().put(JsonKeys.RESPONSE,bool);
             logger.info("CertsServiceImpl:delete Deleted the record from cert_registry table for id "+certAddReqMap.get(JsonKeys.OLD_ID));
         }
@@ -62,21 +63,21 @@ public class CertsServiceImpl implements ICertService {
     }
 
     @Override
-    public String add(Request request) throws BaseException {
+    public String add(Request request, ActorRef certBackgroundActorRef) throws BaseException {
         Map<String,Object> reqMap = request.getRequest();
         if(isPresentRecipientIdAndCertId(request)){
             validateCertAndRecipientId(reqMap);
-            deleteOldCertificate((String) reqMap.get(JsonKeys.OLD_ID));
+            deleteOldCertificate((String) reqMap.get(JsonKeys.OLD_ID),certBackgroundActorRef);
         }
         Map<String, Object> certAddReqMap = request.getRequest();
         assureUniqueCertId((String) certAddReqMap.get(JsonKeys.ID));
-        processRecord(certAddReqMap,(String) request.getContext().get(JsonKeys.VERSION));
+        processRecord(certAddReqMap,(String) request.getContext().get(JsonKeys.VERSION), certBackgroundActorRef);
         logger.info("CertsServiceImpl:add:record successfully processed with request:"+certAddReqMap.get(JsonKeys.ID));
         return (String)certAddReqMap.get(JsonKeys.ID);
     }
 
-    private void deleteOldCertificate(String oldCertId) throws BaseException {
-        CertificateUtil.deleteRecord(oldCertId);
+    private void deleteOldCertificate(String oldCertId, ActorRef certBackgroundActorRef) throws BaseException {
+        CertificateUtil.deleteRecord(oldCertId, certBackgroundActorRef);
     }
 
     private void validateCertAndRecipientId(Map<String,Object> reqMap) throws BaseException {
@@ -117,13 +118,13 @@ public class CertsServiceImpl implements ICertService {
     }
 
 
-    private Response processRecord(Map<String, Object> certReqAddMap, String version) throws BaseException {
+    private Response processRecord(Map<String, Object> certReqAddMap, String version, ActorRef certBackgroundActorRef) throws BaseException {
         Certificate certificate=getCertificate(certReqAddMap);
         if(version.equalsIgnoreCase(JsonKeys.VERSION_1)) {
             certificate.setPdfUrl((String)certReqAddMap.get(JsonKeys.PDF_URL));
         }
         Map<String,Object>recordMap= requestMapper.convertValue(certificate,Map.class);
-        return CertificateUtil.insertRecord(recordMap);
+        return CertificateUtil.insertRecord(recordMap, certBackgroundActorRef);
     }
     private Certificate getCertificate(Map<String, Object> certReqAddMap) {
         Certificate certificate = new Certificate.Builder()

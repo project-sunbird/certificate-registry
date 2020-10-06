@@ -10,7 +10,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.sunbird.Application;
 import org.sunbird.BaseException;
 import org.sunbird.message.IResponseMessage;
 import org.sunbird.message.Localizer;
@@ -83,10 +82,6 @@ public class BaseController extends Controller {
         logger.info("Method call ended.");
     }
 
-    protected ActorRef getActorRef(String operation) throws BaseException {
-        return Application.getInstance().getActorRef(operation);
-    }
-
     /**
      * this method will take play.mv.http request and a validation function and
      * lastly operation(Actor operation) this method is validating the request and ,
@@ -99,7 +94,7 @@ public class BaseController extends Controller {
      * @param operation
      * @return
      */
-    public CompletionStage<Result> handleRequest(play.mvc.Http.Request req, RequestValidatorFunction validatorFunction,
+    public CompletionStage<Result> handleRequest(ActorRef actorRef, play.mvc.Http.Request req, RequestValidatorFunction validatorFunction,
                                                  String operation) {
         try {
             Request request = new Request();
@@ -109,7 +104,7 @@ public class BaseController extends Controller {
             if (validatorFunction != null) {
                 validatorFunction.apply(request);
             }
-            return new RequestHandler().handleRequest(request, operation,req);
+            return new RequestHandler().handleRequest(request, actorRef, operation, req);
         } catch (Exception ex) {
             return CompletableFuture.supplyAsync(() -> {
                 return RequestHandler.handleFailureResponse(ex,req);

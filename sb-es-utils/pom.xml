@@ -53,7 +53,7 @@
 		</dependency>
 		<dependency>
 		<groupId>com.typesafe.akka</groupId>
-		<artifactId>akka-actor_2.12</artifactId>
+		<artifactId>akka-actor_${scala.major.version}</artifactId>
 		<version>${akka.x.version}</version>
 		<scope>compile</scope>
 	</dependency>
