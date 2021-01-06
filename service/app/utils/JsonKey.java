@@ -28,6 +28,9 @@ public interface JsonKey {
   String ATTRIBUTE = "attribute";
   String ERRORS = "errors";
   String SUCCESS = "success";
-
+  String REQUESTED_FOR = "requestedFor";
+  String USER_ID = "user_id";
+  String X_AUTH_TOKEN = "X_AUTH_TOKEN";
+  String REQUESTED_BY = "requestedBy";
 
 }

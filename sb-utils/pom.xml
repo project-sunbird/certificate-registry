@@ -12,6 +12,10 @@
     <artifactId>sb-utils</artifactId>
     <version>1.0.0-SNAPSHOT</version>
 
+    <properties>
+        <learner.akka.version>2.5.19</learner.akka.version>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>org.reflections</groupId>
@@ -48,6 +52,16 @@
             <artifactId>powermock-api-mockito</artifactId>
             <version>${powermock.version}</version>
             <!--<scope>test</scope>-->
+        </dependency>
+        <dependency>
+            <groupId>com.typesafe.akka</groupId>
+            <artifactId>akka-slf4j_2.11</artifactId>
+            <version>${learner.akka.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>net.logstash.logback</groupId>
+            <artifactId>logstash-logback-encoder</artifactId>
+            <version>6.3</version>
         </dependency>
     </dependencies>
     <build>

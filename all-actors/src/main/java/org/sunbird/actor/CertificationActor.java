@@ -26,7 +26,7 @@ public class CertificationActor extends BaseActor {
 
     @Override
     public void onReceive(Request request) throws BaseException {
-        logger.info("CertificationActor:onReceive:request arrived with operation" + request.getOperation());
+        logger.info(request.getRequestContext(), "CertificationActor:onReceive:request arrived with operation" + request.getOperation());
         String operation = request.getOperation();
         switch (operation) {
             case "add" :
@@ -57,7 +57,7 @@ public class CertificationActor extends BaseActor {
                 downloadV2(request);
                 break;
             default:
-                onReceiveUnsupportedMessage("CertificationActor");
+                onReceiveUnsupportedMessage(request.getRequestContext(), "CertificationActor");
         }
     }
 
