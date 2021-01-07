@@ -108,11 +108,6 @@ public class BaseController extends Controller {
             if (req.body() != null && req.body().asJson() != null) {
                 request = (Request) RequestMapper.mapRequest(req, Request.class);
                 request.setRequestContext(getRequestContext(req, operation));
-                request.getContext().put(JsonKey.REQUESTED_BY, req.attrs().getOptional(Attrs.USER_ID).orElse(null));
-                if (StringUtils.isNotBlank(req.attrs().getOptional(Attrs.REQUESTED_FOR).orElse(null)))
-                    request.getContext().put(JsonKey.REQUESTED_FOR, req.attrs().get(Attrs.REQUESTED_FOR));
-                request.getContext().put(JsonKey.X_AUTH_TOKEN, req.attrs().getOptional(Attrs.X_AUTH_TOKEN).orElse(""));
-
             }
             if (validatorFunction != null) {
                 validatorFunction.apply(request);
