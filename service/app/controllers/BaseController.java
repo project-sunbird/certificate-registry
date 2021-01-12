@@ -22,6 +22,7 @@ import org.sunbird.response.Response;
 
 import play.libs.Json;
 import play.libs.concurrent.HttpExecutionContext;
+import play.libs.typedmap.TypedKey;
 import play.mvc.Controller;
 import play.mvc.Http;
 import play.mvc.Result;
@@ -130,7 +131,7 @@ public class BaseController extends Controller {
     }
 
     private RequestContext getRequestContext(Http.Request httpRequest, String actorOperation) {
-        RequestContext requestContext = new RequestContext(httpRequest.attrs().getOptional(Attrs.USER_ID).orElse(null),
+        RequestContext requestContext = new RequestContext(httpRequest.attrs().getOptional(TypedKey.<String>create(JsonKey.USER_ID)).orElse(null),
                 httpRequest.header("x-device-id").orElse(null), httpRequest.header("x-session-id").orElse(null),
                 httpRequest.header("x-app-id").orElse(null), httpRequest.header("x-app-ver").orElse(null),
                 httpRequest.header("x-trace-id").orElse(UUID.randomUUID().toString()),
