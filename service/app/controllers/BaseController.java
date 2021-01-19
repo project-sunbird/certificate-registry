@@ -130,7 +130,7 @@ public class BaseController extends Controller {
     }
 
     private RequestContext getRequestContext(Http.Request httpRequest, String actorOperation) {
-        RequestContext requestContext = new RequestContext(httpRequest.attrs().getOptional(TypedKey.<String>create(JsonKey.USER_ID)).orElse(null),
+        RequestContext requestContext = new RequestContext(httpRequest.attrs().getOptional(TypedKey.<String>create("user_id")).orElse(null),
                 httpRequest.header("x-device-id").orElse(null), httpRequest.header("x-session-id").orElse(null),
                 httpRequest.header("x-app-id").orElse(null), httpRequest.header("x-app-ver").orElse(null),
                 httpRequest.header("x-trace-id").orElse(UUID.randomUUID().toString()),
