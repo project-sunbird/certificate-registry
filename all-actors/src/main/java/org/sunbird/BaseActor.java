@@ -1,8 +1,6 @@
 package org.sunbird;
 
 import akka.actor.UntypedAbstractActor;
-import akka.event.DiagnosticLoggingAdapter;
-import akka.event.Logging;
 import org.sunbird.message.IResponseMessage;
 import org.sunbird.message.Localizer;
 import org.sunbird.message.ResponseCode;
@@ -18,7 +16,7 @@ import java.util.Map;
  * @author Amit Kumar
  */
 public abstract class BaseActor extends UntypedAbstractActor {
-    public final DiagnosticLoggingAdapter logger = Logging.getLogger(this);
+    public LoggerUtil logger = new LoggerUtil(this.getClass());
     public abstract void onReceive(Request request) throws Throwable;
     protected Localizer localizer = Localizer.getInstance();
 
@@ -32,24 +30,19 @@ public abstract class BaseActor extends UntypedAbstractActor {
                 ArrayList<String> requestIds =
                         (ArrayList<String>) request.getHeaders().get(JsonKeys.REQUEST_MESSAGE_ID);
                 trace.put(JsonKeys.REQUEST_MESSAGE_ID, requestIds.get(0));
-                logger.setMDC(trace);
-                // set mdc for non actors
-                new BaseLogger().setReqId(logger.getMDC());
             }
             String operation = request.getOperation();
-            logger.info("onReceive called for operation: {}", operation);
+            logger.info(request.getRequestContext(), "onReceive called for operation: {}", operation);
             try {
-                logger.info("onReceive:method {} started at {}", operation, System.currentTimeMillis());
+                logger.info(request.getRequestContext(), "onReceive:method {} started at {}", operation);
                 onReceive(request);
-                logger.info("onReceive:method {} ended at {}", operation, System.currentTimeMillis());
+                logger.info(request.getRequestContext(), "onReceive:method {} ended at {}", operation);
             } catch (Exception e) {
-                logger.error("Exception : operation {} : message : {} {}", operation, e.getMessage(), e);
-                onReceiveException(operation, e);
-            } finally {
-                logger.clearMDC();
+                logger.error(request.getRequestContext(), e.getMessage(), e);
+                onReceiveException(request, operation, e);
             }
         } else {
-            logger.info("onReceive called with invalid type of request.");
+            logger.info(null, "onReceive called with invalid type of request.");
         }
     }
 
@@ -59,8 +52,8 @@ public abstract class BaseActor extends UntypedAbstractActor {
      * @param exception
      * @throws Exception
      */
-    protected void onReceiveException(String callerName, Exception exception) throws Exception {
-        logger.error("Exception in message processing for: " + callerName + " :: message: " + exception.getMessage(), exception);
+    protected void onReceiveException(Request request, String callerName, Exception exception) throws Exception {
+        logger.error(request.getRequestContext(), "Exception in message processing for: " + callerName + " :: message: " + exception.getMessage(), exception);
         sender().tell(exception, self());
     }
 
@@ -69,8 +62,8 @@ public abstract class BaseActor extends UntypedAbstractActor {
      * this message will handle the unsupported actor operation
      * @param callerName
      */
-    protected void onReceiveUnsupportedMessage(String callerName) {
-        logger.info(callerName + ": unsupported operation");
+    protected void onReceiveUnsupportedMessage(RequestContext requestContext, String callerName) {
+        logger.info(requestContext, callerName + ": unsupported operation");
         /**
          * TODO Need to replace null reference from getLocalized method and replace with requested local.
          */

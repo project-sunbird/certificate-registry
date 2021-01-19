@@ -23,7 +23,7 @@ public class CertBackgroundActor extends BaseActor {
     }
     @Override
     public void onReceive(Request request) throws Throwable {
-        logger.info("CertificationActor:onReceive:request arrived with operation" + request.getOperation());
+        logger.info(request.getRequestContext(), "CertificationActor:onReceive:request arrived with operation" + request.getOperation());
         String operation = request.getOperation();
         switch (operation) {
             case "add_cert_es":
@@ -35,7 +35,7 @@ public class CertBackgroundActor extends BaseActor {
                 break;
 
             default:
-                onReceiveUnsupportedMessage("CertificationActor");
+                onReceiveUnsupportedMessage(request.getRequestContext(), "CertificationActor");
         }
     }
 
@@ -43,9 +43,9 @@ public class CertBackgroundActor extends BaseActor {
         String id = (String) request.getRequest().get(JsonKeys.ID);
         try {
             cassandraOperation.deleteRecord(JsonKeys.SUNBIRD, JsonKeys.CERT_REGISTRY, id);
-            logger.info("Data deleted from cassandra for id " + id);
+            logger.info(request.getRequestContext(), "Data deleted from cassandra for id " + id);
         }catch (Exception ex){
-            logger.error("Exception occurred while deleting data from cert_registry for id : "+id,ex);
+            logger.error(request.getRequestContext(), "Exception occurred while deleting data from cert_registry for id : " + id, ex);
         }
     }
 
@@ -53,6 +53,6 @@ public class CertBackgroundActor extends BaseActor {
     private void add(Request request) {
         Map<String,Object> certAddReqMap = (Map<String, Object>) request.getRequest().get(JsonKeys.REQUEST);
         String id = (String)ElasticSearchHelper.getResponseFromFuture(elasticSearchService.save(JsonKeys.CERT_ALIAS,(String)certAddReqMap.get(JsonKeys.ID),certAddReqMap));
-        logger.info("ES save response for id "+id);
+        logger.info(request.getRequestContext(), "ES save response for id " + id);
     }
 }

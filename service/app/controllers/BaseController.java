@@ -1,5 +1,6 @@
 package controllers;
 
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 import javax.inject.Inject;
@@ -8,9 +9,11 @@ import akka.actor.ActorRef;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sunbird.BaseException;
+import org.sunbird.RequestContext;
 import org.sunbird.message.IResponseMessage;
 import org.sunbird.message.Localizer;
 import org.sunbird.message.ResponseCode;
@@ -19,9 +22,12 @@ import org.sunbird.response.Response;
 
 import play.libs.Json;
 import play.libs.concurrent.HttpExecutionContext;
+import play.libs.typedmap.TypedKey;
 import play.mvc.Controller;
+import play.mvc.Http;
 import play.mvc.Result;
 import play.mvc.Results;
+import utils.JsonKey;
 import utils.RequestMapper;
 import utils.RequestValidatorFunction;
 import utils.module.SignalHandler;
@@ -39,6 +45,7 @@ import utils.module.SignalHandler;
  */
 public class BaseController extends Controller {
     Logger logger = LoggerFactory.getLogger(BaseController.class);
+    private static final String debugEnabled = "false";
 
     @Inject
     SignalHandler signalHandler;
@@ -100,6 +107,7 @@ public class BaseController extends Controller {
             Request request = new Request();
             if (req.body() != null && req.body().asJson() != null) {
                 request = (Request) RequestMapper.mapRequest(req, Request.class);
+                request.setRequestContext(getRequestContext(req, operation));
             }
             if (validatorFunction != null) {
                 validatorFunction.apply(request);
@@ -119,5 +127,15 @@ public class BaseController extends Controller {
                             + ", So play server will not allow any new request.");
             throw new BaseException(IResponseMessage.SERVICE_UNAVAILABLE, IResponseMessage.SERVICE_UNAVAILABLE, ResponseCode.SERVICE_UNAVAILABLE.getCode());
         }
+    }
+
+    private RequestContext getRequestContext(Http.Request httpRequest, String actorOperation) {
+        RequestContext requestContext = new RequestContext(httpRequest.attrs().getOptional(TypedKey.<String>create("user_id")).orElse(null),
+                httpRequest.header("x-device-id").orElse(null), httpRequest.header("x-session-id").orElse(null),
+                httpRequest.header("x-app-id").orElse(null), httpRequest.header("x-app-ver").orElse(null),
+                httpRequest.header("x-trace-id").orElse(UUID.randomUUID().toString()),
+                (httpRequest.header("x-trace-enabled").isPresent() ? httpRequest.header("x-trace-enabled").orElse(debugEnabled): debugEnabled),
+                actorOperation);
+        return requestContext;
     }
 }
