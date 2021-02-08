@@ -13,10 +13,12 @@ public class LoggerUtil {
     }
 
     public void info(RequestContext requestContext, String message, Object data) {
-        if (null != requestContext)
-            logger.info(Markers.appendEntries(requestContext.getContextMap()), message, data);
-        else
-            logger.info(message, data);
+        if (null != requestContext){
+            System.out.println("Info If" + message);
+            logger.info(Markers.appendEntries(requestContext.getContextMap()), message, data);}
+        else{
+            System.out.println("Info Else" + message);
+            logger.info(message, data);}
     }
 
     public void info(RequestContext requestContext, String message) {
