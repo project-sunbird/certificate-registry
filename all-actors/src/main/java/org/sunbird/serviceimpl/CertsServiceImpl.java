@@ -234,7 +234,7 @@ public class CertsServiceImpl implements ICertService {
                 } else {
                     Request req = new Request();
                     req.put(JsonKeys.PDF_URL,certInfo.get(JsonKeys.JSON_URL));
-                    logger.info(request.getRequestContext(), "getJsonSignedUrl: getting signedUrl for the json url {}", certInfo.get(JsonKeys.JSON_URL));
+                    logger.info(request.getRequestContext(), "getJsonSignedUrl: getting signedUrl for the json url " + certInfo.get(JsonKeys.JSON_URL));
                     Response downloadRes = download(req);
                     String signedJsonUrl = (String) downloadRes.getResult().get(JsonKeys.SIGNED_URL);
                     printUri = getPrintUri(signedJsonUrl);
@@ -326,7 +326,7 @@ public class CertsServiceImpl implements ICertService {
     @Override
     public Response read(Request request) throws BaseException {
         String id=(String)request.getRequest().get(JsonKeys.ID);
-        logger.info(request.getRequestContext(), "CertServiceImpl:read:idProvided: {}",id);
+        logger.info(request.getRequestContext(), "CertServiceImpl:read:idProvided: " + id);
         Response cassandraResponse = CertificateUtil.getCertRecordByID(id);
         Response response = new Response();
         List<Map<String, Object>> resultList = (List<Map<String, Object>>) cassandraResponse.getResult().get(JsonKeys.RESPONSE);

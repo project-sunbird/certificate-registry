@@ -32,11 +32,11 @@ public abstract class BaseActor extends UntypedAbstractActor {
                 trace.put(JsonKeys.REQUEST_MESSAGE_ID, requestIds.get(0));
             }
             String operation = request.getOperation();
-            logger.info(request.getRequestContext(), "onReceive called for operation: {}", operation);
+            logger.info(request.getRequestContext(), "onReceive called for operation: " + operation);
             try {
-                logger.info(request.getRequestContext(), "onReceive:method {} started at {}", operation);
+                logger.info(request.getRequestContext(), "onReceive:method for operation " + operation +" started at " + System.currentTimeMillis());
                 onReceive(request);
-                logger.info(request.getRequestContext(), "onReceive:method {} ended at {}", operation);
+                logger.info(request.getRequestContext(), "onReceive:method for operation " + operation + " ended at " + System.currentTimeMillis());
             } catch (Exception e) {
                 logger.error(request.getRequestContext(), e.getMessage(), e);
                 onReceiveException(request, operation, e);
