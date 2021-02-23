@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.apache.commons.lang3.StringUtils;
 import org.sunbird.ActorServiceException;
 import org.sunbird.BaseException;
+import org.sunbird.RequestContext;
 import org.sunbird.message.IResponseMessage;
 import org.sunbird.message.Localizer;
 import org.sunbird.message.ResponseCode;
@@ -23,6 +24,9 @@ public class Request implements Serializable {
   private static final int WAIT_TIME_VALUE = 30;
 
   protected Map<String, Object> context;
+
+  private RequestContext requestContext;
+
   private String id;
   private String ver;
   private String ts;
@@ -51,6 +55,12 @@ public class Request implements Serializable {
     if (StringUtils.isBlank(this.params.getMsgid()) && !StringUtils.isBlank(requestId))
       this.params.setMsgid(requestId);
     this.context.putAll(request.getContext());
+  }
+
+  public Request(RequestContext requestContext) {
+    this.context = new WeakHashMap<>();
+    this.params = new RequestParams();
+    this.requestContext = requestContext;
   }
 
   public String getRequestId() {
@@ -181,4 +191,13 @@ public class Request implements Serializable {
     }
     this.timeout = timeout;
   }
+
+  public RequestContext getRequestContext() {
+    return requestContext;
+  }
+
+  public void setRequestContext(RequestContext requestContext) {
+    this.requestContext = requestContext;
+  }
+
 }

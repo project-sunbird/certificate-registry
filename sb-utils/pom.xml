@@ -12,6 +12,10 @@
     <artifactId>sb-utils</artifactId>
     <version>1.0.0-SNAPSHOT</version>
 
+    <properties>
+        <cert.akka.version>2.5.19</cert.akka.version>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>org.reflections</groupId>
@@ -49,6 +53,27 @@
             <version>${powermock.version}</version>
             <!--<scope>test</scope>-->
         </dependency>
+        <dependency>
+            <groupId>com.typesafe.akka</groupId>
+            <artifactId>akka-slf4j_2.11</artifactId>
+            <version>${cert.akka.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>net.logstash.logback</groupId>
+            <artifactId>logstash-logback-encoder</artifactId>
+            <version>6.3</version>
+        </dependency>
+        <dependency>
+            <groupId>ch.qos.logback.contrib</groupId>
+            <artifactId>logback-json-classic</artifactId>
+            <version>0.1.5</version>
+        </dependency>
+        <dependency>
+            <groupId>ch.qos.logback.contrib</groupId>
+            <artifactId>logback-jackson</artifactId>
+            <version>0.1.5</version>
+        </dependency>
+
     </dependencies>
     <build>
         <plugins>

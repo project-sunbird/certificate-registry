@@ -28,6 +28,14 @@ public interface JsonKey {
   String ATTRIBUTE = "attribute";
   String ERRORS = "errors";
   String SUCCESS = "success";
-
+  String SERVICE_NAME = "certificate-registry";
+  String PRODUCER_NAME = "org.sunbird.certificate-registry";
+  String ENV = "certificate-registry";
+  String PID = "certificate-registry";
+  String P_VERSION = "1.0";
+  String ACTOR_TYPE = "API";
+  String X_DEVICE_ID = "x-device-id";
+  String X_SESSION_ID = "x-session-id";
+  String X_TRACE_ID = "x-trace-id";
 
 }

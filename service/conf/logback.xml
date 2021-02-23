@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <configuration>
 
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
@@ -32,6 +31,49 @@
         <neverBlock>true</neverBlock>
         <appender-ref ref="FILE"/>
     </appender>
+
+    <appender name="defaultLoggerAppender" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder class="net.logstash.logback.encoder.LogstashEncoder">
+            <layout class="net.logstash.logback.layout.LogstashLayout">
+                <fieldNames>
+                    <timestamp>timestamp</timestamp>
+                    <message>msg</message>
+                    <logger>lname</logger>
+                    <thread>tname</thread>
+                    <levelValue>[ignore]</levelValue>
+                    <version>[ignore]</version>
+                    <stack_trace>exception</stack_trace>
+                </fieldNames>
+                <throwableConverter class="net.logstash.logback.stacktrace.ShortenedThrowableConverter">
+                    <maxDepthPerThrowable>30</maxDepthPerThrowable>
+                    <maxLength>2048</maxLength>
+                    <exclude>sun\.reflect\..*\.invoke.*</exclude>
+                    <rootCauseFirst>true</rootCauseFirst>
+                    <inlineHash>true</inlineHash>
+                </throwableConverter>
+            </layout>
+        </encoder>
+    </appender>
+
+    <appender name="customLoggerAppender" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder"/>
+    </appender>
+
+    <logger name="org.sunbird" level="INFO">
+        <appender-ref ref="customLoggerAppender"/>
+    </logger>
+
+    <logger name="org.sunbird" level="DEBUG">
+        <appender-ref ref="customLoggerAppender"/>
+    </logger>
+
+    <logger name="org.sunbird" level="WARN">
+        <appender-ref ref="customLoggerAppender"/>
+    </logger>
+
+    <logger name="org.sunbird" level="ERROR">
+        <appender-ref ref="customLoggerAppender"/>
+    </logger>
 
     <root level="INFO">
         <appender-ref ref="STDOUT"/>
